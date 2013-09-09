@@ -6,9 +6,7 @@
 <script type="text/javascript" src="../lib/d3.v3.min.js"></script>
 <script type="text/javascript" src="../js/fields.js"></script>
 <script type="text/javascript">
-var start = Date.now()
 d3.csv('../data/FOI For Project Search SAMPLE.csv', function(error, rows) {
-  console.log(error);
   var fieldNames = [];
   for(var fieldName in TSB.Fields) {
     fieldNames.push(fieldName);
