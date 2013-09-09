@@ -4,11 +4,17 @@
 <meta charset="UTF-8">
 <title>TSB Data Viz</title>
 <script type="text/javascript" src="../lib/d3.v3.min.js"></script>
+<script type="text/javascript" src="../js/fields.js"></script>
 <script type="text/javascript">
 var start = Date.now()
 d3.csv('../data/FOI For Project Search SAMPLE.csv', function(error, rows) {
-  console.log((Date.now() - start)/1000);
+  console.log(error);
   console.log(rows[0]);
+  var row = rows[0];
+  for(var fieldName in row) {
+    if (!TSB.Fields[fieldName])
+      console.log(fieldName)
+  }
 });
 </script>
 </head>
