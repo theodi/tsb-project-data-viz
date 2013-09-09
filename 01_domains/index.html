@@ -3,6 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <title>TSB Data Viz</title>
+<style type="text/css">
+@font-face { font-family: Abel; src: url('../assets/fonts/Abel/Abel-Regular.ttf'); }
+@font-face { font-family: Marvel; font-weight: bold; src: url('../assets/fonts/Marvel/Marvel-Bold.ttf'); }
+
+body {
+  font-family: Marvel, sans-serif;
+  margin: 1em;
+}
+
+h2.section {
+  font-size: 350%;
+  border-bottom: 1px solid #DDDDDD;
+  margin-bottom: 0.5em;
+  font-weight: bold;
+}
+
+#charts {
+  margin-top: 2em;
+}
+
+#charts svg {
+  margin-right: 1em;
+  margin-bottom: 2em;
+}
+
+text.label {
+  font-size: 90%;
+  text-anchor: end;
+}
+
+text.value {
+  font-size: 90%;
+  text-anchor: start;
+}
+
+text.title {
+  font-size: 180%;
+  text-anchor: start;
+}
+
+</style>
 <script type="text/javascript" src="../lib/d3.v3.min.js"></script>
 <script type="text/javascript" src="../js/fields.js"></script>
 <script type="text/javascript">
@@ -16,7 +57,7 @@ function countValues(values) {
   var countedValues = [];
   values.forEach(function(value) {
     if (!uniqueValues[value]) {
-      var valueInfo = { value : value, count : 0 };
+      var valueInfo = { name : value, count : 0 };
       uniqueValues[value] = valueInfo;
       countedValues.push(valueInfo);
     }
@@ -24,6 +65,60 @@ function countValues(values) {
   });
   countedValues.sort(sortByDecreasingCount);
   return countedValues;
+}
+
+function buildBarChart(title, data, maxValue, barRatio) {
+  maxValue = maxValue || 100;
+  barRatio = barRatio || 0.5;
+  var w = 300;
+  var h = 410;
+  var svg = d3.select("#charts")
+              .append("svg")
+              .attr("width", w)
+              .attr("height", h);
+
+  svg.selectAll("rect")
+    .data(data)
+    .enter()
+    .append("rect")
+    .attr("fill", "#00EDBA")
+    .attr("x", w*(1-barRatio) - 20)
+    .attr("y", function(d, i) { return 50 + i * 17; })
+    .attr("width", function(d, i) { return d.count / maxValue * w*barRatio; })
+    .attr("height", 16);
+
+  svg.selectAll("text.label")
+    .data(data)
+    .enter()
+    .append("text")
+    .attr("fill", "#000000")
+    .attr("class", "label")
+    .attr("x", w*(1-barRatio) - 25)
+    .attr("y", function(d, i) { return 64 + i * 17; })
+    .text(function(d) { return d.name; })
+
+  svg.selectAll("text.value")
+    .data(data)
+    .enter()
+    .append("text")
+    .attr("class", "value")
+    .attr("fill", "#000000")
+    .attr("x", function(d) { return w*(1-barRatio) - 17 + d.count / maxValue * w*barRatio })
+    .attr("y", function(d, i) { return 64 + i * 17; })
+    .text(function(d) { return d.count; })
+
+
+  svg.append("text")
+    .attr("fill", "#000000")
+    .attr("class", "title")
+    .attr("x", 0)
+    .attr("y", 30)
+    .text(title)
+
+  svg.append("line")
+    .attr("stroke", "#DDD")
+    .attr("x1", 0).attr("x2", w)
+    .attr("y1", 40.5).attr("y2", 40.5)
 }
 
 d3.csv('../data/FOI For Project Search SAMPLE.csv', function(error, rows) {
@@ -34,13 +129,15 @@ d3.csv('../data/FOI For Project Search SAMPLE.csv', function(error, rows) {
   fieldNames.forEach(function(fieldName) {
     var values = rows.map(function(row) { return row[fieldName] });
     var countedValues = countValues(values);
-    if (countedValues.length < 50) {
+    if (countedValues.length < 50 && countedValues.length > 1) {
       console.log(fieldName, countedValues);
+      buildBarChart(fieldName, countedValues, countedValues[0].count);
     }
   });
 });
 </script>
 </head>
 <body>
+  <div id="charts"></div>
 </body>
 </html>
