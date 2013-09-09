@@ -9,12 +9,14 @@
 var start = Date.now()
 d3.csv('../data/FOI For Project Search SAMPLE.csv', function(error, rows) {
   console.log(error);
-  console.log(rows[0]);
-  var row = rows[0];
-  for(var fieldName in row) {
-    if (!TSB.Fields[fieldName])
-      console.log(fieldName)
+  var fieldNames = [];
+  for(var fieldName in TSB.Fields) {
+    fieldNames.push(fieldName);
   }
+  fieldNames.forEach(function(fieldName) {
+    var values = d3.set(rows.map(function(row) { return row[fieldName] }));
+    console.log(fieldName, values.values());
+  });
 });
 </script>
 </head>
