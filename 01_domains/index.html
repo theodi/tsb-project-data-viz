@@ -6,14 +6,37 @@
 <script type="text/javascript" src="../lib/d3.v3.min.js"></script>
 <script type="text/javascript" src="../js/fields.js"></script>
 <script type="text/javascript">
+
+function sortByDecreasingCount(a, b) {
+  return -(a.count - b.count); //decreasing order
+}
+
+function countValues(values) {
+  var uniqueValues = {};
+  var countedValues = [];
+  values.forEach(function(value) {
+    if (!uniqueValues[value]) {
+      var valueInfo = { value : value, count : 0 };
+      uniqueValues[value] = valueInfo;
+      countedValues.push(valueInfo);
+    }
+    uniqueValues[value].count++;
+  });
+  countedValues.sort(sortByDecreasingCount);
+  return countedValues;
+}
+
 d3.csv('../data/FOI For Project Search SAMPLE.csv', function(error, rows) {
   var fieldNames = [];
   for(var fieldName in TSB.Fields) {
     fieldNames.push(fieldName);
   }
   fieldNames.forEach(function(fieldName) {
-    var values = d3.set(rows.map(function(row) { return row[fieldName] }));
-    console.log(fieldName, values.values());
+    var values = rows.map(function(row) { return row[fieldName] });
+    var countedValues = countValues(values);
+    if (countedValues.length < 50) {
+      console.log(fieldName, countedValues);
+    }
   });
 });
 </script>
