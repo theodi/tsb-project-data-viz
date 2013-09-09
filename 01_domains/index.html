@@ -67,9 +67,26 @@ function countValues(values) {
   return countedValues;
 }
 
-function buildBarChart(title, data, maxValue, barRatio) {
-  maxValue = maxValue || 100;
-  barRatio = barRatio || 0.5;
+function buildDummyChart(title, data) {
+  var maxValue = data[0].count;
+  var barRatio = 0.5;
+  var w = 300;
+  var h = 410;
+  var svg = d3.select("#charts")
+              .append("svg")
+              .attr("width", w)
+              .attr("height", h);
+  svg.append("text")
+    .attr("fill", "#000000")
+    .attr("class", "title")
+    .attr("x", 0)
+    .attr("y", 30)
+    .text(title)
+}
+
+function buildBarChart(title, data) {
+  var maxValue = data[0].count;
+  var barRatio = 0.5;
   var w = 300;
   var h = 410;
   var svg = d3.select("#charts")
@@ -123,15 +140,27 @@ function buildBarChart(title, data, maxValue, barRatio) {
 
 d3.csv('../data/FOI For Project Search SAMPLE.csv', function(error, rows) {
   var fieldNames = [];
+  console.log('Loaded ', rows.length, 'rows');
   for(var fieldName in TSB.Fields) {
     fieldNames.push(fieldName);
   }
   fieldNames.forEach(function(fieldName) {
+    var field = TSB.Fields[fieldName];
+    if (!field) {
+      throw 'Field ' + fieldName + ' not found in TSB.Fields!';
+    }
     var values = rows.map(function(row) { return row[fieldName] });
     var countedValues = countValues(values);
-    if (countedValues.length < 50 && countedValues.length > 1) {
-      console.log(fieldName, countedValues);
-      buildBarChart(fieldName, countedValues, countedValues[0].count);
+    if (countedValues.length < 100 && countedValues.length > 1) {
+      if (field.type == 'Text' || field.type) {
+        buildBarChart(fieldName, countedValues);
+      }
+      else {
+        buildDummyChart(fieldName, countedValues);
+      }
+    }
+    else {
+      buildDummyChart(fieldName + ' MANY', countedValues);
     }
   });
 });
