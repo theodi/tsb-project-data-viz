@@ -142,6 +142,32 @@ function buildBarChart(title, data) {
     .attr("y1", 40.5).attr("y2", 40.5)
 }
 
+function buildNumberChart(title, data) {
+  var sum = 0;
+  var count = 0;
+  var min = 0;
+  var max = 0;
+  data.forEach(function(value) {
+    var val = Number(value.name);
+
+    if (isNaN(val)) return;
+
+    sum += val * value.count;
+    count += value.count;
+    if (val > max || !max) max = val;
+    if (val < min || !min) min = val;
+  });
+
+  if (min < 0) min = 0;
+
+  var values = [
+    { name : Math.floor(max) + ' max', count : max },
+    { name : Math.floor(min) + ' min', count : min },
+    { name : Math.floor(sum/count) + ' avg', count : Math.floor(sum/count) }
+  ];
+  buildBarChart(title, values)
+}
+
 d3.csv('../data/FOI For Project Search RAW.csv', function(error, rows) {
   var fieldNames = [];
   console.log('Loaded ', rows.length, 'rows');
@@ -166,6 +192,9 @@ d3.csv('../data/FOI For Project Search RAW.csv', function(error, rows) {
     }
     else if (field.type == 'Number' && (field.unique || countedValues.length == 1)) {
       buildBarChart(fieldName, countedValues);
+    }
+    else if (field.type == 'Number') {
+      buildNumberChart(fieldName, countedValues);
     }
     else {
       buildDummyChart(fieldName, countedValues);
