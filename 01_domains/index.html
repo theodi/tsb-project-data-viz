@@ -81,7 +81,7 @@ function buildDummyChart(title, data) {
     .attr("class", "title")
     .attr("x", 0)
     .attr("y", 30)
-    .text(title)
+    .text(title + ' /' + data.length);
 }
 
 function buildBarChart(title, data) {
@@ -130,7 +130,7 @@ function buildBarChart(title, data) {
     .attr("class", "title")
     .attr("x", 0)
     .attr("y", 30)
-    .text(title)
+    .text(title + ' /' + data.length);
 
   svg.append("line")
     .attr("stroke", "#DDD")
@@ -149,18 +149,13 @@ d3.csv('../data/FOI For Project Search SAMPLE.csv', function(error, rows) {
     if (!field) {
       throw 'Field ' + fieldName + ' not found in TSB.Fields!';
     }
-    var values = rows.map(function(row) { return row[fieldName] });
+    var values = rows.map(function(row) { return row[fieldName] || 'Unknown' });
     var countedValues = countValues(values);
-    if (countedValues.length < 100 && countedValues.length > 1) {
-      if (field.type == 'Text' || field.type) {
-        buildBarChart(fieldName, countedValues);
-      }
-      else {
-        buildDummyChart(fieldName, countedValues);
-      }
+    if (!field.unique && (field.type == 'Text' || field.type == 'Enum' || !field.type)) {
+      buildBarChart(fieldName, countedValues);
     }
     else {
-      buildDummyChart(fieldName + ' MANY', countedValues);
+      buildDummyChart(fieldName, countedValues);
     }
   });
 });
