@@ -84,8 +84,8 @@ function buildDummyChart(title, data) {
     .text(title + ' /' + data.length);
 }
 
-function buildBarChart(title, data) {
-  var maxValue = data[0].count;
+function buildBarChart(title, data, maxCount) {
+  maxValue = maxCount || data[0].count;
   var barRatio = 0.5;
   var w = 300;
   var h = 410;
@@ -180,15 +180,22 @@ d3.csv('../data/FOI For Project Search RAW.csv', function(error, rows) {
       throw 'Field ' + fieldName + ' not found in TSB.Fields!';
     }
     var values;
+    var countedValues;
+    var maxCount;
     if (field.type == 'Date') {
-      values = rows.map(function(row) { return row[fieldName] || 'Unknown' });
+      values = rows.map(function(row) { return row[fieldName].split('/')[2] || 'Unknown' });
+      countedValues = countValues(values);
+      maxCount = countedValues[0].count
+      countedValues.sort(function(a, b) {
+        return -Number(a.name) + Number(b.name);
+      })
     }
     else {
       values = rows.map(function(row) { return row[fieldName] || 'Unknown' });
+      countedValues = countValues(values);
     }
-    var countedValues = countValues(values);
-    if ((field.type == 'Text' || field.type == 'Enum' || !field.type || field.format == 'YYYY')) {
-      buildBarChart(fieldName, countedValues);
+    if ((field.type == 'Date' || field.type == 'Text' || field.type == 'Enum' || !field.type || field.format == 'YYYY')) {
+      buildBarChart(fieldName, countedValues, maxCount);
     }
     else if (field.type == 'Number' && (field.unique || countedValues.length == 1)) {
       buildBarChart(fieldName, countedValues);
