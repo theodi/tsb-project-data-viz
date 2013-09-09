@@ -136,9 +136,6 @@ function buildBarChart(title, data) {
     .attr("y", function(d, i) { return 64 + i * 17; })
     .text(function(d) { return d.count; })
 
-
-  
-
   svg.append("line")
     .attr("stroke", "#DDD")
     .attr("x1", 0).attr("x2", w)
@@ -167,8 +164,11 @@ d3.csv('../data/FOI For Project Search RAW.csv', function(error, rows) {
     if ((field.type == 'Text' || field.type == 'Enum' || !field.type || field.format == 'YYYY')) {
       buildBarChart(fieldName, countedValues);
     }
+    else if (field.type == 'Number' && (field.unique || countedValues.length == 1)) {
+      buildBarChart(fieldName, countedValues);
+    }
     else {
-      buildDummyChart(fieldName + ' : ' + field.type, countedValues);
+      buildDummyChart(fieldName, countedValues);
     }
   });
 });
