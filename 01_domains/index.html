@@ -94,6 +94,18 @@ function buildBarChart(title, data) {
               .attr("width", w)
               .attr("height", h);
 
+  svg.append("text")
+    .attr("fill", "#000000")
+    .attr("class", "title")
+    .attr("x", 0)
+    .attr("y", 30)
+    .text(title + ' /' + data.length);
+
+  if (data.length > 20) {
+    data = data.slice(0, 20);
+    data.push({ name : '...' })
+  }
+
   svg.selectAll("rect")
     .data(data)
     .enter()
@@ -125,12 +137,7 @@ function buildBarChart(title, data) {
     .text(function(d) { return d.count; })
 
 
-  svg.append("text")
-    .attr("fill", "#000000")
-    .attr("class", "title")
-    .attr("x", 0)
-    .attr("y", 30)
-    .text(title + ' /' + data.length);
+  
 
   svg.append("line")
     .attr("stroke", "#DDD")
@@ -138,7 +145,7 @@ function buildBarChart(title, data) {
     .attr("y1", 40.5).attr("y2", 40.5)
 }
 
-d3.csv('../data/FOI For Project Search SAMPLE.csv', function(error, rows) {
+d3.csv('../data/FOI For Project Search RAW.csv', function(error, rows) {
   var fieldNames = [];
   console.log('Loaded ', rows.length, 'rows');
   for(var fieldName in TSB.Fields) {
@@ -149,13 +156,19 @@ d3.csv('../data/FOI For Project Search SAMPLE.csv', function(error, rows) {
     if (!field) {
       throw 'Field ' + fieldName + ' not found in TSB.Fields!';
     }
-    var values = rows.map(function(row) { return row[fieldName] || 'Unknown' });
+    var values;
+    if (field.type == 'Date') {
+      values = rows.map(function(row) { return row[fieldName] || 'Unknown' });
+    }
+    else {
+      values = rows.map(function(row) { return row[fieldName] || 'Unknown' });
+    }
     var countedValues = countValues(values);
-    if (!field.unique && (field.type == 'Text' || field.type == 'Enum' || !field.type)) {
+    if ((field.type == 'Text' || field.type == 'Enum' || !field.type || field.format == 'YYYY')) {
       buildBarChart(fieldName, countedValues);
     }
     else {
-      buildDummyChart(fieldName, countedValues);
+      buildDummyChart(fieldName + ' : ' + field.type, countedValues);
     }
   });
 });
