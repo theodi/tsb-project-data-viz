@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TSB Data Viz</title>
+<script type="text/javascript" src="../lib/d3.v3.min.js"></script>
+<script type="text/javascript">
+var start = Date.now()
+d3.csv('../data/FOI For Project Search RAW.csv', function(error, rows) {
+  console.log((Date.now() - start)/1000);
+  console.log(rows[0]);
+});
+</script>
+</head>
+<body>
+</body>
+</html>
