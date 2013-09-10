@@ -18,6 +18,10 @@ g:hover .nameLabel {
   xdisplay: block;
   opacity: 1;
 }
+
+.tooltip {
+  display: none;
+}
 </style>
 <script type="text/javascript" src="../lib/d3.v3.min.js"></script>
 <script type="text/javascript" src="../js/fields.js"></script>
@@ -90,20 +94,20 @@ function makeBubbles(data) {
     .attr('fill', '#000000')
     .attr('x', function(d) { d.x })
     .attr('y', function(d) { d.y })
-    .attr('dy', '.5em')
+    .attr('dy', '.3em')
     .attr('class', 'label')
     .style('text-anchor', 'middle')
     .style('opacity', 0)
     .text(function(d) { return d.count })
 
-  node.append('text')
-    .attr('fill', '#000000')
-    .attr('x', function(d) { d.x })
-    .attr('y', function(d) { d.y })
-    .attr('dy', '-.5em')
-    .style('text-anchor', 'middle')
-    .attr('class', 'nameLabel')
-    .text(function(d) { return d.name })
+  node.on('mouseenter', function(d) {
+    tooltip.style('display', 'block');
+    tooltipText.text(d.name)
+  });
+
+  node.on('mouseleave', function(d) {
+    tooltip.style('display', 'none');
+  });
 
   svg.selectAll('.industries circle')
     .transition()
@@ -116,6 +120,27 @@ function makeBubbles(data) {
     .duration(500)
     .delay(function(d, i) { return i * 10; })
     .style('opacity', 1);
+
+  var tooltip = svg.append('g')
+    .attr('class', 'tooltip')
+
+  tooltip.append('rect')
+    .attr('width', 200)
+    .attr('height', '1.6em')
+    .style('fill', odiColors[1])
+    .attr('rx', '5px')
+    .attr('ry', '5px')
+
+  var tooltipText = tooltip.append('text')
+    .text('BLA BLA')
+    .attr('dx', '0.5em')
+    .attr('dy', '1.5em')
+    .style('fill', '#FFFFFF')
+    .style('font-size', '12px')
+
+  svg.on('mousemove', function(e) {
+    tooltip.attr('transform', function(d) { return 'translate(' + d3.event.x + ',' + (d3.event.y-20) + ')'; });
+  })
 }
 
 function loadData() {
