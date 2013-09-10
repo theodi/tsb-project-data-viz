@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TSB Data Viz</title>
+<style type="text/css">
+</style>
+<script type="text/javascript" src="../lib/d3.v3.min.js"></script>
+<script type="text/javascript" src="../js/fields.js"></script>
+<script type="text/javascript">
+
+function init() {
+  var w = 800;
+  var h = 600;
+  var svg = d3.select('#charts')
+    .append('svg')
+    .attr('width', w)
+    .attr('height', h);
+}
+
+window.onload = init;
+
+</script>
+</head>
+<body>
+  <div id="charts"></div>
+</body>
+</html>
