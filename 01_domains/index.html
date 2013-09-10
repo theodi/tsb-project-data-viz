@@ -168,7 +168,7 @@ function buildNumberChart(title, data) {
   buildBarChart(title, values)
 }
 
-d3.csv('../data/FOI For Project Search RAW.csv', function(error, rows) {
+d3.csv('../data/TSB-data-public.csv', function(error, rows) {
   var fieldNames = [];
   console.log('Loaded ', rows.length, 'rows');
   for(var fieldName in TSB.Fields) {
