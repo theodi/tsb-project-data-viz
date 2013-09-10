@@ -121,6 +121,21 @@ function makeBubbles(data) {
     .delay(function(d, i) { return i * 10; })
     .style('opacity', 1);
 
+  node.on('click', function(clickedNode, clickedNodeIndex) {
+    svg.selectAll('.industries circle')
+      .transition()
+      .duration(500)
+      .delay(function(d, i) { return i * 10; })
+      .attr('r', function(d, i) { return (i == clickedNodeIndex) ? clickedNode.r : 0; });
+
+    svg.selectAll('.industries text.label')
+      .transition()
+      .duration(500)
+      .delay(function(d, i) { return i * 10; })
+      .style('opacity', function(d, i) { return (i == clickedNodeIndex) ? 1 : 0; });
+  })
+
+
   var tooltip = svg.append('g')
     .attr('class', 'tooltip')
 
