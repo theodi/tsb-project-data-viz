@@ -9,39 +9,78 @@
 <script type="text/javascript" src="../js/fields.js"></script>
 <script type="text/javascript">
 
+var w = 800;
+var h = 600;
+var svg;
+
 function init() {
-  var w = 800;
-  var h = 600;
-  var svg = d3.select('#charts')
+  svg = d3.select('#charts')
     .append('svg')
     .attr('width', w)
     .attr('height', h);
 
 
-  var data = [];
-  for(var i=0; i<30; i++) {
-    data.push({
-      x : Math.random() * w,
-      y : Math.random() * h
-    });
+  svg.append('rect')
+    .attr('width', w)
+    .attr('height', h)
+    .style('fill', '#DDDDDD')
+
+  loadData();
+}
+
+function sortByDecreasingCount(a, b) {
+  return -(a.count - b.count); //decreasing order
+}
+
+function countValues(values) {
+  var uniqueValues = {};
+  var countedValues = [];
+  values.forEach(function(value) {
+    if (!uniqueValues[value]) {
+      var valueInfo = { name : value, count : 0 };
+      uniqueValues[value] = valueInfo;
+      countedValues.push(valueInfo);
+    }
+    uniqueValues[value].count++;
+  });
+  countedValues.sort(sortByDecreasingCount);
+  return countedValues;
+}
+
+function makeBubbles(data) {
+  var pack = d3.layout.pack()
+    .size([w - 4, h - 4])
+    .sort(null)
+    .value(function(d) { return d.count/15; });
+
+  console.log(d3.shuffle(data))
+
+  var root = {
+    name : 'Root',
+    children : d3.shuffle(data)
   }
 
-  svg.selectAll('circle')
-    .data(data)
-    .enter()
-    .append('circle')
-    .attr('cx', function(d) { return d.x; })
-    .attr('cy', function(d) { return d.y; })
-    .attr('r', 25)
-    .attr('fill', 'red')
+  var node = svg.datum(root).selectAll('.node')
+      .data(pack.nodes)
+    .enter().append('g')
+      .attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; });
 
-  svg.selectAll('circle').transition()
-    .attr('r', 25);
+  node.append("circle")
+    .style('fill', 'red')
+    .attr("r", function(d) { return d.count ? d.r * 0.8 : 0; });
+}
 
-  svg.selectAll('circle').transition()
-    .duration(750)
-    .delay(function(d, i) { return i * 100; })
-    .attr('r', 50);
+function loadData() {
+  d3.csv('../data/TSB-data-public.csv', function(error, rows) {
+    console.log('Loaded ', rows.length, 'rows');
+
+    var fieldName = 'AreaName';
+    var areaNames = rows.map(function(row) { return row[fieldName] || 'Unknown' });
+    var countedAreaNames = countValues(areaNames);
+    console.log(countedAreaNames);
+
+    makeBubbles(countedAreaNames);
+  });
 }
 
 window.onload = init;
