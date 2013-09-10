@@ -5,7 +5,7 @@
 <title>TSB Data Viz</title>
 <style type="text/css">
 text {
-  font-family: arial;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 12px;
 }
 .nameLabel {
@@ -23,6 +23,8 @@ g:hover .nameLabel {
 <script type="text/javascript" src="../js/fields.js"></script>
 <script type="text/javascript">
 
+var odiColors = ['#2254F4', '#00B7FF', '#08DEF9', '#1DD3A7', '#0DBC37', '#67EF67', '#F9BC26', '#FF6700', '#D60303', '#EF3AAB', '#E6007C', '#B13198', ];
+
 var w = 1280;
 var h = 720;
 var svg;
@@ -37,7 +39,7 @@ function init() {
   svg.append('rect')
     .attr('width', w)
     .attr('height', h)
-    .style('fill', '#DDDDDD')
+    .style('fill', '#FAFAFA')
 
   loadData();
 }
@@ -65,7 +67,7 @@ function makeBubbles(data) {
   var pack = d3.layout.pack()
     .size([w - 4, h - 4])
     .sort(null)
-    .value(function(d) { return d.count/15; });
+    .value(function(d) { return Math.max(5, d.count/15); });
 
   console.log(d3.shuffle(data))
 
@@ -77,10 +79,11 @@ function makeBubbles(data) {
   var node = svg.datum(root).selectAll('.node')
       .data(pack.nodes)
     .enter().append('g')
+      .attr('class', 'industries')
       .attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; });
 
   node.append('circle')
-    .style('fill', 'red')
+    .style('fill', odiColors[2])
     .attr('r', function(d) { return 0; });
 
   node.append('text')
@@ -88,7 +91,9 @@ function makeBubbles(data) {
     .attr('x', function(d) { d.x })
     .attr('y', function(d) { d.y })
     .attr('dy', '.5em')
+    .attr('class', 'label')
     .style('text-anchor', 'middle')
+    .style('opacity', 0)
     .text(function(d) { return d.count })
 
   node.append('text')
@@ -100,11 +105,17 @@ function makeBubbles(data) {
     .attr('class', 'nameLabel')
     .text(function(d) { return d.name })
 
-  svg.selectAll('circle')
+  svg.selectAll('.industries circle')
     .transition()
     .duration(500)
     .delay(function(d, i) { return i * 10; })
     .attr('r', function(d) { return d.count ? d.r * 0.8 : 0; });
+
+  svg.selectAll('.industries text.label')
+    .transition()
+    .duration(500)
+    .delay(function(d, i) { return i * 10; })
+    .style('opacity', 1);
 }
 
 function loadData() {
