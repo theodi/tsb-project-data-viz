@@ -65,9 +65,15 @@ function makeBubbles(data) {
     .enter().append('g')
       .attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; });
 
-  node.append("circle")
+  node.append('circle')
     .style('fill', 'red')
-    .attr("r", function(d) { return d.count ? d.r * 0.8 : 0; });
+    .attr('r', function(d) { return 0; });
+
+  svg.selectAll('circle')
+    .transition()
+    .duration(500)
+    .delay(function(d, i) { return i * 10; })
+    .attr('r', function(d) { return d.count ? d.r * 0.8 : 0; });
 }
 
 function loadData() {
