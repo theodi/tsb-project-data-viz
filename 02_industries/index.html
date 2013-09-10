@@ -73,8 +73,6 @@ function makeBubbles(data) {
     .sort(null)
     .value(function(d) { return Math.max(5, d.count/15); });
 
-  console.log(d3.shuffle(data))
-
   var root = {
     name : 'Root',
     children : d3.shuffle(data)
