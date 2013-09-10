@@ -16,6 +16,32 @@ function init() {
     .append('svg')
     .attr('width', w)
     .attr('height', h);
+
+
+  var data = [];
+  for(var i=0; i<30; i++) {
+    data.push({
+      x : Math.random() * w,
+      y : Math.random() * h
+    });
+  }
+
+  svg.selectAll('circle')
+    .data(data)
+    .enter()
+    .append('circle')
+    .attr('cx', function(d) { return d.x; })
+    .attr('cy', function(d) { return d.y; })
+    .attr('r', 25)
+    .attr('fill', 'red')
+
+  svg.selectAll('circle').transition()
+    .attr('r', 25);
+
+  svg.selectAll('circle').transition()
+    .duration(750)
+    .delay(function(d, i) { return i * 100; })
+    .attr('r', 50);
 }
 
 window.onload = init;
