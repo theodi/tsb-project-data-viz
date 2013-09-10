@@ -113,7 +113,7 @@ function buildBarChart(title, data, maxCount) {
     .attr("fill", "#00EDBA")
     .attr("x", w*(1-barRatio) - 20)
     .attr("y", function(d, i) { return 50 + i * 17; })
-    .attr("width", function(d, i) { return d.count / maxValue * w*barRatio; })
+    .attr("width", function(d, i) { return d.count ? (d.count / maxValue * w*barRatio) : 0; })
     .attr("height", 16);
 
   svg.selectAll("text.label")
