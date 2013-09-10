@@ -96,7 +96,7 @@ function makeBubbles(data) {
     .attr('class', 'label')
     .style('text-anchor', 'middle')
     .style('opacity', 0)
-    .text(function(d) { return d.count })
+    .text(function(d) { return splitWords(d.name.replace(/[^A-Za-z ]/g,'')).map(getFirstLetter).slice(0,3).join('') })
 
   node.append('text')
     .attr('fill', '#000000')
@@ -188,6 +188,14 @@ function makeBubbles(data) {
   })
 }
 
+
+function getFirstLetter(s) {
+  return s[0];
+}
+
+function splitWords(s) {
+  return s.split(' ');
+}
 function loadData() {
   d3.csv('../data/TSB-data-public.csv', function(error, rows) {
     console.log('Loaded ', rows.length, 'rows');
