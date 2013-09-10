@@ -100,6 +100,18 @@ function makeBubbles(data) {
     .style('opacity', 0)
     .text(function(d) { return d.count })
 
+  node.append('text')
+    .attr('fill', '#000000')
+    .attr('x', function(d) { d.x })
+    .attr('y', function(d) { d.y })
+    .attr('dy', function(d) { return -d.r })
+    .attr('class', 'circleTitle')
+    .style('text-anchor', 'middle')
+    .style('fill', odiColors[2])
+    .style('opacity', 0)
+    .style('display', 'none')
+    .text(function(d) { return d.name })
+
   node.on('mouseenter', function(d) {
     tooltip.style('display', 'block');
     tooltipText.text(d.name)
@@ -122,17 +134,37 @@ function makeBubbles(data) {
     .style('opacity', 1);
 
   node.on('click', function(clickedNode, clickedNodeIndex) {
-    svg.selectAll('.industries circle')
-      .transition()
-      .duration(500)
-      .delay(function(d, i) { return i * 10; })
-      .attr('r', function(d, i) { return (i == clickedNodeIndex) ? clickedNode.r : 0; });
+    tooltip.style('display', 'none');
 
-    svg.selectAll('.industries text.label')
+    svg.selectAll('.industries circle').filter(function(d, i) { return i != clickedNodeIndex; })
       .transition()
       .duration(500)
       .delay(function(d, i) { return i * 10; })
-      .style('opacity', function(d, i) { return (i == clickedNodeIndex) ? 1 : 0; });
+      .attr('r', function(d, i) { return 0; });
+
+    svg.selectAll('.industries text.label').filter(function(d, i) { return i != clickedNodeIndex; })
+      .transition()
+      .duration(500)
+      .delay(function(d, i) { return i * 10; })
+      .style('opacity', 0 )
+
+    d3.select(this).selectAll('.circleTitle').style('display', 'block')
+      .transition()
+      .delay(500)
+      .duration(500)
+      .style('opacity', 1)
+
+    svg.selectAll('.industries').filter(function(d, i) { return i == clickedNodeIndex; })
+      .transition()
+      .delay(500)
+      .duration(1500)
+      .attr('transform', function(d) { return 'translate(' + w/2 + ',' + 150 + ')'; });
+
+    svg.selectAll('.industries').filter(function(d, i) { return i != clickedNodeIndex; })
+      .transition()
+      .duration(500)
+      .delay(function(d, i) { return i * 10; })
+      .remove()
   })
 
 
