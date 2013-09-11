@@ -202,12 +202,31 @@ function displayTopParticipants(items, areaName) {
   var participants = countValues(extractField(areaRows, 'ParticipantName'));
   var projects = groupBy(areaRows, 'TSBProjectNumber');
   var projectsByParticipant = groupBy(areaRows, 'ParticipantName');
-  var topParticipants = participants.slice(0, 20);
+  var topParticipants = participants.slice(0, 30);
+
+  console.log(topParticipants);
+
+  function participantNameToIndex(name) {
+    var idx = -1;
+    topParticipants.forEach(function(p, i) {
+      if (p.name == name) idx = i;
+    })
+    return idx;
+  }
+
+  function participantNameToOffset(name) {
+    var offset = 0;
+    topParticipants.forEach(function(p, i) {
+      if (p.name == name) offset = p.offset;
+    })
+    return offset;
+  }
 
   var totalCount = 0;
   var maxProjectCount = 0;
-  topParticipants.forEach(function(participant) {
-    projectsByParticipant.forEach(function(projectList) {
+  topParticipants.forEach(function(participant, i) {
+    projectsByParticipant.forEach(function(projectList, j) {
+      if (i == 0 && j == 0) console.log(projectList);
       if (participant.name == projectList.key) {
         if (projectList.items.length > maxProjectCount) {
           maxProjectCount = projectList.items.length;
@@ -217,7 +236,41 @@ function displayTopParticipants(items, areaName) {
         totalCount += projectList.items.length;
       }
     })
+
+    participant.otherCompaniesNames = {};
+    participant.projects.forEach(function(project) {
+      projects.forEach(function(projectInfo) {
+        if (projectInfo.key == project.TSBProjectNumber) {
+          projectInfo.items.forEach(function(item) {
+            if (item.ParticipantName != participant.name) {
+              participant.otherCompaniesNames[item.ParticipantName] = item.ParticipantName;
+            }
+          })
+        }
+      })
+    })
+    participant.otherCompanies = [];
+    for(var otherCompanyName in participant.otherCompaniesNames) {
+      participant.otherCompanies.push(otherCompanyName);
+    }
+    participant.otherCompaniesOffsets = participant.otherCompanies
+      .map(participantNameToOffset)
+      .filter(function(value) { return value; });
   })
+
+  var line = d3.svg.line()
+    .x(function(d,i) { return (100+(d/totalCount*(w-200))) })
+    .y(function(d, i) { return (i==1) ? h/3 : h/2});
+
+  topParticipants.forEach(function(participant, i) {
+    participant.otherCompaniesOffsets.forEach(function(o) {
+      svg
+        .append("svg:path")
+        .style('stroke', 'black')
+        .style('fill', 'none')
+        .attr("d", line([participant.offset, (participant.offset+o)/2, o]));
+    })
+  });
 
   var node = svg.selectAll('.participant')
     .data(topParticipants)
@@ -226,6 +279,10 @@ function displayTopParticipants(items, areaName) {
       .attr('transform', function(d, i) {
         return 'translate(' + (100+(d.offset/totalCount*(w-200))) + ',' + h/2 + ')'; 
       });
+
+  node.on('click', function(d,i) {
+    console.log(d);
+  })
 
   node.append('circle')
     .style('fill', function(d) {
@@ -356,7 +413,7 @@ function loadData() {
           .duration(500)
           .style('opacity', 0);
       })
-    //displayTopParticipants(rows, 'High Value Manufacturing')
+    displayTopParticipants(rows, 'High Value Manufacturing')
   });
 }
 
