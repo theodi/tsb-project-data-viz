@@ -207,6 +207,11 @@ d3.csv('../data/TSB-data-public.csv', function(error, rows) {
       buildDummyChart(fieldName, countedValues);
     }
   });
+}).on("progress", function(event){
+  if (event.lengthComputable) {
+    var percentComplete = Math.round(event.loaded * 100 / event.total);
+    console.log(percentComplete);
+  }
 });
 </script>
 </head>
