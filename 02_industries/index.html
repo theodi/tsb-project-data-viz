@@ -228,7 +228,10 @@ function displayTopParticipants(items, areaName) {
       });
 
   node.append('circle')
-    .style('fill', odiColors[4])
+    .style('fill', function(d) {
+      if (d.projects[0].CostCategoryType == 'Academic') return odiColors[4];
+      else return odiColors[6];
+    })
     .attr('r', function(d) { return 0; });
 
   node.append('text')
