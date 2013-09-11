@@ -202,7 +202,7 @@ function displayTopParticipants(items, areaName) {
   var participants = countValues(extractField(areaRows, 'ParticipantName'));
   var projects = groupBy(areaRows, 'TSBProjectNumber');
   var projectsByParticipant = groupBy(areaRows, 'ParticipantName');
-  var topParticipants = participants.slice(0, 30);
+  var topParticipants = participants.slice(0, 20);
 
   console.log(topParticipants);
 
@@ -215,7 +215,7 @@ function displayTopParticipants(items, areaName) {
   }
 
   function participantNameToOffset(name) {
-    var offset = 0;
+    var offset = -1;
     topParticipants.forEach(function(p, i) {
       if (p.name == name) offset = p.offset;
     })
@@ -255,15 +255,17 @@ function displayTopParticipants(items, areaName) {
     }
     participant.otherCompaniesOffsets = participant.otherCompanies
       .map(participantNameToOffset)
-      .filter(function(value) { return value; });
+      .filter(function(value) { return value != -1; });
   })
-
-  var line = d3.svg.line()
-    .x(function(d,i) { return (100+(d/totalCount*(w-200))) })
-    .y(function(d, i) { return (i==1) ? h/3 : h/2});
 
   topParticipants.forEach(function(participant, i) {
     participant.otherCompaniesOffsets.forEach(function(o) {
+      var scale = 1.0 - Math.abs(participant.offset - o) / totalCount;
+      var line = d3.svg.line()
+      .x(function(d,i) { return (100+(d/totalCount*(w-200))) })
+      .y(function(d, i) { return (i==1) ? h/2 * (0.25 + 0.75*scale) : h/2})
+      .interpolate('basis')
+
       svg
         .append("svg:path")
         .style('stroke', 'black')
@@ -413,7 +415,7 @@ function loadData() {
           .duration(500)
           .style('opacity', 0);
       })
-    displayTopParticipants(rows, 'High Value Manufacturing')
+    //displayTopParticipants(rows, 'High Value Manufacturing')
   });
 }
 
