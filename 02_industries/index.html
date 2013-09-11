@@ -32,6 +32,7 @@ var odiColors = ['#2254F4', '#00B7FF', '#08DEF9', '#1DD3A7', '#0DBC37', '#67EF67
 var w = 1280;
 var h = 720;
 var svg;
+var restartBtn;
 
 function init() {
   svg = d3.select('#charts')
@@ -67,7 +68,7 @@ function countValues(values) {
   return countedValues;
 }
 
-function makeBubbles(data) {
+function makeBubbles(data, rows) {
   var pack = d3.layout.pack()
     .size([w - 4, h - 4])
     .sort(null)
@@ -132,7 +133,11 @@ function makeBubbles(data) {
     .style('opacity', 1);
 
   node.on('click', function(clickedNode, clickedNodeIndex) {
+    if (restartBtn.style('display') == 'block') {
+      return;
+    }
     tooltip.style('display', 'none');
+    restartBtn.style('display', 'block')
 
     svg.selectAll('.industries circle').filter(function(d, i) { return i != clickedNodeIndex; })
       .transition()
@@ -156,13 +161,17 @@ function makeBubbles(data) {
       .transition()
       .delay(500)
       .duration(1500)
-      .attr('transform', function(d) { return 'translate(' + w/2 + ',' + 150 + ')'; });
+      .attr('transform', function(d) { return 'translate(' + w/2 + ',' + 150 + ')'; })
+      .each('end', function() {
+        displayTopParticipants(rows, clickedNode.name)
+      })
 
     svg.selectAll('.industries').filter(function(d, i) { return i != clickedNodeIndex; })
       .transition()
       .duration(500)
       .delay(function(d, i) { return i * 10; })
       .remove()
+
   })
 
 
@@ -188,6 +197,93 @@ function makeBubbles(data) {
   })
 }
 
+function displayTopParticipants(items, areaName) {
+  var areaRows = items.filter(function(item) { return item['AreaName'] == areaName });
+  var participants = countValues(extractField(areaRows, 'ParticipantName'));
+  var projects = groupBy(areaRows, 'TSBProjectNumber');
+  var projectsByParticipant = groupBy(areaRows, 'ParticipantName');
+  var topParticipants = participants.slice(0, 20);
+
+  var totalCount = 0;
+  var maxProjectCount = 0;
+  topParticipants.forEach(function(participant) {
+    projectsByParticipant.forEach(function(projectList) {
+      if (participant.name == projectList.key) {
+        if (projectList.items.length > maxProjectCount) {
+          maxProjectCount = projectList.items.length;
+        }
+        participant.projects = projectList.items;
+        participant.offset = totalCount;
+        totalCount += projectList.items.length;
+      }
+    })
+  })
+
+  var node = svg.selectAll('.participant')
+    .data(topParticipants)
+    .enter().append('g')
+      .attr('class', 'participant')
+      .attr('transform', function(d, i) {
+        return 'translate(' + (100+(d.offset/totalCount*(w-200))) + ',' + h/2 + ')'; 
+      });
+
+  node.append('circle')
+    .style('fill', odiColors[4])
+    .attr('r', function(d) { return 0; });
+
+  node.append('text')
+    .attr('fill', '#000000')
+    .attr('class', 'label')
+    .attr('dy', '0.3em')
+    .style('text-anchor', 'middle')
+    .style('opacity', 0 )
+    .text(function(d) { return d.projects.length; })
+
+  node.append('text')
+    .attr('fill', '#000000')
+    .attr('dx', function(d) { return 0})
+    .attr('dy', function(d) { return 0})
+    .attr('class', 'label')
+    .text(function(d) { return d.name; })
+    .style('opacity', 0 )
+    .attr('transform', function(d) { return 'translate('+0+','+(d.projects.length/maxProjectCount * 50+20)+')rotate(50)' })
+
+  svg.selectAll('.participant circle')
+    .transition()
+    .duration(500)
+    .delay(function(d, i) { return i * 20; })
+    .attr('r', function(d, i) { return d.projects.length/maxProjectCount * 40; });
+
+  svg.selectAll('.participant text.label')
+    .transition()
+    .duration(500)
+    .delay(function(d, i) { return i * 20; })
+    .style('opacity', 1 )
+
+}
+
+function groupBy(items, propertyName) {
+  var groups = {};
+  items.forEach(function(item) {
+    if (!groups[item[propertyName]]) groups[item[propertyName]] = []
+    groups[item[propertyName]].push(item);
+  })
+  var result = [];
+  var keys = [];
+  for(var i in groups) {
+    keys.push(i);
+    result.push({
+      key: i,
+      items: groups[i]
+    })
+  }
+  result.keys = keys;
+  return result;
+}
+
+function extractField(items, propertyName) {
+  return items.map(function(item) { return item[propertyName] || 'Unknown' });
+}
 
 function getFirstLetter(s) {
   return s[0];
@@ -196,6 +292,7 @@ function getFirstLetter(s) {
 function splitWords(s) {
   return s.split(' ');
 }
+
 function loadData() {
   d3.csv('../data/TSB-data-public.csv', function(error, rows) {
     console.log('Loaded ', rows.length, 'rows');
@@ -203,9 +300,60 @@ function loadData() {
     var fieldName = 'AreaName';
     var areaNames = rows.map(function(row) { return row[fieldName] || 'Unknown' });
     var countedAreaNames = countValues(areaNames);
-    console.log(countedAreaNames);
 
-    makeBubbles(countedAreaNames);
+    makeBubbles(countedAreaNames, rows);
+
+    restartBtn = svg.append('text')
+      .attr('class', 'restartBtn')
+      .text('< restart')
+      .attr('x', 10)
+      .attr('y', 20)
+      .style('flll', '#000000')
+      .style('display', 'none')
+      .on('mouseover', function() {
+        this.style.fill = 'red';
+        this.style.cursor = 'pointer';
+      })
+      .on('mouseleave', function() {
+        this.style.fill = 'black';
+      })
+      .on('click', function() {
+        this.style.display = 'none';
+
+        svg.selectAll('.industries')
+          .transition()
+          .duration(500)
+          .remove()
+
+        svg.selectAll('.industries circle')
+          .transition()
+          .duration(500)
+          .attr('r', 0)
+          .each('end', function() {
+            makeBubbles(countedAreaNames, rows);
+          })
+
+        svg.selectAll('.industries text')
+          .transition()
+          .duration(500)
+          .style('opacity', 0);
+
+        svg.selectAll('.participant')
+          .transition()
+          .duration(600)
+          .remove()
+
+        svg.selectAll('.participant circle')
+          .transition()
+          .duration(500)
+          .attr('r', 0)
+
+        svg.selectAll('.participant text')
+          .transition()
+          .duration(500)
+          .style('opacity', 0);
+      })
+    //displayTopParticipants(rows, 'High Value Manufacturing')
   });
 }
 
