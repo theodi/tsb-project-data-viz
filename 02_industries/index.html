@@ -222,6 +222,16 @@ function displayTopParticipants(items, areaName) {
     return offset;
   }
 
+  function isAcademmic(name) {
+    var academic = false;
+    topParticipants.forEach(function(p, i) {
+      if (p.name == name && p.projects[0].CostCategoryType == 'Academic') {
+        academic = true;
+      }
+    })
+    return academic;
+  }
+
   var totalCount = 0;
   var maxProjectCount = 0;
   topParticipants.forEach(function(participant, i) {
@@ -258,19 +268,26 @@ function displayTopParticipants(items, areaName) {
       .filter(function(value) { return value != -1; });
   })
 
-  topParticipants.forEach(function(participant, i) {
-    participant.otherCompaniesOffsets.forEach(function(o) {
+  topParticipants.forEach(function(participant) {
+    participant.otherCompaniesOffsets.forEach(function(o, i) {
       var scale = 1.0 - Math.abs(participant.offset - o) / totalCount;
       var line = d3.svg.line()
       .x(function(d,i) { return (100+(d/totalCount*(w-200))) })
       .y(function(d, i) { return (i==1) ? h/2 * (0.25 + 0.75*scale) : h/2})
       .interpolate('basis')
 
+      var academic = isAcademmic(participant.name) || isAcademmic(participant.otherCompanies[i]);
+
       svg
         .append("svg:path")
-        .style('stroke', 'black')
+        .style('stroke', academic ? odiColors[4] : odiColors[6])
         .style('fill', 'none')
-        .attr("d", line([participant.offset, (participant.offset+o)/2, o]));
+        .style('opacity', 0)
+        .attr("d", line([participant.offset, (participant.offset+o)/2, o]))
+        .transition()
+        .delay(1000)
+        .duration(1000)
+        .style('opacity', academic ? 1 : 0.5)
     })
   });
 
@@ -321,7 +338,6 @@ function displayTopParticipants(items, areaName) {
     .duration(500)
     .delay(function(d, i) { return i * 20; })
     .style('opacity', 1 )
-
 }
 
 function groupBy(items, propertyName) {
@@ -409,6 +425,12 @@ function loadData() {
           .transition()
           .duration(500)
           .attr('r', 0)
+
+        svg.selectAll('path')
+          .transition()
+          .duration(500)
+          .style('opacity', 0 )
+          .remove()
 
         svg.selectAll('.participant text')
           .transition()
