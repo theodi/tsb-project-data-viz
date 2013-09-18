@@ -82,6 +82,25 @@ function uniqueValues(list) {
   return result;
 }
 
+function compareByFieldName(fieldName) {
+  return function(a, b) {
+    return a[fieldName] - b[fieldName];
+  }
+}
+
+function negate(f) {
+  return function() {
+    return -f.apply(this, arguments);
+  }
+}
+
+function listOfFieldValues(obj) {
+  var result = [];
+  for(var i in obj) {
+    result.push(obj[i]);
+  }
+  return result;
+}
 
 function loadData() {
   d3.csv('../data/TSB-data-public-sample.csv', function(error, rows) {
@@ -90,9 +109,37 @@ function loadData() {
     var participantNames = uniqueValues(extractField(rows, 'ParticipantName'));
     participantNames.forEach(function(name) {
       if (!name) return;
-      participants[name] = { name : name, connections : {} };
+      participants[name] = { name : name, numConnections: 0, numProjects: 0, connections : {} };
     })
     var projects = groupBy(rows, 'TSBProjectNumber');
+    projects.forEach(function(project) {
+      var projectParticipants = uniqueValues(extractField(project.items, 'ParticipantName'));
+      projectParticipants.forEach(function(participant, i) {
+        participants[participant].numProjects++;
+      });
+      projectParticipants.forEach(function(participant, i) {
+        projectParticipants.forEach(function(otherParticipant, j) {
+          if (j <= i) return;
+          if (!participants[participant].connections[otherParticipant]) {
+            participants[participant].connections[otherParticipant] = 0;
+            participants[participant].numConnections++;
+          }
+          if (!participants[otherParticipant].connections[participant]) {
+            participants[otherParticipant].connections[participant] = 0;
+            participants[otherParticipant].numConnections++;
+          }
+          participants[participant].connections[otherParticipant]++;
+          participants[otherParticipant].connections[participant]++;
+        })
+      })
+    })
+    var participantsList = listOfFieldValues(participants);
+    participantsList.sort(negate(compareByFieldName('numConnections')));
+
+    for(var i=0; i<50; i++) {
+      var p = participantsList[i];
+      console.log(p.name, 'connections:', p.numConnections, 'projects:', p.numProjects, p);
+    }
   });
 }
 
