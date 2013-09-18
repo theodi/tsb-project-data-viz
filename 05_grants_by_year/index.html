@@ -22,6 +22,10 @@ g:hover .nameLabel {
 .tooltip {
   display: none;
 }
+
+.x.axis path {
+  display: none;
+}
 </style>
 <script type="text/javascript" src="../lib/d3.v3.min.js"></script>
 <script type="text/javascript" src="../js/fields.js"></script>
@@ -191,6 +195,16 @@ function makeChart(years, areas, maxEver) {
       .attr('dy', 0 + 20 * i)
       .style('fill', odiColors[i] || "#000000")
   }
+
+  //var yearsFormatter = d3.format(",.0f");
+  //console.log()
+
+  svg.append("g")
+      .attr("class", "x axis")
+      //.tickFormat(function(d) { return "$" + yearsFormatter(d); })
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
 }
 
 window.onload = init;
