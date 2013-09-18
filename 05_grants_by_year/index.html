@@ -30,7 +30,7 @@ g:hover .nameLabel {
 var odiColors = ['#2254F4', '#00B7FF', '#08DEF9', '#1DD3A7', '#0DBC37', '#67EF67', '#F9BC26', '#FF6700', '#D60303', '#EF3AAB', '#E6007C', '#B13198', ];
 
 var w = window.innerWidth;
-var h = window.innerHeight/2;
+var h = window.innerHeight*0.7;
 var svg;
 
 function init() {
@@ -148,7 +148,7 @@ function makeChart(years, areas, maxEver) {
   var height = h - margin.top - margin.bottom;
 
   var x = d3.scale.linear().range([0, width]);
-  var y = d3.scale.linear().range([height, 0]);
+  var y = d3.scale.linear().range([height, 100]);
 
   var xAxis = d3.svg.axis()
       .scale(x)
@@ -182,7 +182,14 @@ function makeChart(years, areas, maxEver) {
       .attr("class", "line")
       .attr("d", line)
       .style('fill', 'none')
-      .style('stroke', odiColors[i])
+      .style('stroke', odiColors[i] || "#000000")
+      .style('stroke-width', 2)
+      .style('opacity', 0.5)
+    svg.append("text")
+      .text(areaName)
+      .attr('dx', 0)
+      .attr('dy', 0 + 20 * i)
+      .style('fill', odiColors[i] || "#000000")
   }
 }
 
