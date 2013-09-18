@@ -108,9 +108,13 @@ function loadData() {
     console.log('Loaded ', rows.length, 'rows');
     var participants = {};
     var participantNames = uniqueValues(extractField(rows, 'ParticipantName'));
+    var isAcademic = {};
+    groupBy(rows, 'ParticipantName').forEach(function(participant) {
+      isAcademic[participant.key] = (participant.items[0].CostCategoryType == 'Academic');
+    })
     participantNames.forEach(function(name) {
       if (!name) return;
-      participants[name] = { name : name, numConnections: 0, numProjects: 0, connections : {} };
+      participants[name] = { name : name, academic: isAcademic[name], numConnections: 0, numProjects: 0, connections : {} };
     })
     var projects = groupBy(rows, 'TSBProjectNumber');
     projects.forEach(function(project) {
@@ -173,7 +177,7 @@ function makeGraph(participants, participantsList) {
       .data(links)
       .enter().append('line')
       .attr('class', 'link')
-      .style('stroke', 'rgba(255, 0, 0, 0.1)')
+      .style('stroke', 'rgba(128, 90, 18, 0.2)')
       .style('stroke-width', function(d) { return 1 });
 
   var node = svg.selectAll('.node')
@@ -181,7 +185,7 @@ function makeGraph(participants, participantsList) {
     .enter().append('circle')
       .attr('class', 'node')
       .attr('r', 3)
-      .style('fill', function(d) { return '#FF0000' })
+      .style('fill', function(d) { return d.academic ? odiColors[4] : odiColors[6] })
       .call(force.drag);
 
   force.on('tick', function() {
