@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TSB Data Viz</title>
+<style type="text/css">
+text {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 12px;
+}
+.nameLabel {
+  xdisplay: none;
+  opacity: 0;
+  transition: opacity 0.3s; -webkit-transition: opacity 0.3s;
+}
+
+g:hover .nameLabel {
+  xdisplay: block;
+  opacity: 1;
+}
+
+.tooltip {
+  display: none;
+}
+</style>
+<script type="text/javascript" src="../lib/d3.v3.min.js"></script>
+<script type="text/javascript" src="../js/fields.js"></script>
+<script type="text/javascript">
+
+var odiColors = ['#2254F4', '#00B7FF', '#08DEF9', '#1DD3A7', '#0DBC37', '#67EF67', '#F9BC26', '#FF6700', '#D60303', '#EF3AAB', '#E6007C', '#B13198', ];
+
+var w = window.innerWidth;
+var h = window.innerHeight;
+var svg;
+
+function init() {
+  svg = d3.select('#charts')
+    .append('svg')
+    .attr('width', w)
+    .attr('height', h);
+
+  svg.append('rect')
+    .attr('width', w)
+    .attr('height', h)
+    .style('fill', '#FAFAFA')
+
+  loadData();
+}
+
+function groupBy(items, propertyName) {
+  var groups = {};
+  items.forEach(function(item) {
+    if (!groups[item[propertyName]]) groups[item[propertyName]] = []
+    groups[item[propertyName]].push(item);
+  })
+  var result = [];
+  var keys = [];
+  for(var i in groups) {
+    keys.push(i);
+    result.push({
+      key: i,
+      items: groups[i]
+    })
+  }
+  result.keys = keys;
+  return result;
+}
+
+function extractField(items, propertyName) {
+  return items.map(function(item) { return item[propertyName] || 'Unknown' });
+}
+
+function uniqueValues(list) {
+  var values = {};
+  var result = [];
+  list.forEach(function(value) {
+    if (!values[value]) {
+      values[value] = true;
+      result.push(value);
+    }
+  });
+  return result;
+}
+
+function compareByFieldName(fieldName) {
+  return function(a, b) {
+    return a[fieldName] - b[fieldName];
+  }
+}
+
+function negate(f) {
+  return function() {
+    return -f.apply(this, arguments);
+  }
+}
+
+function listOfFieldValues(obj) {
+  var result = [];
+  for(var i in obj) {
+    result.push(obj[i]);
+  }
+  return result;
+}
+
+function loadData() {
+  d3.csv('../data/TSB-data-public-sample.csv', function(error, rows) {
+    var projects = groupBy(rows, 'TSBProjectNumber');
+    var clusterBy = 'AreaBudgetHolder';
+    var years = [];
+    for(var i=0; i<projects.length; i++) {
+      var project = projects[i];
+      var year = project.items[0].CompetitionYear;
+      var area = project.items[0].AreaBudgetHolder;
+      if (!years[year]) {
+        years[year] = {};
+      }
+      if (!years[year][area]) {
+        years[year][area] = 0;
+      }
+      var totalGrant = project.items.reduce(function(prev, curr) {
+        return prev + Number(curr.OfferGrant);
+      }, 0)
+      years[year][area] += totalGrant;
+    }
+    var maxEver = 0;
+    for(var year in years) {
+      for(var area in years[year]) {
+        maxEver = Math.max(maxEver, years[year][area]);
+      }
+    }
+    console.log(maxEver);
+  });
+}
+
+window.onload = init;
+
+</script>
+</head>
+<body>
+  <div id="charts"></div>
+</body>
+</html>
