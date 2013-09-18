@@ -30,7 +30,7 @@ g:hover .nameLabel {
 var odiColors = ['#2254F4', '#00B7FF', '#08DEF9', '#1DD3A7', '#0DBC37', '#67EF67', '#F9BC26', '#FF6700', '#D60303', '#EF3AAB', '#E6007C', '#B13198', ];
 
 var w = window.innerWidth;
-var h = window.innerHeight;
+var h = window.innerHeight/2;
 var svg;
 
 function init() {
@@ -93,10 +93,11 @@ function listOfFieldValues(obj) {
 }
 
 function loadData() {
-  d3.csv('../data/TSB-data-public-sample.csv', function(error, rows) {
+  d3.csv('../data/TSB-data-public.csv', function(error, rows) {
     var projects = groupBy(rows, 'TSBProjectNumber');
     var clusterBy = 'AreaBudgetHolder';
     var years = [];
+    var areas = {};
     for(var i=0; i<projects.length; i++) {
       var project = projects[i];
       var year = project.items[0].CompetitionYear;
@@ -107,10 +108,17 @@ function loadData() {
       if (!years[year][area]) {
         years[year][area] = 0;
       }
+      if (!areas[area]) {
+        areas[area] = {};
+      }
+      if (!areas[area][year]) {
+        areas[area][year] = 0;
+      }
       var totalGrant = project.items.reduce(function(prev, curr) {
         return prev + Number(curr.OfferGrant);
       }, 0)
       years[year][area] += totalGrant;
+      areas[area][year] += totalGrant;
     }
     var maxEver = 0;
     for(var year in years) {
@@ -119,11 +127,22 @@ function loadData() {
       }
     }
     console.log(maxEver);
-    makeChart(years, maxEver);
+
+    for(var areaName in areas) {
+      var area = areas[areaName];
+      var values = [];
+      for(var year in area) {
+        values.push( { year : Number(year), value : area[year] })
+      }
+      areas[areaName] = values;
+    }
+    console.log(areas);
+
+    makeChart(years, areas, maxEver);
   });
 }
 
-function makeChart(years, maxEver) {
+function makeChart(years, areas, maxEver) {
   var margin = {top: 20, right: 20, bottom: 30, left: 50}
   var width = w - margin.left - margin.right;
   var height = h - margin.top - margin.bottom;
@@ -139,18 +158,11 @@ function makeChart(years, maxEver) {
       .scale(y)
       .orient('left');
 
-  var data = [
-    { year: 2003, totalGrant: 0},
-    { year: 2005, totalGrant: 10},
-    { year: 2007, totalGrant: 450},
-    { year: 2008, totalGrant: 240},
-    { year: 2012, totalGrant: 340},
-    { year: 2013, totalGrant: 230}
-  ];
+  var data = areas.Digital;
 
   var line = d3.svg.line()
       .x(function(d) { return x(d.year); })
-      .y(function(d) { return y(d.totalGrant); });
+      .y(function(d) { return y(d.value); });
 
   var svg = d3.select('#charts').append('svg')
       .attr('width', width + margin.left + margin.right)
@@ -158,15 +170,20 @@ function makeChart(years, maxEver) {
     .append('g')
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-  x.domain(d3.extent(data, function(d) { return d.year; }));
-  y.domain(d3.extent(data, function(d) { return d.totalGrant; }));
+  x.domain([2003, 2013]);
+  y.domain([0, maxEver]);
 
-  svg.append("path")
-      .datum(data)
+  var i = 0;
+  for(var areaName in areas) {
+    i++;
+    var area = areas[areaName];
+    svg.append("path")
+      .datum(area)
       .attr("class", "line")
       .attr("d", line)
       .style('fill', 'none')
-      .style('stroke', 'red')
+      .style('stroke', odiColors[i])
+  }
 }
 
 window.onload = init;
