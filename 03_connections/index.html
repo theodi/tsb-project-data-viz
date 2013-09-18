@@ -188,6 +188,9 @@ function makeGraph(participants, participantsList) {
       .style('fill', function(d) { return d.academic ? odiColors[4] : odiColors[6] })
       .call(force.drag);
 
+  node.append("title")
+      .text(function(d) { return d.name; });
+
   force.on('tick', function() {
     link.attr('x1', function(d) { return d.source.x; })
         .attr('y1', function(d) { return d.source.y; })
