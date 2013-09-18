@@ -151,8 +151,8 @@ function loadData() {
 
 function makeGraph(participants, participantsList) {
   var force = d3.layout.force()
-    .charge(-40)
-    .linkDistance(5)
+    .charge(-70)
+    .linkDistance(15)
     .size([w, h]);
 
 
@@ -177,7 +177,7 @@ function makeGraph(participants, participantsList) {
       .data(links)
       .enter().append('line')
       .attr('class', 'link')
-      .style('stroke', 'rgba(128, 90, 18, 0.2)')
+      .style('stroke', 'rgba(128, 90, 18, 0.1)')
       .style('stroke-width', function(d) { return 1 });
 
   var node = svg.selectAll('.node')
