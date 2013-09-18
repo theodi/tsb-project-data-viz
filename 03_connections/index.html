@@ -47,9 +47,52 @@ function init() {
   loadData();
 }
 
+function groupBy(items, propertyName) {
+  var groups = {};
+  items.forEach(function(item) {
+    if (!groups[item[propertyName]]) groups[item[propertyName]] = []
+    groups[item[propertyName]].push(item);
+  })
+  var result = [];
+  var keys = [];
+  for(var i in groups) {
+    keys.push(i);
+    result.push({
+      key: i,
+      items: groups[i]
+    })
+  }
+  result.keys = keys;
+  return result;
+}
+
+function extractField(items, propertyName) {
+  return items.map(function(item) { return item[propertyName] || 'Unknown' });
+}
+
+function uniqueValues(list) {
+  var values = {};
+  var result = [];
+  list.forEach(function(value) {
+    if (!values[value]) {
+      values[value] = true;
+      result.push(value);
+    }
+  });
+  return result;
+}
+
+
 function loadData() {
   d3.csv('../data/TSB-data-public-sample.csv', function(error, rows) {
     console.log('Loaded ', rows.length, 'rows');
+    var participants = {};
+    var participantNames = uniqueValues(extractField(rows, 'ParticipantName'));
+    participantNames.forEach(function(name) {
+      if (!name) return;
+      participants[name] = { name : name, connections : {} };
+    })
+    var projects = groupBy(rows, 'TSBProjectNumber');
   });
 }
 
