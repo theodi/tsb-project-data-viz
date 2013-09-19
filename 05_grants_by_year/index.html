@@ -179,7 +179,6 @@ function makeChart(years, areas, maxEver) {
 
   var i = 0;
   for(var areaName in areas) {
-    i++;
     var area = areas[areaName];
     svg.append("path")
       .datum(area)
@@ -189,11 +188,28 @@ function makeChart(years, areas, maxEver) {
       .style('stroke', odiColors[i] || "#000000")
       .style('stroke-width', 2)
       .style('opacity', 0.5)
-    svg.append("text")
-      .text(areaName)
-      .attr('dx', 0)
-      .attr('dy', 0 + 20 * i)
-      .style('fill', odiColors[i] || "#000000")
+    var g = svg.append('g')
+    g.append("text")
+        .text(areaName)
+        .attr('dx', 0)
+        .attr('dy', 0 + 20 * i)
+        .style('fill', odiColors[i] || "#000000");
+    g.append("rect")
+        .attr('x', -20)
+        .attr('y', 0 + 20 * (i - 1) + 8)
+        .attr('width', 15)
+        .attr('height', 15)
+        .data([i])
+        .style('fill', odiColors[i] || "#000000")
+        .on('mouseenter', function(data, i) {
+          svg.selectAll('path').style('opacity', function(d, j) {
+            return data == j ? 1 : 0.1;
+          });
+        })
+        .on('mouseleave', function() {
+          svg.selectAll('path').style('opacity', 0.5);
+        });
+    i++;
   }
 
   //var yearsFormatter = d3.format(",.0f");
