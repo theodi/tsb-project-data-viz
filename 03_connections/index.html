@@ -162,11 +162,18 @@ function makeGraph(participants, participantsList) {
   participantsList.forEach(function(participant) {
     for(var otherParticipantName in participant.connections) {
       var otherParticipant = participants[otherParticipantName];
-      links.push({source:participant.index, target:otherParticipant.index, value:1})
+      var value = participant.connections[otherParticipantName];
+      links.push({source:participant.index, target:otherParticipant.index, value:value})
     }
   })
 
   console.log('makeGraph', 'nodes:', nodes.length);
+
+  svg.append("text")
+      .text('Connections between companies based on first 500 rows of data')
+      .attr('dx', 20)
+      .attr('dy', 20)
+      .style('fill', '#000000')
 
   force
       .nodes(nodes)
@@ -178,7 +185,7 @@ function makeGraph(participants, participantsList) {
       .enter().append('line')
       .attr('class', 'link')
       .style('stroke', 'rgba(128, 90, 18, 0.1)')
-      .style('stroke-width', function(d) { return 1 });
+      .style('stroke-width', function(d) { return d.value });
 
   var node = svg.selectAll('.node')
       .data(nodes)
