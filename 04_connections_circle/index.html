@@ -104,7 +104,7 @@ function listOfFieldValues(obj) {
 
 function loadData() {
   d3.csv('../data/TSB-data-public-sample.csv', function(error, rows) {
-    rows = rows.slice(0, 1000);
+    rows = rows.slice(0, 500);
     console.log('Loaded ', rows.length, 'rows');
     var participants = {};
     var participantNames = uniqueValues(extractField(rows, 'ParticipantName'));
@@ -168,6 +168,12 @@ function makeGraph(participants, participantsList) {
   })
 
   console.log('makeGraph', 'nodes:', nodes.length);
+
+  svg.append("text")
+      .text('Connections between companies based on first 500 rows of data')
+      .attr('dx', 20)
+      .attr('dy', 20)
+      .style('fill', '#000000')
 
   var link = svg.selectAll('.link')
     .data(links)
