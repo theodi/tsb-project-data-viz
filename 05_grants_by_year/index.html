@@ -147,7 +147,7 @@ function loadData() {
 }
 
 function makeChart(years, areas, maxEver) {
-  var margin = {top: 20, right: 20, bottom: 30, left: 50}
+  var margin = {top: 20, right: 50, bottom: 30, left: 50}
   var width = w - margin.left - margin.right;
   var height = h - margin.top - margin.bottom;
 
@@ -174,7 +174,7 @@ function makeChart(years, areas, maxEver) {
     .append('g')
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-  x.domain([2003, 2013]);
+  x.domain([2002, 2013]);
   y.domain([0, maxEver]);
 
   var i = 0;
