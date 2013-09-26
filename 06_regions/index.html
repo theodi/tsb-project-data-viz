@@ -38,6 +38,13 @@ var svg;
 var mapSVG = '../data/United_Kingdom_Map_-_Region.svg';
 var dataSet;
 
+var regionNameMap = [
+  ['North West England', 'North West'],
+  ['North East England', 'North East'],
+  ['South West England', 'South West'],
+  ['South East England', 'South East']
+];
+
 function init() {
   svg = d3.select('#charts').append('svg')
     .attr('width', w)
@@ -68,10 +75,24 @@ function loadMap() {
   loadData();
 }
 
+
+function regionNameToSvgId(name) {
+  //make camel case and remove spaces
+  var id = name.split(' ').map(function(s) { return s[0].toUpperCase() + s.substr(1);}).join('');
+  return id;
+}
+
 function loadData() {
   d3.csv('../data/TSB-data-public-sample.csv', function(error, rows) {
+    //normalize region names
+    rows.forEach(function(row) {
+      regionNameMap.forEach(function(regionMapping) {
+        row.Region.replace(regionMapping[0], regionMapping[1]);
+      });
+    });
+
     dataSet = DataSet.fromArray(rows);
-    console.log(dataSet.uniqueValues('Region'))
+    console.log(dataSet.uniqueValues('Region').map(regionNameToSvgId))
   });
 }
 
