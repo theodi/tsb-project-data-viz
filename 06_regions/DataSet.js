@@ -17,7 +17,7 @@ var DataSet = (function() {
   }
 
   function DataSet() {
-
+    this.rows = [];
   }
 
   DataSet.fromArray = function(array) {
@@ -32,6 +32,19 @@ var DataSet = (function() {
 
   DataSet.prototype.uniqueValues = function(fieldName) {
     return unique(extract(this.rows, fieldName));
+  }
+
+  DataSet.prototype.groupBy = function(fieldName) {
+    var groups = {};
+    groups.uniqueValues = [];
+    this.rows.forEach(function(item) {
+      if (!groups[item[fieldName]]) {
+        groups[item[fieldName]] = new DataSet();
+        groups.uniqueValues.push(fieldName);
+      }
+      groups[item[fieldName]].rows.push(item);
+    })
+    return groups;
   }
 
   return DataSet;

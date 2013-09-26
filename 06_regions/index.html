@@ -8,6 +8,16 @@ text {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 12px;
 }
+
+.label {
+  fill: #999;
+  text-transform: uppercase;
+}
+
+.bigNum {
+  font-size: 200%;
+}
+
 .nameLabel {
   xdisplay: none;
   opacity: 0;
@@ -102,9 +112,16 @@ function loadData() {
 
     dataSet = DataSet.fromArray(rows);
 
+    var offsetFromTop = 400;
+
+    var regionalData = dataSet.groupBy('Region');
+    for(var regionName in regionalData) {
+      regionalData[regionNameToSvgId(regionName)] = regionalData[regionName];
+    }
+
     var regionIds = dataSet.uniqueValues('Region').map(regionNameToSvgId);
     regionIds.forEach(function(regionId, i) {
-      svg.select('#' + regionId)
+      svg.transition().select('#' + regionId)
         .style('fill', odiColors[i%odiColors.length])
         .selectAll('path')
         .style('fill', odiColors[i%odiColors.length]);
@@ -112,13 +129,54 @@ function loadData() {
       var region = svg.select('#' + regionId);
       if (region.size() == 0) return;
       var regionBbox = region.node().getBoundingClientRect();
-      console.log(regionBbox);
+
       var regionX = -regionBbox.left - (regionBbox.right - regionBbox.left)/2 + w*0.05 + i * w*0.9/regionIds.length;
-      var regionY = -regionBbox.top + 300;
+      var regionY = -regionBbox.top + offsetFromTop;
       if (i == 11) {
         regionX -= 70;
       }
-      region.transition().attr('transform', 'translate('+regionX/mapScale+','+regionY/mapScale+')');
+      region.transition().delay(1000).duration(2000).attr('transform', 'translate('+regionX/mapScale+','+regionY/mapScale+')');
+
+      var cx = (i + 0.25) * w*0.9/regionIds.length;
+      if (i == 11) {
+        cx -= 40;
+      }
+
+      svg.append('text')
+        .text(regionId.replace('AndTheHumber', ''))
+        .attr('dx', cx)
+        .attr('dy', offsetFromTop - 50)
+        .style('opacity', 0)
+        .transition()
+        .delay(2000)
+        .duration(1000)
+        .style('opacity', 1)
+
+      var regionData = regionalData[regionId];
+      var projects = regionData.groupBy('TSBProjectNumber');
+      console.log(regionId, projects.uniqueValues.length);
+
+      svg.append('text')
+        .text(projects.uniqueValues.length)
+        .attr('class', 'bigNum')
+        .attr('dx', cx)
+        .attr('dy', 50)
+        .style('opacity', 0)
+        .transition()
+        .delay(3000)
+        .duration(1000)
+        .style('opacity', projects.uniqueValues.length/500)
+
+      svg.append('text')
+        .text('Projects')
+        .attr('class', 'label')
+        .attr('dx', cx)
+        .attr('dy', 20)
+        .style('opacity', 0)
+        .transition()
+        .delay(3000)
+        .duration(1000)
+        .style('opacity', 1)
     })
 
     unusedShapes.forEach(function(unusedShapeId) {
