@@ -74,8 +74,9 @@ function loadMap() {
     mapX += w/2 - mapWidth/2;
     mapY += h/2 - mapHeight/2;
     svg.select('#map').attr('transform', 'translate(' + mapX + ',' + mapY + ') scale(' + mapScale + ',' + mapScale + ')');
+
+    loadData();
   });
-  loadData();
 }
 
 
