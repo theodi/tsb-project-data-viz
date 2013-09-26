@@ -74,12 +74,6 @@ function loadMap() {
     mapX += w/2 - mapWidth/2;
     mapY += h/2 - mapHeight/2;
     svg.select('#map').attr('transform', 'translate(' + mapX + ',' + mapY + ') scale(' + mapScale + ',' + mapScale + ')');
-
-    bb = svgMap.getBoundingClientRect();
-    var rect = svg.append('rect');
-    rect.attr('x', bb.left).attr('y', bb.top).attr('width', bb.width).attr('height', bb.height);
-    rect.style('stroke', 'red');
-    rect.style('fill', 'none');
   });
   loadData();
 }
