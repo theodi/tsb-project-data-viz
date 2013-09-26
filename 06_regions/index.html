@@ -66,10 +66,13 @@ function loadMap() {
     var svgMap = svgDoc.getElementById('map');
     svg[0][0].appendChild(svgMap);
     var mapScale = 0.25;
-    var mapMargin = 30;
     var bb = svgMap.getBoundingClientRect();
-    var mapX = -bb.left * mapScale + mapMargin;
-    var mapY = -bb.top * mapScale + mapMargin;
+    var mapX = -bb.left * mapScale;
+    var mapY = -bb.top * mapScale;
+    var mapWidth = (bb.right - bb.left) * mapScale;
+    var mapHeight = (bb.bottom - bb.top) * mapScale;
+    mapX += w/2 - mapWidth/2;
+    mapY += h/2 - mapHeight/2;
     svg.select('#map').attr('transform', 'translate(' + mapX + ',' + mapY + ') scale(' + mapScale + ',' + mapScale + ')');
 
     bb = svgMap.getBoundingClientRect();
@@ -109,8 +112,6 @@ function loadData() {
     })
   });
 }
-
-
 
 window.onload = init;
 
