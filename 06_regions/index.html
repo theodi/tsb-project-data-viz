@@ -71,6 +71,7 @@ function loadMap() {
 function loadData() {
   d3.csv('../data/TSB-data-public-sample.csv', function(error, rows) {
     dataSet = DataSet.fromArray(rows);
+    console.log(dataSet.uniqueValues('Region'))
   });
 }
 
