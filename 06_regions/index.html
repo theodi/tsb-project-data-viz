@@ -38,6 +38,12 @@ var svg;
 var mapSVG = '../data/United_Kingdom_Map_-_Region.svg';
 var dataSet;
 
+var odiColors = [
+  '#2254F4', '#00B7FF', '#08DEF9', '#1DD3A7',
+  '#0DBC37', '#67EF67', '#F9BC26', '#FF6700',
+  '#D60303', '#EF3AAB', '#E6007C', '#B13198'
+];
+
 var regionNameMap = [
   ['North West England', 'North West'],
   ['North East England', 'North East'],
@@ -92,7 +98,15 @@ function loadData() {
     });
 
     dataSet = DataSet.fromArray(rows);
-    console.log(dataSet.uniqueValues('Region').map(regionNameToSvgId))
+
+    var regionIds = dataSet.uniqueValues('Region').map(regionNameToSvgId);
+    regionIds.forEach(function(regionId, i) {
+      console.log(regionId, svg.select('#'+regionId))
+      svg.select('#' + regionId)
+        .style('fill', odiColors[i%odiColors.length])
+        .selectAll('path')
+        .style('fill', odiColors[i%odiColors.length]);
+    })
   });
 }
 
