@@ -37,6 +37,7 @@ var h = window.innerHeight*0.7;
 var svg;
 var mapSVG = '../data/United_Kingdom_Map_-_Region.svg';
 var dataSet;
+var mapScale = 0.25;
 
 var odiColors = [
   '#2254F4', '#00B7FF', '#08DEF9', '#1DD3A7',
@@ -51,6 +52,8 @@ var regionNameMap = [
   ['South East England', 'South East']
 ];
 
+var unusedShapes = ['Ireland', 'IsleOfMan', 'ChannelIslands', 'Border1', 'Border2', 'Border3'];
+
 function init() {
   svg = d3.select('#charts').append('svg')
     .attr('width', w)
@@ -61,11 +64,11 @@ function init() {
 
 
 function loadMap() {
+  console.log('loadMap');
   d3.xml(mapSVG, 'image/svg+xml', function(xml) {
     var svgDoc = document.importNode(xml.documentElement, true);
     var svgMap = svgDoc.getElementById('map');
     svg[0][0].appendChild(svgMap);
-    var mapScale = 0.25;
     var bb = svgMap.getBoundingClientRect();
     var mapX = -bb.left * mapScale;
     var mapY = -bb.top * mapScale;
@@ -91,7 +94,9 @@ function loadData() {
     //normalize region names
     rows.forEach(function(row) {
       regionNameMap.forEach(function(regionMapping) {
-        row.Region.replace(regionMapping[0], regionMapping[1]);
+        if (row.Region == regionMapping[0]) {
+          row.Region = regionMapping[1];
+        }
       });
     });
 
@@ -99,12 +104,26 @@ function loadData() {
 
     var regionIds = dataSet.uniqueValues('Region').map(regionNameToSvgId);
     regionIds.forEach(function(regionId, i) {
-      console.log(regionId, svg.select('#'+regionId))
       svg.select('#' + regionId)
         .style('fill', odiColors[i%odiColors.length])
         .selectAll('path')
         .style('fill', odiColors[i%odiColors.length]);
+
+      var region = svg.select('#' + regionId);
+      if (region.size() == 0) return;
+      var regionBbox = region.node().getBoundingClientRect();
+      console.log(regionBbox);
+      var regionX = -regionBbox.left - (regionBbox.right - regionBbox.left)/2 + w*0.05 + i * w*0.9/regionIds.length;
+      var regionY = -regionBbox.top + 300;
+      if (i == 11) {
+        regionX -= 70;
+      }
+      region.transition().attr('transform', 'translate('+regionX/mapScale+','+regionY/mapScale+')');
     })
+
+    unusedShapes.forEach(function(unusedShapeId) {
+      svg.select('#' + unusedShapeId).style('display', 'none');
+    });
   });
 }
 
