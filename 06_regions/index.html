@@ -29,12 +29,14 @@ g:hover .nameLabel {
 </style>
 <script type="text/javascript" src="../lib/d3.v3.min.js"></script>
 <script type="text/javascript" src="../js/fields.js"></script>
+<script type="text/javascript" src="DataSet.js"></script>
 <script type="text/javascript">
 
 var w = window.innerWidth;
 var h = window.innerHeight*0.7;
 var svg;
 var mapSVG = '../data/United_Kingdom_Map_-_Region.svg';
+var dataSet;
 
 function init() {
   svg = d3.select('#charts').append('svg')
@@ -53,19 +55,26 @@ function loadMap() {
     var mapScale = 0.25;
     var mapMargin = 30;
     var bb = svgMap.getBoundingClientRect();
-    console.log(bb);
     var mapX = -bb.left * mapScale + mapMargin;
     var mapY = -bb.top * mapScale + mapMargin;
     svg.select('#map').attr('transform', 'translate(' + mapX + ',' + mapY + ') scale(' + mapScale + ',' + mapScale + ')');
 
     bb = svgMap.getBoundingClientRect();
-    console.log(bb);
     var rect = svg.append('rect');
     rect.attr('x', bb.left).attr('y', bb.top).attr('width', bb.width).attr('height', bb.height);
     rect.style('stroke', 'red');
     rect.style('fill', 'none');
   });
+  loadData();
 }
+
+function loadData() {
+  d3.csv('../data/TSB-data-public-sample.csv', function(error, rows) {
+    dataSet = DataSet.fromArray(rows);
+  });
+}
+
+
 
 window.onload = init;
 
