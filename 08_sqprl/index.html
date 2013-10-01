@@ -102,8 +102,7 @@ function addParticipantDot(participant) {
     .attr('r', 3)
     .style('fill', 'red')
 
-  //return { x : cx, y : cy };
-  return [cx, cy];
+  return { x : cx, y : cy };
 }
 
 function loadData() {
@@ -113,17 +112,17 @@ function loadData() {
       dots.push(addParticipantDot(participant));
     })
 
-    var d3_geom_voronoi = d3.geom.voronoi()//.x(function(d) { return d.x; }).y(function(d) { return d.y; });
+    var d3_geom_voronoi = d3.geom.voronoi().x(function(d) { return d.x; }).y(function(d) { return d.y; });
     var link = svg.selectAll("line");
     link = link.data(d3_geom_voronoi.links(dots))
     console.log(d3_geom_voronoi.links(dots) );
     link.enter().append("line")
     link
-      .style('stroke', 'red')
-      .attr("x1", function(d) { return d.source[0]; })
-      .attr("y1", function(d) { return d.source[1]; })
-      .attr("x2", function(d) { return d.target[0]; })
-      .attr("y2", function(d) { return d.target[1]; })
+      .style('stroke', 'rgba(255,0,0,0.2)')
+      .attr("x1", function(d) { return d.source.x; })
+      .attr("y1", function(d) { return d.source.y; })
+      .attr("x2", function(d) { return d.target.x; })
+      .attr("y2", function(d) { return d.target.y; })
   });
 
 
