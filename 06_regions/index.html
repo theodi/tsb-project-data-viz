@@ -121,6 +121,11 @@ function loadData() {
 
     var regionIds = dataSet.uniqueValues('Region').map(regionNameToSvgId);
     regionIds.forEach(function(regionId, i) {
+
+      var regionData = regionalData[regionId];
+      var projects = regionData.groupBy('TSBProjectNumber');
+      console.log(regionId, projects.uniqueValues.length);
+
       svg.transition().select('#' + regionId)
         .style('fill', odiColors[i%odiColors.length])
         .selectAll('path')
@@ -152,9 +157,7 @@ function loadData() {
         .duration(1000)
         .style('opacity', 1)
 
-      var regionData = regionalData[regionId];
-      var projects = regionData.groupBy('TSBProjectNumber');
-      console.log(regionId, projects.uniqueValues.length);
+
 
       svg.append('text')
         .text(projects.uniqueValues.length)
