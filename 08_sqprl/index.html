@@ -8,6 +8,9 @@ text {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 12px;
 }
+.tooltip {
+  display: none;
+}
 </style>
 <script type="text/javascript" src="../lib/d3.v3.min.js"></script>
 <script type="text/javascript" src="../js/fields.js"></script>
@@ -23,6 +26,8 @@ var mapSVG = '../data/United_Kingdom_Map_-_Region.svg';
 var dataSet;
 var mapScale = window.innerHeight / 2000;
 var dotR = 5;
+var tooltip;
+var tooltipText;
 
 var odiColors = [
   '#2254F4', '#00B7FF', '#08DEF9', '#1DD3A7',
@@ -107,11 +112,12 @@ function addParticipantDot(participant) {
   var dotObj = { ox : cx, oy: cy, x : cx, y : cy, circle : circle, r : r, selected : false }
 
   circle.on('mouseenter', function() {
-    dotObj.selected = true;
-    d3.select(this).style('fill', odiColors[3])
+    d3.select(this).style('fill', odiColors[3]);
+    tooltip.style('display', 'block');
+    tooltipText.text(participant.participantLabel);
   })
   circle.on('mouseleave', function() {
-    dotObj.selected = false;
+    tooltip.style('display', 'none');
     d3.select(this).style('fill', odiColors[1])
   })
 
@@ -154,18 +160,12 @@ function loadData() {
           }
           var dist = length(ab);
           var r = (a.r + b.r) * 1.5;
-          if (a.selected) r += 2 * a.r;
-          if (b.selected) r += 2 * b.r;
           if (dist < r) {
             var f = 1.0 - dist/r;
-            if (!a.selected) {
-              a.x -= ab.x * 0.5 * f;
-              a.y -= ab.y * 0.5 * f;
-            }
-            if (!b.selected) {
-              b.x += ab.x * 0.5 * f;
-              b.y += ab.y * 0.5 * f;
-            }
+            a.x -= ab.x * 0.5 * f;
+            a.y -= ab.y * 0.5 * f;
+            b.x += ab.x * 0.5 * f;
+            b.y += ab.y * 0.5 * f;
             a.circle.attr('cx', a.x);
             a.circle.attr('cy', a.y);
             b.circle.attr('cx', b.x);
@@ -191,11 +191,32 @@ function loadData() {
     var updateCount = 0;
     var updateInterval = setInterval(function() {
       if (++updateCount > 60) {
-        //clearInterval(updateInterval);
+        clearInterval(updateInterval);
       }
       updateLayout();
       updateLinks();
     }, 1000/30)
+
+    tooltip = svg.append('g')
+      .attr('class', 'tooltip')
+
+    tooltip.append('rect')
+      .attr('width', 200)
+      .attr('height', '1.6em')
+      .style('fill', odiColors[3])
+      .attr('rx', '5px')
+      .attr('ry', '5px')
+
+    tooltipText = tooltip.append('text')
+      .text('BLA BLA')
+      .attr('dx', '0.5em')
+      .attr('dy', '1.5em')
+      .style('fill', '#FFFFFF')
+      .style('font-size', '12px')
+
+    svg.on('mousemove', function(e) {
+      tooltip.attr('transform', function(d) { return 'translate(' + (d3.event.x + 10) + ',' + (d3.event.y-20) + ')'; });
+    })
   });
 
 
