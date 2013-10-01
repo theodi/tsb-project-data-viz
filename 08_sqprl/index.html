@@ -16,13 +16,88 @@ text {
 <script type="text/javascript" src="DataSet.js"></script>
 <script type="text/javascript" src="SPARQLDataSource.js"></script>
 <script type="text/javascript">
-var ds = new SPARQLDataSource();
+var w = window.innerWidth;
+var h = window.innerHeight*0.7;
+var svg;
+var mapSVG = '../data/United_Kingdom_Map_-_Region.svg';
+var dataSet;
+var mapScale = 0.25;
 
+var odiColors = [
+  '#2254F4', '#00B7FF', '#08DEF9', '#1DD3A7',
+  '#0DBC37', '#67EF67', '#F9BC26', '#FF6700',
+  '#D60303', '#EF3AAB', '#E6007C', '#B13198'
+];
+
+var regionsMap = {
+  'E12000001' : 'North East',
+  'E12000002' : 'North West',
+  'E12000003' : 'Yorkshire and The Humber',
+  'E12000004' : 'East Midlands',
+  'E12000005' : 'West Midlands',
+  'E12000006' : 'East of England',
+  'E12000007' : 'London',
+  'E12000008' : 'South East',
+  'E12000009' : 'South West',
+  'S92000003' : 'Scotland',
+  'N92000002' : 'Northern Ireland',
+  'W92000004' : 'Wales'
+};
+
+var ds = new SPARQLDataSource();
 var exampleProject = 'http://tsb-projects.labs.theodi.org/id/project/100416';
 
-ds.getProjectParticipants(exampleProject).then(function(data) {
-  console.log(data);
-});
+function init() {
+  svg = d3.select('#charts').append('svg')
+    .attr('width', w)
+    .attr('height', h);
+
+  loadMap();
+}
+
+function regionNameToSvgId(name) {
+  //make camel case and remove spaces
+  var id = name.split(' ').map(function(s) { return s[0].toUpperCase() + s.substr(1);}).join('');
+  return id;
+}
+
+function loadMap() {
+  console.log('loadMap');
+  d3.xml(mapSVG, 'image/svg+xml', function(xml) {
+    var svgDoc = document.importNode(xml.documentElement, true);
+    var svgMap = svgDoc.getElementById('map');
+    svg[0][0].appendChild(svgMap);
+    var bb = svgMap.getBoundingClientRect();
+    var mapX = -bb.left * mapScale;
+    var mapY = -bb.top * mapScale;
+    var mapWidth = (bb.right - bb.left) * mapScale;
+    var mapHeight = (bb.bottom - bb.top) * mapScale;
+    mapX += w/2 - mapWidth/2;
+    mapY += h/2 - mapHeight/2;
+    svg.select('#map').attr('transform', 'translate(' + mapX + ',' + mapY + ') scale(' + mapScale + ',' + mapScale + ')');
+
+    var i = 0;
+    for(var regionGovId in regionsMap) {
+      var regionId = regionNameToSvgId(regionsMap[regionGovId]);
+      console.log(regionGovId, regionsMap[regionGovId], regionId, svg.select('#' + regionId));
+      svg.select('#' + regionId)
+        .style('fill', odiColors[i%odiColors.length])
+        .selectAll('path')
+        .style('fill', odiColors[i%odiColors.length])
+      i++;
+    }
+
+    loadData();
+  });
+}
+
+function loadData() {
+  ds.getProjectParticipants(exampleProject).then(function(data) {
+    console.log(data);
+  });
+}
+
+window.onload = init;
 
 </script>
 </head>
