@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TSB Data Viz</title>
+<style type="text/css">
+text {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 12px;
+}
+</style>
+<script type="text/javascript" src="../lib/d3.v3.min.js"></script>
+<script type="text/javascript" src="../js/fields.js"></script>
+<script type="text/javascript" src="sparql.js"></script>
+<script type="text/javascript">
+
+var sparqler = new SPARQL.Service("proxy.php");
+sparqler.setPrefix("tsb", "http://tsb-projects.labs.theodi.org/def/");
+sparqler.setPrefix("rdf", "http://www.w3.org/2000/01/rdf-schema#");
+sparqler.setOutput("json");
+var query = sparqler.createQuery();
+query.query(
+  "SELECT ?s WHERE { ?s a tsb:Project . }",
+  {failure: onFailure, success: onSuccess}
+);
+
+function onFailure(err) {
+  console.log('onFailure', err);
+}
+
+function onSuccess(json) {
+  console.log('onSuccess', json);
+}
+
+//select
+//?s
+//where {
+//  ?s a <http://tsb-projects.labs.theodi.org/def/Project> ;
+//  <http://www.w3.org/2000/01/rdf-schema#label> ?label .
+//}
+</script>
+</head>
+<body>
+  <div id="charts"></div>
+</body>
+</html>
