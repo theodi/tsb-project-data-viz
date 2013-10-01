@@ -92,7 +92,7 @@ function loadMap() {
         .style('fill', '#DDD')
     }
 
-    loadData();
+    loadData(exampleProject);
   });
 }
 
@@ -126,12 +126,17 @@ function addParticipantDot(participant) {
     d3.select(this).style('fill', isEduction ? odiColors[3] : odiColors[1])
   })
   circle.on('click', function() {
-    listOrganisationProjects(participant.participant);
+    //listOrganisationProjects(participant.participant);
+    svg.selectAll('circle').transition().attr('r', 0);
+    svg.selectAll('line').transition().style('opacity', 0);
+    setTimeout(function() {
+      loadData(dotObj.projects[0]);
+    }, 1000);
   })
 
   ds.getOrganisationProjects(participant.participant).then(function(data) {
     dotObj.r = minDotR + data.rows.length;
-    circle.transition().attr('r', 2 + data.rows.length);
+    circle.transition().duration(500).attr('r', 2 + data.rows.length);
     dotObj.loaded = true;
     dotObj.projects = data;
   });
@@ -224,10 +229,10 @@ function loadData() {
           var r = (a.r + b.r) * 1.5;
           if (dist < r) {
             var f = 1.0 - dist/r;
-            a.x -= ab.x * 0.15 * f;
-            a.y -= ab.y * 0.15 * f;
-            b.x += ab.x * 0.15 * f;
-            b.y += ab.y * 0.15 * f;
+            a.x -= ab.x * 0.05 * f;
+            a.y -= ab.y * 0.05 * f;
+            b.x += ab.x * 0.05 * f;
+            b.y += ab.y * 0.05 * f;
             a.circle.attr('cx', a.x);
             a.circle.attr('cy', a.y);
             b.circle.attr('cx', b.x);
@@ -235,16 +240,23 @@ function loadData() {
           }
         });
       })
-
     }
+
+    var link = linkGroup.selectAll("line");
+      link = link.data(d3_geom_voronoi.links(dots))
+      link.enter().append("line")
+      link
+        .style('stroke', odiColors[1])
+        .style('opacity', 0)
+      link.transition()
+        .duration(500)
+        .style('opacity', 0.5)
 
     function updateLinks() {
       var link = linkGroup.selectAll("line");
       link = link.data(d3_geom_voronoi.links(dots))
       link.enter().append("line")
       link
-        .style('stroke', odiColors[1])
-        .style('opacity', 0.5)
         .attr("x1", function(d) { return d.source.x; })
         .attr("y1", function(d) { return d.source.y; })
         .attr("x2", function(d) { return d.target.x; })
