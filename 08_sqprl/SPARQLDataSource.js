@@ -16,6 +16,10 @@ SPARQLDataSource.prototype.query = function(queryStr) {
   query.query(queryStr, {
     failure: function(err) { deferred.reject(new Error(err)); },
     success: function(json) {
+      if (!json) {
+        deferred.reject(new Error('No data'));
+        return;
+      }
       var data = json.results.bindings.map(self.extractValues);
       var dataSet = DataSet.fromArray(data);
       deferred.resolve(dataSet);
