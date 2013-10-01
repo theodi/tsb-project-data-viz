@@ -22,6 +22,7 @@ var svg;
 var mapSVG = '../data/United_Kingdom_Map_-_Region.svg';
 var dataSet;
 var mapScale = window.innerHeight / 2000;
+var dotR = 5;
 
 var odiColors = [
   '#2254F4', '#00B7FF', '#08DEF9', '#1DD3A7',
@@ -96,13 +97,13 @@ function addParticipantDot(participant) {
   var regionBbox = region.node().getBoundingClientRect();
   var cx = (regionBbox.right + regionBbox.left)/2 - 20 + Math.random() * 40;
   var cy = (regionBbox.top + regionBbox.bottom)/2 - 20 + Math.random() * 40;
-  svg.append('circle')
+  var circle = svg.append('circle')
     .attr('cx', cx)
     .attr('cy', cy)
-    .attr('r', 3)
+    .attr('r', dotR)
     .style('fill', 'red')
 
-  return { x : cx, y : cy };
+  return { ox : cx, oy: cy, x : cx, y : cy, circle : circle };
 }
 
 function loadData() {
@@ -115,7 +116,6 @@ function loadData() {
     var d3_geom_voronoi = d3.geom.voronoi().x(function(d) { return d.x; }).y(function(d) { return d.y; });
     var link = svg.selectAll("line");
     link = link.data(d3_geom_voronoi.links(dots))
-    console.log(d3_geom_voronoi.links(dots) );
     link.enter().append("line")
     link
       .style('stroke', 'rgba(255,0,0,0.2)')
@@ -123,7 +123,46 @@ function loadData() {
       .attr("y1", function(d) { return d.source.y; })
       .attr("x2", function(d) { return d.target.x; })
       .attr("y2", function(d) { return d.target.y; })
+
+    function dist(a, b) {
+      return Math.sqrt((a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y));
+    }
+
+    function length(v) {
+      return Math.sqrt(v.x*v.x + v.y*v.y);
+    }
+
+    var updateInterval = setInterval(function() {
+      dots.forEach(function(a) {
+        dots.forEach(function(b) {
+          if (a == b) return;
+          var ab = {
+            x : b.x - a.x,
+            y : b.y - a.y
+          }
+          if (length(ab) < dotR * 2) {
+            a.x -= ab.x * 0.5;
+            a.y -= ab.y * 0.5;
+            b.x += ab.x * 0.5;
+            b.y += ab.y * 0.5;
+            a.circle.attr('cx', a.x);
+            a.circle.attr('cy', a.y);
+            b.circle.attr('cx', b.x);
+            b.circle.attr('cy', b.y);
+          }
+        });
+      })
+      link = link.data(d3_geom_voronoi.links(dots))
+      link.enter().append("line")
+      link
+        .style('stroke', 'rgba(255,0,0,0.2)')
+        .attr("x1", function(d) { return d.source.x; })
+        .attr("y1", function(d) { return d.source.y; })
+        .attr("x2", function(d) { return d.target.x; })
+        .attr("y2", function(d) { return d.target.y; })
+    }, 1000/25)
   });
+
 
 
 }
