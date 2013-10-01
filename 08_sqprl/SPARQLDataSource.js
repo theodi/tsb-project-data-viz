@@ -85,14 +85,39 @@ SPARQLDataSource.prototype.getProjectInfo = function(projectId) {
   return this.query(q);
 }
 
+/*
+select (count(distinct(?o)) as ?numParticipants) ?project ?projectLabel where {
+  ?o a <http://tsb-projects.labs.theodi.org/def/Organization> .
+  ?o <http://tsb-projects.labs.theodi.org/def/participatesIn> ?project .
+    {
+      select ?project ?projectLabel  where {
+        ?project a <http://tsb-projects.labs.theodi.org/def/Project> .
+        ?project <http://www.w3.org/2000/01/rdf-schema#label> ?projectLabel .
+        ?project <http://tsb-projects.labs.theodi.org/def/hasParticipant>  <http://tsb-projects.labs.theodi.org/id/organization/04190816> .
+      } 
+    }
+}  GROUP BY ?project ?projectLabel
+(/)
+*/
+
+
 SPARQLDataSource.prototype.getOrganisationProjects = function(organisationId) {
   var q =" \
-    SELECT ?project ?projectLabel \
+    SELECT (count(distinct(?o)) as ?numParticipants) ?project ?projectLabel \
     WHERE { \
-      ?project a tsb:Project . \
-      ?project rdf:label ?projectLabel . \
-      ?project tsb:hasParticipant  <" + organisationId + "> . \
-    }";
+      ?o a tsb:Organization . \
+      ?o tsb:participatesIn ?project . \
+      { \
+        SELECT ?project ?projectLabel \
+        WHERE { \
+          ?project a tsb:Project . \
+          ?project rdf:label ?projectLabel . \
+          ?project tsb:hasParticipant  <" + organisationId + "> . \
+        } \
+      } \
+    } \
+    GROUP BY ?project ?projectLabel \
+    ";
 
   return this.query(q);
 }
