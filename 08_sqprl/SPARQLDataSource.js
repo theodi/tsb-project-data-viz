@@ -13,7 +13,12 @@ SPARQLDataSource.prototype.getProjects = function(callback) {
   sparqler.setOutput("json");
   var query = sparqler.createQuery();
   query.query(
-    "SELECT ?s WHERE { ?s a tsb:Project . }",
+    " \
+    SELECT (?p as ?uri) ?label \
+    WHERE { \
+      ?p a tsb:Project . \
+      ?p rdf:label ?label \
+    }",
     {failure: onFailure, success: onSuccess}
   );
 
@@ -23,9 +28,9 @@ SPARQLDataSource.prototype.getProjects = function(callback) {
 
   function onSuccess(json) {
     var projects = json.results.bindings.map(function(binding) {
-      return { url : binding.s.value };
+      return { uri : binding.uri.value, label : binding.label.value };
     });
-    deferred.resolve(projects);
+    deferred.resolve(projects[0]);
   }
 
   return deferred.promise;
