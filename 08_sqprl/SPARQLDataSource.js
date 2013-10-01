@@ -4,7 +4,7 @@ function SPARQLDataSource() {
 
 SPARQLDataSource.endpoint = "proxy.php";
 
-SPARQLDataSource.prototype.getProjects = function(callback) {
+SPARQLDataSource.prototype.query = function(q)
   var deferred = Q.defer();
 
   var sparqler = new SPARQL.Service(SPARQLDataSource.endpoint);
