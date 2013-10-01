@@ -11,6 +11,7 @@ SPARQLDataSource.prototype.query = function(queryStr) {
   var sparqler = new SPARQL.Service(SPARQLDataSource.endpoint);
   sparqler.setPrefix("tsb", "http://tsb-projects.labs.theodi.org/def/");
   sparqler.setPrefix("rdf", "http://www.w3.org/2000/01/rdf-schema#");
+  sparqler.setPrefix("w3", "http://www.w3.org/ns/org#");
   sparqler.setOutput("json");
   var query = sparqler.createQuery();
   query.query(queryStr, {
@@ -63,10 +64,12 @@ SPARQLDataSource.prototype.getProjectsParticipants = function() {
 
 SPARQLDataSource.prototype.getProjectParticipants = function(projectId) {
   var q =" \
-    SELECT ?participant ?participantLabel \
+    SELECT ?participant ?participantLabel ?participantRegion \
     WHERE { \
       <" + projectId + "> tsb:hasParticipant ?participant . \
       ?participant rdf:label ?participantLabel . \
+      ?participant w3:hasSite ?participantSite . \
+      ?participantSite tsb:region ?participantRegion . \
     }";
 
   return this.query(q);
