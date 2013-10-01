@@ -25,7 +25,7 @@ var svg;
 var mapSVG = '../data/United_Kingdom_Map_-_Region.svg';
 var dataSet;
 var mapScale = window.innerHeight / 2000;
-var dotR = 5;
+var minDotR = 3;
 var tooltip;
 var tooltipText;
 var title;
@@ -103,14 +103,14 @@ function addParticipantDot(participant) {
   var regionBbox = region.node().getBoundingClientRect();
   var cx = (regionBbox.right + regionBbox.left)/2 - 20 + Math.random() * 40;
   var cy = (regionBbox.top + regionBbox.bottom)/2 - 20 + Math.random() * 40;
-  var r = dotR + Math.random() * dotR;
+  var r = minDotR;
   var circle = svg.append('circle')
     .attr('cx', cx)
     .attr('cy', cy)
     .attr('r', r)
     .style('fill', odiColors[1])
 
-  var dotObj = { ox : cx, oy: cy, x : cx, y : cy, circle : circle, r : r, selected : false }
+  var dotObj = { ox : cx, oy: cy, x : cx, y : cy, circle : circle, r : r, selected : false, loaded: false }
 
   circle.on('mouseenter', function() {
     d3.select(this).style('fill', odiColors[3]);
@@ -124,6 +124,13 @@ function addParticipantDot(participant) {
   circle.on('click', function() {
     listOrganisationProjects(participant.participant);
   })
+
+  ds.getOrganisationProjects(participant.participant).then(function(data) {
+    console.log('numProjects', data.rows.length);
+    dotObj.r = minDotR + data.rows.length;
+    circle.transition().attr('r', 2 + data.rows.length);
+    dotObj.loaded = true;
+  });
 
   return dotObj;
 }
@@ -205,7 +212,14 @@ function loadData() {
 
     var updateCount = 0;
     var updateInterval = setInterval(function() {
-      if (++updateCount > 60) {
+      var numLoaded = 0;
+      dots.forEach(function(dot) {
+        if (dot.loaded) numLoaded++;
+      });
+      if (numLoaded == dots.length) {
+        updateCount++;
+      }
+      if (updateCount > 60) {
         clearInterval(updateInterval);
       }
       updateLayout();
@@ -233,10 +247,6 @@ function loadData() {
       tooltip.attr('transform', function(d) { return 'translate(' + (d3.event.x + 10) + ',' + (d3.event.y-20) + ')'; });
     })
   });
-}
-
-function listOrganisationProjects(participant) {
-  console.log('listOrganisationProjects', participant);
 }
 
 window.onload = init;

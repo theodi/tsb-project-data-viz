@@ -84,3 +84,15 @@ SPARQLDataSource.prototype.getProjectInfo = function(projectId) {
 
   return this.query(q);
 }
+
+SPARQLDataSource.prototype.getOrganisationProjects = function(organisationId) {
+  var q =" \
+    SELECT ?project ?projectLabel \
+    WHERE { \
+      ?project a tsb:Project . \
+      ?project rdf:label ?projectLabel . \
+      ?project tsb:hasParticipant  <" + organisationId + "> . \
+    }";
+
+  return this.query(q);
+}
