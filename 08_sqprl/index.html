@@ -18,19 +18,11 @@ text {
 <script type="text/javascript">
 var ds = new SPARQLDataSource();
 
-ds.getProjectsParticipants().then(function(data) {
-  var projectsById = data.groupBy('project');
-  var projects = [];
-  for(var id in projectsById) {
-    if (id == 'uniqueValues') continue;
-    var project = projectsById[id];
-    projects.push(project);
-  }
-  projects.sort(function(a, b) {
-    return -(a.rows.length - b.rows.length);
-  })
-  console.log('bla',projects);
-})
+var exampleProject = 'http://tsb-projects.labs.theodi.org/id/project/100416';
+
+ds.getProjectParticipants(exampleProject).then(function(data) {
+  console.log(data);
+});
 
 </script>
 </head>

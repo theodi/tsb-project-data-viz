@@ -60,3 +60,14 @@ SPARQLDataSource.prototype.getProjectsParticipants = function() {
 
   return this.query(q);
 }
+
+SPARQLDataSource.prototype.getProjectParticipants = function(projectId) {
+  var q =" \
+    SELECT ?participant ?participantLabel \
+    WHERE { \
+      <" + projectId + "> tsb:hasParticipant ?participant . \
+      ?participant rdf:label ?participantLabel . \
+    }";
+
+  return this.query(q);
+}
