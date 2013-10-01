@@ -112,7 +112,9 @@ function addParticipantDot(participant) {
     .attr('r', r)
     .style('fill', isEduction ? odiColors[3] : odiColors[1])
 
-  var dotObj = { ox : cx, oy: cy, x : cx, y : cy, circle : circle, r : r, selected : false, loaded: false, projects : [] }
+  var dotObj = { ox : cx, oy: cy, x : cx, y : cy, circle : circle, r : r, selected : false, loaded: false, projects : {} }
+
+  var projectLinks = [];
 
   circle.on('mouseenter', function() {
     d3.select(this).style('fill', odiColors[6]);
@@ -126,12 +128,14 @@ function addParticipantDot(participant) {
     d3.select(this).style('fill', isEduction ? odiColors[3] : odiColors[1])
   })
   circle.on('click', function() {
-    //listOrganisationProjects(participant.participant);
-    svg.selectAll('circle').transition().attr('r', 0);
-    svg.selectAll('line').transition().style('opacity', 0);
-    setTimeout(function() {
-      loadData(dotObj.projects[0]);
-    }, 1000);
+    projectLinks.forEach(function(projectLink) {
+      if (projectLink.style('display') == 'none') {
+        projectLink.style('display', 'block');
+      }
+      else {
+        projectLink.style('display', 'none');
+      }
+    });
   })
 
   ds.getOrganisationProjects(participant.participant).then(function(data) {
@@ -139,23 +143,65 @@ function addParticipantDot(participant) {
     circle.transition().duration(500).attr('r', 2 + data.rows.length);
     dotObj.loaded = true;
     dotObj.projects = data;
+
+    data.rows.forEach(function(project, i) {
+      var projectLink = svg.append('g')
+      .attr('class', 'projectLink');
+
+      projectLinks.push(projectLink);
+
+      projectLink.style('display', 'none');
+
+      projectLink.attr('transform', function(d) { return 'translate(' + (dotObj.x) + ',' + (dotObj.y - (i + 1) * 22) + ')'; });
+
+      var projectLinkBg = projectLink.append('rect')
+        .attr('width', '20px')
+        .attr('height', '20px')
+        .style('fill', isEduction ? odiColors[3] : odiColors[1])
+        .attr('rx', '5px')
+        .attr('ry', '5px')
+
+      projectLinkBg.on('mouseenter', function() {
+        d3.select(this).style('fill', odiColors[6]);
+        tooltip.style('display', 'block');
+        tooltipText.text(project.projectLabel);
+        var w = tooltipText.node().getComputedTextLength();
+        tooltip.select('rect').attr('width', w + 20)
+      })
+      projectLinkBg.on('mouseleave', function() {
+        tooltip.style('display', 'none');
+        d3.select(this).style('fill', isEduction ? odiColors[3] : odiColors[1])
+      })
+      projectLinkBg.on('click', function() {
+        projectLinks.forEach(function(projectLink) {
+          projectLink.style('display', 'none');
+        });
+        svg.selectAll('.title').transition().attr('opacity', 0).remove();
+        svg.selectAll('circle').transition().attr('r', 0).remove();
+        svg.selectAll('line').transition().style('opacity', 0).remove();
+        svg.selectAll('.projectLink').transition().attr('opacity', 0).remove();;
+        tooltip.style('display', 'none');
+        setTimeout(function() {
+          loadData(project.project);
+        }, 1000);
+      });
+    });
   });
 
   return dotObj;
 }
 
-function loadData() {
+function loadData(project) {
   var dots = [];
 
-  ds.getProjectInfo(exampleProject).then(function(data) {
-    console.log(data);
-
+  ds.getProjectInfo(project).then(function(data) {
     var lines = [];
 
     var words = data.rows[0].projectLabel.split(' ');
 
     var mainLabel = svg.append('text')
       .text('PROJECT:')
+      .attr('class', 'title')
       .attr('dx', '3.6em')
       .attr('dy', '5.5em')
       .style('fill', '#999')
@@ -193,11 +239,11 @@ function loadData() {
       }
     }
     label.remove();
-    console.log(lines);
 
     lines.forEach(function(line, i) {
       svg.append('text')
       .text(line)
+      .attr('class', 'title')
       .attr('dx', '2.5em')
       .attr('dy', (5.5 + 1.2*i)+'em')
       .style('fill', '#000000')
@@ -205,7 +251,7 @@ function loadData() {
     })
   })
 
-  ds.getProjectParticipants(exampleProject).then(function(data) {
+  ds.getProjectParticipants(project).then(function(data) {
     var linkGroup = svg.append('g');
     data.rows.forEach(function(participant) {
       dots.push(addParticipantDot(participant));
@@ -279,26 +325,33 @@ function loadData() {
       updateLinks();
     }, 1000/30)
 
-    tooltip = svg.append('g')
-      .attr('class', 'tooltip')
 
-    tooltip.append('rect')
-      .attr('width', 200)
-      .attr('height', '1.6em')
-      .style('fill', odiColors[6])
-      .attr('rx', '5px')
-      .attr('ry', '5px')
+    if (!tooltip) {
+      tooltip = svg.append('g')
+        .attr('class', 'tooltip')
 
-    tooltipText = tooltip.append('text')
-      .text('BLA BLA')
-      .attr('dx', '0.5em')
-      .attr('dy', '1.5em')
-      .style('fill', '#000')
-      .style('font-size', '12px')
+      tooltip.append('rect')
+        .attr('width', 200)
+        .attr('height', '1.6em')
+        .style('fill', odiColors[6])
+        .attr('rx', '5px')
+        .attr('ry', '5px')
 
-    svg.on('mousemove', function(e) {
-      tooltip.attr('transform', function(d) { return 'translate(' + (d3.event.x + 10) + ',' + (d3.event.y-20) + ')'; });
-    })
+      tooltipText = tooltip.append('text')
+        .text('BLA BLA')
+        .attr('dx', '0.5em')
+        .attr('dy', '1.5em')
+        .style('fill', '#000')
+        .style('font-size', '12px')
+
+      svg.on('mousemove', function(e) {
+        tooltip.attr('transform', function(d) { return 'translate(' + (d3.event.x + 10) + ',' + (d3.event.y-20) + ')'; });
+      })
+    }
+    else {
+      tooltip.detach()
+      svg.append(tooltip)
+    }
   });
 }
 
