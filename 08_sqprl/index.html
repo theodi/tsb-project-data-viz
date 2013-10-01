@@ -101,7 +101,7 @@ function addParticipantDot(participant) {
     .attr('cx', cx)
     .attr('cy', cy)
     .attr('r', dotR)
-    .style('fill', 'red')
+    .style('fill', odiColors[1])
 
   return { ox : cx, oy: cy, x : cx, y : cy, circle : circle };
 }
@@ -114,25 +114,12 @@ function loadData() {
     })
 
     var d3_geom_voronoi = d3.geom.voronoi().x(function(d) { return d.x; }).y(function(d) { return d.y; });
-    var link = svg.selectAll("line");
-    link = link.data(d3_geom_voronoi.links(dots))
-    link.enter().append("line")
-    link
-      .style('stroke', 'rgba(255,0,0,0.2)')
-      .attr("x1", function(d) { return d.source.x; })
-      .attr("y1", function(d) { return d.source.y; })
-      .attr("x2", function(d) { return d.target.x; })
-      .attr("y2", function(d) { return d.target.y; })
-
-    function dist(a, b) {
-      return Math.sqrt((a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y));
-    }
 
     function length(v) {
       return Math.sqrt(v.x*v.x + v.y*v.y);
     }
 
-    var updateInterval = setInterval(function() {
+    function updateLayout() {
       dots.forEach(function(a) {
         dots.forEach(function(b) {
           if (a == b) return;
@@ -140,7 +127,7 @@ function loadData() {
             x : b.x - a.x,
             y : b.y - a.y
           }
-          if (length(ab) < dotR * 2) {
+          if (length(ab) < dotR * 2.0) {
             a.x -= ab.x * 0.5;
             a.y -= ab.y * 0.5;
             b.x += ab.x * 0.5;
@@ -152,15 +139,21 @@ function loadData() {
           }
         });
       })
-      link = link.data(d3_geom_voronoi.links(dots))
-      link.enter().append("line")
-      link
-        .style('stroke', 'rgba(255,0,0,0.2)')
-        .attr("x1", function(d) { return d.source.x; })
-        .attr("y1", function(d) { return d.source.y; })
-        .attr("x2", function(d) { return d.target.x; })
-        .attr("y2", function(d) { return d.target.y; })
-    }, 1000/25)
+    }
+
+    for(var i=0; i<10; i++) {
+      updateLayout();
+    }
+
+    var link = svg.selectAll("line");
+    link = link.data(d3_geom_voronoi.links(dots))
+    link.enter().append("line")
+    link
+      .style('stroke', odiColors[1])
+      .attr("x1", function(d) { return d.source.x; })
+      .attr("y1", function(d) { return d.source.y; })
+      .attr("x2", function(d) { return d.target.x; })
+      .attr("y2", function(d) { return d.target.y; })
   });
 
 
