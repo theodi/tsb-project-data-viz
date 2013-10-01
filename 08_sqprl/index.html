@@ -103,8 +103,8 @@ function addParticipantDot(participant) {
   var participantId = participant.participant.substr(participant.participant.lastIndexOf('/')+1);
   var isEduction = participantId[0] == 'R';
   var regionBbox = region.node().getBoundingClientRect();
-  var cx = (regionBbox.right + regionBbox.left)/2 - 20 + Math.random() * 40;
-  var cy = (regionBbox.top + regionBbox.bottom)/2 - 20 + Math.random() * 40;
+  var cx = (regionBbox.right + regionBbox.left)/2 - Math.random() * 2;
+  var cy = (regionBbox.top + regionBbox.bottom)/2 - Math.random() * 2;
   var r = minDotR;
   var circle = svg.append('circle')
     .attr('cx', cx)
@@ -119,7 +119,7 @@ function addParticipantDot(participant) {
   circle.on('mouseenter', function() {
     d3.select(this).style('fill', odiColors[6]);
     tooltip.style('display', 'block');
-    tooltipText.text(participant.participantLabel);
+    tooltipText.text(participant.participantLabel + ' ' + participantId);
     var w = tooltipText.node().getComputedTextLength();
     tooltip.select('rect').attr('width', w + 20)
   })
@@ -139,11 +139,15 @@ function addParticipantDot(participant) {
   })
 
   ds.getOrganisationProjects(participant.participant).then(function(data) {
-    dotObj.r = minDotR + data.rows.length;
-    circle.transition().duration(500).attr('r', 2 + data.rows.length);
+    dotObj.r = minDotR + Math.sqrt(data.rows.length);
+    circle.transition().duration(500).attr('r', dotObj.r);
     dotObj.loaded = true;
     dotObj.projects = data;
 
+    data.rows.sort(function(a, b) {
+      return -(Number(a.numParticipants) - Number(b.numParticipants));
+    })
+    data.rows = data.rows.slice(0, Math.min(data.rows.length, 10));
     data.rows.forEach(function(project, i) {
       var projectLink = svg.append('g')
       .attr('class', 'projectLink');
@@ -161,18 +165,24 @@ function addParticipantDot(participant) {
         .attr('rx', '5px')
         .attr('ry', '5px')
 
-      projectLinkBg.on('mouseenter', function() {
-        d3.select(this).style('fill', odiColors[6]);
+      projectLink.append('text')
+        .style('fill', '#000000')
+        .attr('dx', '3px')
+        .attr('dy', '13px')
+        .text(project.numParticipants)
+
+      projectLink.on('mouseenter', function() {
+        projectLinkBg.style('fill', odiColors[6]);
         tooltip.style('display', 'block');
         tooltipText.text(project.projectLabel);
         var w = tooltipText.node().getComputedTextLength();
         tooltip.select('rect').attr('width', w + 20)
       })
-      projectLinkBg.on('mouseleave', function() {
+      projectLink.on('mouseleave', function() {
         tooltip.style('display', 'none');
-        d3.select(this).style('fill', isEduction ? odiColors[3] : odiColors[1])
+        projectLinkBg.style('fill', isEduction ? odiColors[3] : odiColors[1])
       })
-      projectLinkBg.on('click', function() {
+      projectLink.on('click', function() {
         projectLinks.forEach(function(projectLink) {
           projectLink.style('display', 'none');
         });
@@ -326,32 +336,29 @@ function loadData(project) {
     }, 1000/30)
 
 
-    if (!tooltip) {
-      tooltip = svg.append('g')
-        .attr('class', 'tooltip')
-
-      tooltip.append('rect')
-        .attr('width', 200)
-        .attr('height', '1.6em')
-        .style('fill', odiColors[6])
-        .attr('rx', '5px')
-        .attr('ry', '5px')
-
-      tooltipText = tooltip.append('text')
-        .text('BLA BLA')
-        .attr('dx', '0.5em')
-        .attr('dy', '1.5em')
-        .style('fill', '#000')
-        .style('font-size', '12px')
-
-      svg.on('mousemove', function(e) {
-        tooltip.attr('transform', function(d) { return 'translate(' + (d3.event.x + 10) + ',' + (d3.event.y-20) + ')'; });
-      })
+    if (tooltip) {
+      tooltip.remove();
     }
-    else {
-      tooltip.detach()
-      svg.append(tooltip)
-    }
+    tooltip = svg.append('g')
+      .attr('class', 'tooltip')
+
+    tooltip.append('rect')
+      .attr('width', 200)
+      .attr('height', '1.6em')
+      .style('fill', odiColors[6])
+      .attr('rx', '5px')
+      .attr('ry', '5px')
+
+    tooltipText = tooltip.append('text')
+      .text('BLA BLA')
+      .attr('dx', '0.5em')
+      .attr('dy', '1.5em')
+      .style('fill', '#000')
+      .style('font-size', '12px')
+
+    svg.on('mousemove', function(e) {
+      tooltip.attr('transform', function(d) { return 'translate(' + (d3.event.x + 10) + ',' + (d3.event.y-20) + ')'; });
+    })
   });
 }
 
