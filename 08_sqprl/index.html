@@ -100,6 +100,8 @@ function addParticipantDot(participant) {
   var regionGovId = participant.participantRegion.substr(participant.participantRegion.lastIndexOf('/')+1);
   var regionId = regionNameToSvgId(regionsMap[regionGovId]);
   var region = svg.select('#' + regionId);
+  var participantId = participant.participant.substr(participant.participant.lastIndexOf('/')+1);
+  var isEduction = participantId[0] == 'R';
   var regionBbox = region.node().getBoundingClientRect();
   var cx = (regionBbox.right + regionBbox.left)/2 - 20 + Math.random() * 40;
   var cy = (regionBbox.top + regionBbox.bottom)/2 - 20 + Math.random() * 40;
@@ -108,25 +110,26 @@ function addParticipantDot(participant) {
     .attr('cx', cx)
     .attr('cy', cy)
     .attr('r', r)
-    .style('fill', odiColors[1])
+    .style('fill', isEduction ? odiColors[3] : odiColors[1])
 
   var dotObj = { ox : cx, oy: cy, x : cx, y : cy, circle : circle, r : r, selected : false, loaded: false }
 
   circle.on('mouseenter', function() {
-    d3.select(this).style('fill', odiColors[3]);
+    d3.select(this).style('fill', odiColors[6]);
     tooltip.style('display', 'block');
     tooltipText.text(participant.participantLabel);
+    var w = tooltipText.node().getComputedTextLength();
+    tooltip.select('rect').attr('width', w + 20)
   })
   circle.on('mouseleave', function() {
     tooltip.style('display', 'none');
-    d3.select(this).style('fill', odiColors[1])
+    d3.select(this).style('fill', isEduction ? odiColors[3] : odiColors[1])
   })
   circle.on('click', function() {
     listOrganisationProjects(participant.participant);
   })
 
   ds.getOrganisationProjects(participant.participant).then(function(data) {
-    console.log('numProjects', data.rows.length);
     dotObj.r = minDotR + data.rows.length;
     circle.transition().attr('r', 2 + data.rows.length);
     dotObj.loaded = true;
@@ -192,6 +195,7 @@ function loadData() {
       link.enter().append("line")
       link
         .style('stroke', odiColors[1])
+        .style('opacity', 0.5)
         .attr("x1", function(d) { return d.source.x; })
         .attr("y1", function(d) { return d.source.y; })
         .attr("x2", function(d) { return d.target.x; })
@@ -220,7 +224,7 @@ function loadData() {
     tooltip.append('rect')
       .attr('width', 200)
       .attr('height', '1.6em')
-      .style('fill', odiColors[3])
+      .style('fill', odiColors[6])
       .attr('rx', '5px')
       .attr('ry', '5px')
 
@@ -228,7 +232,7 @@ function loadData() {
       .text('BLA BLA')
       .attr('dx', '0.5em')
       .attr('dy', '1.5em')
-      .style('fill', '#FFFFFF')
+      .style('fill', '#000')
       .style('font-size', '12px')
 
     svg.on('mousemove', function(e) {
