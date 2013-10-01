@@ -76,15 +76,13 @@ function loadMap() {
     mapY += h/2 - mapHeight/2;
     svg.select('#map').attr('transform', 'translate(' + mapX + ',' + mapY + ') scale(' + mapScale + ',' + mapScale + ')');
 
-    var i = 0;
     for(var regionGovId in regionsMap) {
       var regionId = regionNameToSvgId(regionsMap[regionGovId]);
       console.log(regionGovId, regionsMap[regionGovId], regionId, svg.select('#' + regionId));
       svg.select('#' + regionId)
-        .style('fill', odiColors[i%odiColors.length])
+        .style('fill', '#DDD')
         .selectAll('path')
-        .style('fill', odiColors[i%odiColors.length])
-      i++;
+        .style('fill', '#DDD')
     }
 
     loadData();
