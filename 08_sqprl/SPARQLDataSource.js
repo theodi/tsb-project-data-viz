@@ -74,3 +74,13 @@ SPARQLDataSource.prototype.getProjectParticipants = function(projectId) {
 
   return this.query(q);
 }
+
+SPARQLDataSource.prototype.getProjectInfo = function(projectId) {
+  var q =" \
+    SELECT ?projectLabel \
+    WHERE { \
+      <" + projectId + "> rdf:label ?projectLabel . \
+    }";
+
+  return this.query(q);
+}

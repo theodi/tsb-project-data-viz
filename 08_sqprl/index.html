@@ -28,6 +28,7 @@ var mapScale = window.innerHeight / 2000;
 var dotR = 5;
 var tooltip;
 var tooltipText;
+var title;
 
 var odiColors = [
   '#2254F4', '#00B7FF', '#08DEF9', '#1DD3A7',
@@ -120,12 +121,26 @@ function addParticipantDot(participant) {
     tooltip.style('display', 'none');
     d3.select(this).style('fill', odiColors[1])
   })
+  circle.on('click', function() {
+    listOrganisationProjects(participant.participant);
+  })
 
   return dotObj;
 }
 
 function loadData() {
   var dots = [];
+
+  ds.getProjectInfo(exampleProject).then(function(data) {
+    console.log(data);
+    title = svg.append('text')
+      .text(data.rows[0].projectLabel)
+      .attr('dx', '2.5em')
+      .attr('dy', '2.5em')
+      .style('fill', '#000000')
+      .style('font-size', '20px')
+  })
+
   ds.getProjectParticipants(exampleProject).then(function(data) {
     var linkGroup = svg.append('g');
     data.rows.forEach(function(participant) {
@@ -218,9 +233,10 @@ function loadData() {
       tooltip.attr('transform', function(d) { return 'translate(' + (d3.event.x + 10) + ',' + (d3.event.y-20) + ')'; });
     })
   });
+}
 
-
-
+function listOrganisationProjects(participant) {
+  console.log('listOrganisationProjects', participant);
 }
 
 window.onload = init;
