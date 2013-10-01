@@ -12,25 +12,13 @@ text {
 <script type="text/javascript" src="../lib/d3.v3.min.js"></script>
 <script type="text/javascript" src="../js/fields.js"></script>
 <script type="text/javascript" src="sparql.js"></script>
+<script type="text/javascript" src="SPARQLDataSource.js"></script>
 <script type="text/javascript">
+var ds = new SPARQLDataSource();
 
-var sparqler = new SPARQL.Service("proxy.php");
-sparqler.setPrefix("tsb", "http://tsb-projects.labs.theodi.org/def/");
-sparqler.setPrefix("rdf", "http://www.w3.org/2000/01/rdf-schema#");
-sparqler.setOutput("json");
-var query = sparqler.createQuery();
-query.query(
-  "SELECT ?s WHERE { ?s a tsb:Project . }",
-  {failure: onFailure, success: onSuccess}
-);
-
-function onFailure(err) {
-  console.log('onFailure', err);
-}
-
-function onSuccess(json) {
-  console.log('onSuccess', json);
-}
+ds.getProjects(function(result) {
+  console.log('projects', result);
+})
 
 </script>
 </head>
