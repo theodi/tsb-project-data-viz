@@ -1,0 +1,9 @@
+{
+  "name": "SVGCapture",
+  "description": "SVGCapture",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "phantom": ">=0.0.0"
+  }
+}
