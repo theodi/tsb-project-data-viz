@@ -97,18 +97,31 @@ function addParticipantDot(participant) {
   var regionBbox = region.node().getBoundingClientRect();
   var cx = (regionBbox.right + regionBbox.left)/2 - 20 + Math.random() * 40;
   var cy = (regionBbox.top + regionBbox.bottom)/2 - 20 + Math.random() * 40;
+  var r = dotR + Math.random() * dotR;
   var circle = svg.append('circle')
     .attr('cx', cx)
     .attr('cy', cy)
-    .attr('r', dotR)
+    .attr('r', r)
     .style('fill', odiColors[1])
 
-  return { ox : cx, oy: cy, x : cx, y : cy, circle : circle };
+  var dotObj = { ox : cx, oy: cy, x : cx, y : cy, circle : circle, r : r, selected : false }
+
+  circle.on('mouseenter', function() {
+    dotObj.selected = true;
+    d3.select(this).style('fill', odiColors[3])
+  })
+  circle.on('mouseleave', function() {
+    dotObj.selected = false;
+    d3.select(this).style('fill', odiColors[1])
+  })
+
+  return dotObj;
 }
 
 function loadData() {
   var dots = [];
   ds.getProjectParticipants(exampleProject).then(function(data) {
+    var linkGroup = svg.append('g');
     data.rows.forEach(function(participant) {
       dots.push(addParticipantDot(participant));
     })
@@ -121,17 +134,38 @@ function loadData() {
 
     function updateLayout() {
       dots.forEach(function(a) {
+        var ao = {
+          x : a.ox - a.x,
+          y : a.oy - a.y
+        };
+        var dist = length(ao);
+        var f = dist / (a.r * 2.0);
+        if (dist > a.r * 2.0) {
+          a.x += ao.x * 0.05;
+          a.y += ao.y * 0.05;
+        }
+      })
+      dots.forEach(function(a) {
         dots.forEach(function(b) {
           if (a == b) return;
           var ab = {
             x : b.x - a.x,
             y : b.y - a.y
           }
-          if (length(ab) < dotR * 2.0) {
-            a.x -= ab.x * 0.5;
-            a.y -= ab.y * 0.5;
-            b.x += ab.x * 0.5;
-            b.y += ab.y * 0.5;
+          var dist = length(ab);
+          var r = (a.r + b.r) * 1.5;
+          if (a.selected) r += 2 * a.r;
+          if (b.selected) r += 2 * b.r;
+          if (dist < r) {
+            var f = 1.0 - dist/r;
+            if (!a.selected) {
+              a.x -= ab.x * 0.5 * f;
+              a.y -= ab.y * 0.5 * f;
+            }
+            if (!b.selected) {
+              b.x += ab.x * 0.5 * f;
+              b.y += ab.y * 0.5 * f;
+            }
             a.circle.attr('cx', a.x);
             a.circle.attr('cy', a.y);
             b.circle.attr('cx', b.x);
@@ -139,21 +173,29 @@ function loadData() {
           }
         });
       })
+
     }
 
-    for(var i=0; i<10; i++) {
+    function updateLinks() {
+      var link = linkGroup.selectAll("line");
+      link = link.data(d3_geom_voronoi.links(dots))
+      link.enter().append("line")
+      link
+        .style('stroke', odiColors[1])
+        .attr("x1", function(d) { return d.source.x; })
+        .attr("y1", function(d) { return d.source.y; })
+        .attr("x2", function(d) { return d.target.x; })
+        .attr("y2", function(d) { return d.target.y; })
+    }
+
+    var updateCount = 0;
+    var updateInterval = setInterval(function() {
+      if (++updateCount > 60) {
+        //clearInterval(updateInterval);
+      }
       updateLayout();
-    }
-
-    var link = svg.selectAll("line");
-    link = link.data(d3_geom_voronoi.links(dots))
-    link.enter().append("line")
-    link
-      .style('stroke', odiColors[1])
-      .attr("x1", function(d) { return d.source.x; })
-      .attr("y1", function(d) { return d.source.y; })
-      .attr("x2", function(d) { return d.target.x; })
-      .attr("y2", function(d) { return d.target.y; })
+      updateLinks();
+    }, 1000/30)
   });
 
 
