@@ -17,11 +17,11 @@ text {
 <script type="text/javascript" src="SPARQLDataSource.js"></script>
 <script type="text/javascript">
 var w = window.innerWidth;
-var h = window.innerHeight*0.7;
+var h = window.innerHeight;
 var svg;
 var mapSVG = '../data/United_Kingdom_Map_-_Region.svg';
 var dataSet;
-var mapScale = 0.25;
+var mapScale = 0.45;
 
 var odiColors = [
   '#2254F4', '#00B7FF', '#08DEF9', '#1DD3A7',
@@ -74,11 +74,11 @@ function loadMap() {
     var mapHeight = (bb.bottom - bb.top) * mapScale;
     mapX += w/2 - mapWidth/2;
     mapY += h/2 - mapHeight/2;
-    svg.select('#map').attr('transform', 'translate(' + mapX + ',' + mapY + ') scale(' + mapScale + ',' + mapScale + ')');
+    var map = svg.select('#map');
+    map.attr('transform', 'translate(' + mapX + ',' + mapY + ') scale(' + mapScale + ',' + mapScale + ')');
 
     for(var regionGovId in regionsMap) {
       var regionId = regionNameToSvgId(regionsMap[regionGovId]);
-      console.log(regionGovId, regionsMap[regionGovId], regionId, svg.select('#' + regionId));
       svg.select('#' + regionId)
         .style('fill', '#DDD')
         .selectAll('path')
@@ -89,9 +89,25 @@ function loadMap() {
   });
 }
 
+function addParticipantDot(participant) {
+  var regionGovId = participant.participantRegion.substr(participant.participantRegion.lastIndexOf('/')+1);
+  var regionId = regionNameToSvgId(regionsMap[regionGovId]);
+  var region = svg.select('#' + regionId);
+  var regionBbox = region.node().getBoundingClientRect();
+  var cx = (regionBbox.right + regionBbox.left)/2;
+  var cy = (regionBbox.top + regionBbox.bottom)/2;
+  svg.append('circle')
+    .attr('cx', cx)
+    .attr('cy', cy)
+    .attr('r', 5)
+    .style('fill', 'red')
+}
+
 function loadData() {
   ds.getProjectParticipants(exampleProject).then(function(data) {
-    console.log(data);
+    data.rows.forEach(function(participant) {
+      addParticipantDot(participant);
+    })
   });
 }
 
