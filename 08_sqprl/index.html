@@ -112,7 +112,7 @@ function addParticipantDot(participant) {
     .attr('r', r)
     .style('fill', isEduction ? odiColors[3] : odiColors[1])
 
-  var dotObj = { ox : cx, oy: cy, x : cx, y : cy, circle : circle, r : r, selected : false, loaded: false }
+  var dotObj = { ox : cx, oy: cy, x : cx, y : cy, circle : circle, r : r, selected : false, loaded: false, projects : [] }
 
   circle.on('mouseenter', function() {
     d3.select(this).style('fill', odiColors[6]);
@@ -133,6 +133,7 @@ function addParticipantDot(participant) {
     dotObj.r = minDotR + data.rows.length;
     circle.transition().attr('r', 2 + data.rows.length);
     dotObj.loaded = true;
+    dotObj.projects = data;
   });
 
   return dotObj;
@@ -143,12 +144,60 @@ function loadData() {
 
   ds.getProjectInfo(exampleProject).then(function(data) {
     console.log(data);
-    title = svg.append('text')
-      .text(data.rows[0].projectLabel)
+
+    var lines = [];
+
+    var words = data.rows[0].projectLabel.split(' ');
+
+    var mainLabel = svg.append('text')
+      .text('PROJECT:')
+      .attr('dx', '3.6em')
+      .attr('dy', '5.5em')
+      .style('fill', '#999')
+      .style('font-size', '14px')
+
+    var label = svg.append('text')
+      .text('')
       .attr('dx', '2.5em')
       .attr('dy', '2.5em')
       .style('fill', '#000000')
       .style('font-size', '20px')
+
+    var maxLineWidth = 400;
+
+    var prevLine = '';
+    var prevWord = '';
+    var line = words[0];
+    while(true) {
+      label.text(line);
+      var lineWidth = label.node().getComputedTextLength();
+      if (lineWidth < maxLineWidth) {
+        prevLine = line;
+        prevWord = words.shift();
+        if (!prevWord) {
+          lines.push(line);
+          break;
+        }
+        line += ' ' + prevWord;
+      }
+      else {
+        line = prevLine;
+        words.unshift(prevWord);
+        lines.push(line);
+        line = '';
+      }
+    }
+    label.remove();
+    console.log(lines);
+
+    lines.forEach(function(line, i) {
+      svg.append('text')
+      .text(line)
+      .attr('dx', '2.5em')
+      .attr('dy', (5.5 + 1.2*i)+'em')
+      .style('fill', '#000000')
+      .style('font-size', '20px')
+    })
   })
 
   ds.getProjectParticipants(exampleProject).then(function(data) {
