@@ -162,18 +162,6 @@ function loadData() {
 
     function updateLayout() {
       dots.forEach(function(a) {
-        var ao = {
-          x : a.ox - a.x,
-          y : a.oy - a.y
-        };
-        var dist = length(ao);
-        var f = dist / (a.r * 2.0);
-        if (dist > a.r * 2.0) {
-          a.x += ao.x * 0.05;
-          a.y += ao.y * 0.05;
-        }
-      })
-      dots.forEach(function(a) {
         dots.forEach(function(b) {
           if (a == b) return;
           var ab = {
@@ -184,10 +172,10 @@ function loadData() {
           var r = (a.r + b.r) * 1.5;
           if (dist < r) {
             var f = 1.0 - dist/r;
-            a.x -= ab.x * 0.5 * f;
-            a.y -= ab.y * 0.5 * f;
-            b.x += ab.x * 0.5 * f;
-            b.y += ab.y * 0.5 * f;
+            a.x -= ab.x * 0.15 * f;
+            a.y -= ab.y * 0.15 * f;
+            b.x += ab.x * 0.15 * f;
+            b.y += ab.y * 0.15 * f;
             a.circle.attr('cx', a.x);
             a.circle.attr('cy', a.y);
             b.circle.attr('cx', b.x);
