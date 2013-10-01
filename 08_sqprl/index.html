@@ -12,11 +12,12 @@ text {
 <script type="text/javascript" src="../lib/d3.v3.min.js"></script>
 <script type="text/javascript" src="../js/fields.js"></script>
 <script type="text/javascript" src="sparql.js"></script>
+<script type="text/javascript" src="q.min.js"></script>
 <script type="text/javascript" src="SPARQLDataSource.js"></script>
 <script type="text/javascript">
 var ds = new SPARQLDataSource();
 
-ds.getProjects(function(result) {
+ds.getProjects().then(function(result) {
   console.log('projects', result);
 })
 
