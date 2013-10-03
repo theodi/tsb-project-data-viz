@@ -54,6 +54,8 @@ var regionsMap = {
 var ds = new SPARQLDataSource();
 var exampleProject = 'http://tsb-projects.labs.theodi.org/id/project/100416';
 
+var HIGHER_EDUCATION = 'http://tsb-projects.labs.theodi.org/def/concept/legal-entity-form/higher-education';
+
 function init() {
   svg = d3.select('#charts').append('svg')
     .attr('width', w)
@@ -101,7 +103,7 @@ function addParticipantDot(participant) {
   var regionId = regionNameToSvgId(regionsMap[regionGovId]);
   var region = svg.select('#' + regionId);
   var participantId = participant.participant.substr(participant.participant.lastIndexOf('/')+1);
-  var isEduction = participantId[0] == 'R';
+  var isEduction = participant.participantEntityForm == HIGHER_EDUCATION;
   var regionBbox = region.node().getBoundingClientRect();
   var cx = (regionBbox.right + regionBbox.left)/2 - Math.random() * 2;
   var cy = (regionBbox.top + regionBbox.bottom)/2 - Math.random() * 2;

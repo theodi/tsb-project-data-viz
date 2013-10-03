@@ -64,10 +64,11 @@ SPARQLDataSource.prototype.getProjectsParticipants = function() {
 
 SPARQLDataSource.prototype.getProjectParticipants = function(projectId) {
   var q =" \
-    SELECT ?participant ?participantLabel ?participantRegion \
+    SELECT ?participant ?participantLabel ?participantRegion ?participantEntityForm \
     WHERE { \
       <" + projectId + "> tsb:hasParticipant ?participant . \
       ?participant rdf:label ?participantLabel . \
+      ?participant tsb:legalEntityForm ?participantEntityForm . \
       ?participant w3:hasSite ?participantSite . \
       ?participantSite tsb:region ?participantRegion . \
     }";
