@@ -3,8 +3,9 @@ var TSB = TSB || {};
 if (!TSB.Viz) {
   TSB.Viz = {};
 }
-if (!TSB.Config) {
-  TSB.Config = {
+if (!TSB.Viz.Config) {
+  TSB.Viz.Config = {
+    bgColor: '#EFEFEF',
     assetsPath: 'assets'
   }
 }
@@ -14,7 +15,7 @@ TSB.Viz.Project = (function() {
 var w = window.innerWidth;
 var h = window.innerHeight;
 var svg;
-var mapSVG = TSB.Config.assetsPath + '/United_Kingdom_Map_-_Region.svg';
+var mapSVG = TSB.Viz.Config.assetsPath + '/United_Kingdom_Map_-_Region.svg';
 var dataSet;
 var minDotR = 3;
 var tooltip;
@@ -42,7 +43,7 @@ var regionsMap = {
   'W92000004' : 'Wales'
 };
 
-var ds = new SPARQLDataSource();
+var ds = new SPARQLDataSource(TSB.Viz.Config.sparqlEndpoint);
 var exampleProject = 'http://tsb-projects.labs.theodi.org/id/project/100416';
 var HIGHER_EDUCATION = 'http://tsb-projects.labs.theodi.org/def/concept/legal-entity-form/higher-education';
 
@@ -55,7 +56,7 @@ function regionNameToSvgId(name) {
 function loadMap() {
   console.log('loadMap');
 
-  svg.append('rect').attr('fill', 'red').attr('width', w).attr('height', h);
+  svg.append('rect').attr('fill', TSB.Viz.Config.bgColor).attr('width', w).attr('height', h);
 
   var mapScale = h / 1800;
 

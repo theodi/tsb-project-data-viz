@@ -1,5 +1,5 @@
-function SPARQLDataSource() {
-
+function SPARQLDataSource(endpoint) {
+  //SPARQLDataSource.endpoint = endpoint || SPARQLDataSource.endpoint;
 }
 
 SPARQLDataSource.endpoint = "proxy.php";
