@@ -1,0 +1,8 @@
+text {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 12px;
+}
+
+.tooltip {
+  display: none;
+}

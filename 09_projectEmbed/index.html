@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TSB Data Viz</title>
+<link rel="stylesheet" type="text/css" href="css/tsb.viz.css"/>
+<script type="text/javascript" src="js-lib/d3.v3.min.js"></script>
+<script type="text/javascript" src="js-lib/sparql.js"></script>
+<script type="text/javascript" src="js-lib/q.min.js"></script>
+<script type="text/javascript" src="js/DataSet.js"></script>
+<script type="text/javascript" src="js/SPARQLDataSource.js"></script>
+<script type="text/javascript" src="js/tsb.viz.project.js"></script>
+<script type="text/javascript">
+
+window.onload = function() {
+  var projectId = 'http://tsb-projects.labs.theodi.org/id/project/100416';
+  var container = document.getElementById('projectChart');
+  TSB.Viz.Project(projectId, container, 570, 400);
+
+  var projectId2 = 'http://tsb-projects.labs.theodi.org/id/project/100416';
+  var container2 = document.getElementById('projectChart');
+  TSB.Viz.Project(projectId2, container2, 570, 400);
+}
+
+</script>
+</head>
+<body>
+  <div id="projectChart"></div>
+  <div id="projectChart2"></div>
+</body>
+</html>
