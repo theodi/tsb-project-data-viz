@@ -1,5 +1,5 @@
 function SPARQLDataSource(endpoint) {
-  //SPARQLDataSource.endpoint = endpoint || SPARQLDataSource.endpoint;
+  SPARQLDataSource.endpoint = endpoint || SPARQLDataSource.endpoint;
 }
 
 SPARQLDataSource.endpoint = "proxy.php";
@@ -8,10 +8,11 @@ SPARQLDataSource.prototype.query = function(queryStr) {
   var deferred = Q.defer();
   var self = this;
 
-  var sparqler = new SPARQL.Service(SPARQLDataSource.endpoint);
+  var sparqler = new SPARQL.Service('http://tsb-projects.labs.theodi.org/sparql.json?format=json');
   sparqler.setPrefix("tsb", "http://tsb-projects.labs.theodi.org/def/");
   sparqler.setPrefix("rdf", "http://www.w3.org/2000/01/rdf-schema#");
   sparqler.setPrefix("w3", "http://www.w3.org/ns/org#");
+  sparqler.setMethod("GET");
   sparqler.setOutput("json");
   var query = sparqler.createQuery();
   query.query(queryStr, {

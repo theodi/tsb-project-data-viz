@@ -43,7 +43,7 @@ var regionsMap = {
   'W92000004' : 'Wales'
 };
 
-var ds = new SPARQLDataSource(TSB.Viz.Config.sparqlEndpoint);
+var ds;
 var exampleProject = 'http://tsb-projects.labs.theodi.org/id/project/100416';
 var HIGHER_EDUCATION = 'http://tsb-projects.labs.theodi.org/def/concept/legal-entity-form/higher-education';
 
@@ -54,6 +54,7 @@ function regionNameToSvgId(name) {
 }
 
 function loadMap() {
+  ds = new SPARQLDataSource(TSB.Viz.Config.sparqlEndpoint);
   console.log('loadMap');
 
   svg.append('rect').attr('fill', TSB.Viz.Config.bgColor).attr('width', w).attr('height', h);

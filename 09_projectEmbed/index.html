@@ -13,7 +13,8 @@
 <script type="text/javascript">
 
 window.onload = function() {
-  TSB.Viz.Config.sparqlEndpoint = 'proxy.php';
+  TSB.Viz.Config.sparqlEndpoint = 'proxy.php?format=json';
+  //TSB.Viz.Config.sparqlEndpoint = 'blabla';
   //TSB.Viz.Config.bgColor = 'transparent'; //remove bg color
   var projectId = 'http://tsb-projects.labs.theodi.org/id/project/100416';
   var container = document.getElementById('projectChart');
