@@ -30,7 +30,28 @@ function loadData() {
     dataSet = DataSet.fromArray(rows);
 
     var projects = dataSet.groupBy('TSBProjectNumber');
-    console.log(projects.uniqueValues.length);
+    var projectList = [];
+    projects.uniqueValues.forEach(function (projectId) {
+      projectList.push(projects[projectId]);
+    });
+
+    projectList.forEach(function(project, projectIndex) {
+      spacingX = 10
+      spacingY = 40
+      margin = 20
+      projectsPerLine = Math.floor((w - margin) / 10)
+      px = margin + (projectIndex % projectsPerLine) * spacingX
+      py = margin + Math.floor(projectIndex / projectsPerLine) * spacingY
+      pw = 5
+      ph = 20
+      svg
+        .append('g')
+        .append('rect')
+        .attr('class', 'project')
+        .attr('x', px).attr('y', py)
+        .attr('width', pw).attr('height', ph)
+        .attr('fill', 'yellow')
+    })
   });
 }
 
@@ -38,6 +59,12 @@ function init() {
   svg = d3.select('#home-viz').append('svg')
     .attr('width', w)
     .attr('height', h);
+
+  svg
+    .append('rect')
+    .attr('class', 'bg')
+    .attr('width', w).attr('height', h)
+    .attr('fill', 'red')
 
   loadData();
 }
