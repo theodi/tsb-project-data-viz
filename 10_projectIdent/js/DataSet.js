@@ -40,7 +40,7 @@ var DataSet = (function() {
     this.rows.forEach(function(item) {
       if (!groups[item[fieldName]]) {
         groups[item[fieldName]] = new DataSet();
-        groups.uniqueValues.push(fieldName);
+        groups.uniqueValues.push(item[fieldName]);
       }
       groups[item[fieldName]].rows.push(item);
     })
