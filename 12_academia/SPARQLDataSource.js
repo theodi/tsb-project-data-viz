@@ -142,6 +142,11 @@ SPARQLDataSource.prototype.getAcademicInstitutions = function() {
   return this.query(q);
 }
 
+
+//org --participatesIn--> project -----------hasParticipant--> participant
+//                         competition                          label
+//                          budgetArea                          enterpriseSize
+//                           budgetAreaLabel                     label
 SPARQLDataSource.prototype.getOrganizationCollaborators = function(orgId) {
   var q =" \
   PREFIX tsb: <http://tsb-projects.labs.theodi.org/def/> \
