@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TSB Data Viz</title>
+<style type="text/css">
+text {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 12px;
+}
+.tooltip {
+  display: none;
+}
+</style>
+<script type="text/javascript" src="../lib/d3.v3.min.js"></script>
+<script type="text/javascript" src="../js/fields.js"></script>
+<script type="text/javascript" src="sparql.js"></script>
+<script type="text/javascript" src="q.min.js"></script>
+<script type="text/javascript" src="DataSet.js"></script>
+<script type="text/javascript" src="SPARQLDataSource.js"></script>
+<script type="text/javascript">
+
+var odiColors = [
+  '#2254F4', '#00B7FF', '#08DEF9', '#1DD3A7',
+  '#0DBC37', '#67EF67', '#F9BC26', '#FF6700',
+  '#D60303', '#EF3AAB', '#E6007C', '#B13198'
+];
+
+var regionsMap = {
+  'E12000001' : 'North East',
+  'E12000002' : 'North West',
+  'E12000003' : 'Yorkshire and The Humber',
+  'E12000004' : 'East Midlands',
+  'E12000005' : 'West Midlands',
+  'E12000006' : 'East of England',
+  'E12000007' : 'London',
+  'E12000008' : 'South East',
+  'E12000009' : 'South West',
+  'S92000003' : 'Scotland',
+  'N92000002' : 'Northern Ireland',
+  'W92000004' : 'Wales'
+};
+
+var w = window.innerWidth;
+var h = window.innerHeight;
+
+var ds = new SPARQLDataSource();
+
+function init() {
+  svg = d3.select('#charts').append('svg')
+    .attr('width', w)
+    .attr('height', h);
+
+  //loadAcademicInstitutions();
+  drawSuperCircle(50);
+}
+
+function loadAcademicInstitutions() {
+  ds.getAcademicInstitutions().then(function(data) {
+    data.rows.forEach(function(row) {
+      row.numProjects = Number(row.numProjects);
+    });
+
+    data.rows.sort(function(a, b) {
+      return b.numProjects - a.numProjects;
+    })
+    for(var i=0; i<50; i++) {
+      console.log(data.rows[i].orgLabel, data.rows[i].numProjects);
+    }
+  });
+}
+
+function seq(n) {
+  var result = [];
+  for(var i=0; i<n; i++) {
+    result.push(i);
+  }
+  return result;
+}
+
+function drawSuperCircle(r, p) {
+  r = r || 10;
+  p = p || 4;
+  var npoints = 64;
+
+  function superPoints(r, p) {
+    return seq(npoints).map(function(i) {
+      var angle = Math.PI*2*i/(npoints-1);
+      var xsign = 1;
+      var ysign = 1;
+      if (angle > 3 * Math.PI/2) {
+        angle = 2 * Math.PI - angle;
+        xsign = 1;
+        ysign = -1;
+      }
+      else if (angle > 2 * Math.PI/2) {
+        angle = angle - Math.PI;
+        xsign = -1;
+        ysign = -1;
+      }
+      else if (angle > Math.PI/2) {
+        angle = Math.PI - angle;
+        xsign = -1;
+        ysign = 1;
+      }
+      return {
+        x: w/2 + xsign * r * Math.pow(Math.cos(angle), 2/p),
+        y: h/2 + ysign * r * Math.pow(Math.sin(angle), 2/p)
+      }
+    })
+  }
+
+  //This is the accessor function we talked about above
+  var lineFunction = d3.svg.line()
+                           .x(function(d) { return d.x; })
+                           .y(function(d) { return d.y; })
+                           .interpolate("linear");
+
+  //The SVG Container
+  var svgContainer = d3.select("#charts svg")
+                                      .attr("width", w)
+                                      .attr("height", h);
+
+  //The line SVG Path we draw
+  var lineGraph = svgContainer.append("path")
+                              .attr("stroke", "none")
+                              .attr("stroke-width", 2)
+                              .attr("fill", "red");
+
+  lineGraph
+    .attr("d", lineFunction(superPoints(r/2, 1)))
+    .transition().duration(1000).ease('bounce')
+    .attr("d", lineFunction(superPoints(r, p)))
+}
+
+window.onload = init;
+
+</script>
+</head>
+<body>
+  <div id="charts"></div>
+</body>
+</html>
