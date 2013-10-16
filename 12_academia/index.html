@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <title>TSB Data Viz</title>
 <style type="text/css">
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
 text {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 12px;
@@ -15,6 +19,7 @@ text {
 <script type="text/javascript" src="../lib/d3.v3.min.js"></script>
 <script type="text/javascript" src="../js/fields.js"></script>
 <script type="text/javascript" src="sparql.js"></script>
+<script type="text/javascript" src="d3-grid.js"></script>
 <script type="text/javascript" src="q.min.js"></script>
 <script type="text/javascript" src="lodash.js"></script>
 <script type="text/javascript" src="DataSet.js"></script>
@@ -47,30 +52,6 @@ var h = window.innerHeight;
 
 var ds = new SPARQLDataSource();
 
-function init() {
-  svg = d3.select('#charts').append('svg')
-    .attr('width', w)
-    .attr('height', h);
-
-  //loadAcademicInstitutions();
-  drawSuperCircle(50);
-}
-
-function loadAcademicInstitutions() {
-  ds.getAcademicInstitutions().then(function(data) {
-    data.rows.forEach(function(row) {
-      row.numProjects = Number(row.numProjects);
-    });
-
-    data.rows.sort(function(a, b) {
-      return b.numProjects - a.numProjects;
-    })
-    for(var i=0; i<50; i++) {
-      console.log(data.rows[i].orgLabel, data.rows[i].numProjects);
-    }
-  });
-}
-
 function seq(n) {
   var result = [];
   for(var i=0; i<n; i++) {
@@ -79,59 +60,85 @@ function seq(n) {
   return result;
 }
 
-function drawSuperCircle(r, p) {
-  r = r || 10;
-  p = p || 4;
+function inital(list, n) {
+  return list.slice(0, n);
+}
+
+function superPoints(r, p) {
   var npoints = 64;
+  return seq(npoints).map(function(i) {
+    var angle = Math.PI*2*i/(npoints-1);
+    var xsign = 1;
+    var ysign = 1;
+    if (angle > 3 * Math.PI/2) {
+      angle = 2 * Math.PI - angle;
+      xsign = 1;
+      ysign = -1;
+    }
+    else if (angle > 2 * Math.PI/2) {
+      angle = angle - Math.PI;
+      xsign = -1;
+      ysign = -1;
+    }
+    else if (angle > Math.PI/2) {
+      angle = Math.PI - angle;
+      xsign = -1;
+      ysign = 1;
+    }
+    return {
+      x: xsign * r * Math.pow(Math.cos(angle), 2/p),
+      y: ysign * r * Math.pow(Math.sin(angle), 2/p)
+    }
+  })
+}
 
-  function superPoints(r, p) {
-    return seq(npoints).map(function(i) {
-      var angle = Math.PI*2*i/(npoints-1);
-      var xsign = 1;
-      var ysign = 1;
-      if (angle > 3 * Math.PI/2) {
-        angle = 2 * Math.PI - angle;
-        xsign = 1;
-        ysign = -1;
-      }
-      else if (angle > 2 * Math.PI/2) {
-        angle = angle - Math.PI;
-        xsign = -1;
-        ysign = -1;
-      }
-      else if (angle > Math.PI/2) {
-        angle = Math.PI - angle;
-        xsign = -1;
-        ysign = 1;
-      }
-      return {
-        x: w/2 + xsign * r * Math.pow(Math.cos(angle), 2/p),
-        y: h/2 + ysign * r * Math.pow(Math.sin(angle), 2/p)
-      }
-    })
-  }
+function init() {
+  svg = d3.select('#charts').append('svg')
+    .attr('width', w)
+    .attr('height', h);
 
-  //This is the accessor function we talked about above
+  loadAcademicInstitutions();
+}
+
+function loadAcademicInstitutions() {
+  var margin = 50;
+  var rectGrid = d3.layout.grid()
+    .bands()
+    .size([w-2*margin, h-2*margin])
+    .padding([0, 0]);
+
   var lineFunction = d3.svg.line()
                            .x(function(d) { return d.x; })
                            .y(function(d) { return d.y; })
                            .interpolate("linear");
 
-  //The SVG Container
-  var svgContainer = d3.select("#charts svg")
-                                      .attr("width", w)
-                                      .attr("height", h);
+  ds.getAcademicInstitutions().then(function(data) {
+    data.rows.forEach(function(row) {
+      row.numProjects = Number(row.numProjects);
+    });
 
-  //The line SVG Path we draw
-  var lineGraph = svgContainer.append("path")
-                              .attr("stroke", "none")
-                              .attr("stroke-width", 2)
-                              .attr("fill", "red");
+    data.rows.sort(function(a, b) {
+      return b.numProjects - a.numProjects;
+    })
 
-  lineGraph
-    .attr("d", lineFunction(superPoints(r/2, 1)))
-    .transition().duration(1000).ease('bounce')
-    .attr("d", lineFunction(superPoints(r, p)))
+    var top50 = inital(data.rows, 50);
+
+    var point = svg.selectAll(".point")
+      .data(rectGrid(top50));
+
+    point.enter().append("path")
+      .attr("class", "point")
+      .attr("stroke", "none")
+      .attr("stroke-width", 2)
+      .attr("fill", "red")
+      .attr("transform", function(d) {
+        return "translate(" + (margin + d.x + rectGrid.nodeSize()[0]/2) + "," + (margin + d.y + rectGrid.nodeSize()[1]/2) + ")"; 
+      })
+      .attr("d", lineFunction(superPoints(0, 4)))
+      .transition().duration(1000)
+      .delay(function(d, i) { return i * 100; })
+      .attr("d", lineFunction(superPoints(20, 4)))
+  });
 }
 
 window.onload = init;
