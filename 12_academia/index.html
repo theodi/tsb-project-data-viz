@@ -160,6 +160,24 @@ function loadAcademicInstitutions() {
   });
 }
 
+var budgetAreaToColor = (function() {
+    var colorMap = {
+      'TSBProgrammes' : '#2254F4'
+    };
+    var idx = 1;
+    return function(area) {
+      if (area.trim() == 'TSB Programmes') area = 'TSBProgrammes';
+      if (!colorMap[area]) {
+        colorMap[area] = odiColors[idx++];
+        if (!colorMap[area]) {
+          colorMap[area] = '#DDD';
+        }
+        console.log('new mapping', area, colorMap[area], idx);
+      }
+      return colorMap[area];
+    }
+  })();
+
 function pullCollaborators(academicOrg, academicOrgIndex) {
   var g = d3.select('#g_' + academicOrg.id);
   var r = 80;
@@ -190,7 +208,7 @@ function pullCollaborators(academicOrg, academicOrgIndex) {
         .attr('cx', randomPoints[collaboratorIndex].x)
         .attr('cy', randomPoints[collaboratorIndex].y)
         .attr('r', sizes[collaboratorInfo.collaboratorSizeLabel])
-        .style('fill', odiColors[1])
+        .style('fill', budgetAreaToColor(collaboratorInfo.budgetAreaLabel))
         .style('opacity', 0.5)
     });
   })
