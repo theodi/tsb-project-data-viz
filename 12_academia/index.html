@@ -52,6 +52,8 @@ var h = window.innerHeight;
 
 var ds = new SPARQLDataSource();
 
+var uniqueAreasOnce = true;
+
 function seq(n) {
   var result = [];
   for(var i=0; i<n; i++) {
@@ -164,6 +166,8 @@ function loadAcademicInstitutions() {
   });
 }
 
+var uniqueAreas = [];
+
 var budgetAreaToColor = (function() {
     var colorMap = {
       'TSBProgrammes' : '#2254F4'
@@ -176,6 +180,7 @@ var budgetAreaToColor = (function() {
           color: odiColors[idx],
           index: idx
         };
+        uniqueAreas.push(area);
         idx++;
         if (!colorMap[area]) {
           colorMap[area] = '#DDD';
@@ -188,7 +193,7 @@ var budgetAreaToColor = (function() {
 
 function pullCollaborators(academicOrg, academicOrgIndex) {
   var g = d3.select('#g_' + academicOrg.id);
-  var r = 80;
+  var r = 70;
   var minr = 20;
   var sizes = {
     large: 4,
@@ -224,15 +229,27 @@ function pullCollaborators(academicOrg, academicOrgIndex) {
       var y = radius * Math.sin(angle);
 
       g.append('circle')
-        //.attr('cx', randomPoints[collaboratorIndex].x)
-        //.attr('cy', randomPoints[collaboratorIndex].y)
-        .attr('cx', x)
-        .attr('cy', y)
         .attr('r', size)
         .style('stroke', areaColor.color)
         .style('fill', 'none')
         .style('opacity', 0.5)
+        //.attr('cx', randomPoints[collaboratorIndex].x)
+        //.attr('cy', randomPoints[collaboratorIndex].y)
+        .attr('cx', x)
+        .attr('cy', y)
     });
+
+    if (uniqueAreasOnce) {
+      uniqueAreasOnce = false;
+      uniqueAreas.forEach(function(area) {
+        var color = budgetAreaToColor(area);
+        svg.append('text')
+          .text(area)
+          .attr('x', color.index * 100)
+          .attr('y', 30)
+          .style('fill', color.color)
+      })
+    }
   })
 }
 
