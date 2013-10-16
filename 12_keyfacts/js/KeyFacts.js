@@ -113,8 +113,8 @@ function loadData() {
 
   var label = stackedGraph.append('text')
       .text('PROGRAMS')
-      .attr('dx', marginLeft + 2*spacing)
-      .attr('dy', h/2 + 10)
+      .attr('x', marginLeft + 2*spacing)
+      .attr('y', h/2 + 10)
       .style('font-size', '2em')
       .attr('fill', '#FFDD00')
       .attr('text-anchor', 'middle')
@@ -184,8 +184,8 @@ function loadMap() {
 
     var label = mapContainer.append('text')
       .text('REGIONS')
-      .attr('dx', marginLeft + spacing)
-      .attr('dy', h/2 + 10)
+      .attr('x', marginLeft + spacing)
+      .attr('y', h/2 + 10)
       .style('font-size', '2em')
       .attr('fill', '#00B7FA')
       .attr('text-anchor', 'middle')
@@ -207,7 +207,7 @@ function loadMoney() {
 
   for(var i=0; i<20; i++) {
     texts.append('text')
-      .text("1000000")
+      .text("£1000000")
       .attr('dx', marginLeft - spacing/2 + Math.random() * spacing)
       .attr('dy', Math.random() * h)
       .attr('fill', '#333')
@@ -215,8 +215,8 @@ function loadMoney() {
 
    var label = moneyContainer.append('text')
     .text('FUNDS')
-    .attr('dx', marginLeft)
-    .attr('dy', h/2 + 10)
+    .attr('x', marginLeft)
+    .attr('y', h/2 + 10)
     .style('font-size', '2em')
     .attr('fill', '#00BB4D')
     .attr('text-anchor', 'middle')
@@ -275,6 +275,7 @@ function init() {
     .attr('class', 'bg')
     .attr('width', w).attr('height', h)
     .attr('fill', '#FFF')
+    .style('opacity', 0.2)
 
   makeLayout();
   loadData();
