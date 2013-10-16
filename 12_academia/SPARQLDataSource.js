@@ -128,7 +128,7 @@ SPARQLDataSource.prototype.getAcademicInstitutions = function() {
   PREFIX tsb: <http://tsb-projects.labs.theodi.org/def/> \
   PREFIX esize: <http://tsb-projects.labs.theodi.org/def/concept/enterprise-size/> \
   PREFIX rdf: <http://www.w3.org/2000/01/rdf-schema#> \
-  SELECT (count(?org) as ?numProjects) ?orgLabel \
+  SELECT ?org (count(?org) as ?numProjects) ?orgLabel \
   WHERE { \
     ?org a tsb:Organization . \
     ?org rdf:label ?orgLabel . \
@@ -138,6 +138,28 @@ SPARQLDataSource.prototype.getAcademicInstitutions = function() {
     ?org tsb:enterpriseSize esize:academic . \
   } \
   GROUP BY ?org ?orgLabel \
+  ";
+  return this.query(q);
+}
+
+SPARQLDataSource.prototype.getOrganizationCollaborators = function(orgId) {
+  var q =" \
+  PREFIX tsb: <http://tsb-projects.labs.theodi.org/def/> \
+  PREFIX esize: <http://tsb-projects.labs.theodi.org/def/concept/enterprise-size/> \
+  PREFIX rdf: <http://www.w3.org/2000/01/rdf-schema#> \
+  select ?collaborator ?collaboratorLabel ?collaboratorSizeLabel ?budgetAreaLabel \
+  where { \
+       <" + orgId + "> tsb:participatesIn ?project . \
+       ?org tsb:participatesIn ?project . \
+       ?project tsb:competition ?competition . \
+       ?competition tsb:budgetArea ?budgetArea . \
+       ?budgetArea rdf:label ?budgetAreaLabel . \
+       ?project tsb:hasParticipant ?collaborator . \
+       ?collaborator rdf:label ?collaboratorLabel . \
+       ?collaborator tsb:enterpriseSize ?collaboratorSize . \
+       ?collaboratorSize rdf:label ?collaboratorSizeLabel . \
+  } \
+  group by ?collaborator ?collaboratorLabel ?collaboratorSizeLabel ?budgetAreaLabel \
   ";
   return this.query(q);
 }

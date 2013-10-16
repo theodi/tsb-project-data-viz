@@ -115,6 +115,7 @@ function loadAcademicInstitutions() {
   ds.getAcademicInstitutions().then(function(data) {
     data.rows.forEach(function(row) {
       row.numProjects = Number(row.numProjects);
+      row.id = row.org.substr(row.org.lastIndexOf('/')+1)
     });
 
     data.rows.sort(function(a, b) {
@@ -133,9 +134,10 @@ function loadAcademicInstitutions() {
       .data(rectGrid(topBest));
       point.enter()
       .append('g')
+      .attr('id', function(d) { return 'g_' + d.id; })
       .attr("transform", function(d) {
         return "translate(" + (margin + d.x + rectGrid.nodeSize()[0]/2) + "," + (margin + d.y + rectGrid.nodeSize()[1]/2) + ")";
-      });
+      })
 
     point.append("path")
       .attr("class", "point")
@@ -153,7 +155,16 @@ function loadAcademicInstitutions() {
       .attr('text-anchor', 'middle')
       .text(function(d) { return d.orgLabel })
       .attr('fill', 'black')
+
+    topBest.forEach(pullCollaborators);
   });
+}
+
+function pullCollaborators(academicOrg, academicOrgIndex) {
+  var g = d3.select('g_' + academicOrg.id);
+  ds.getOrganizationCollaborators(academicOrg.org).then(function(data) {
+    console.log('Got data for', academicOrg.orgLabel, data);
+  })
 }
 
 window.onload = init;
