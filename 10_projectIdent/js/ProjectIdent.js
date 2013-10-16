@@ -66,15 +66,18 @@ function loadData() {
     projectList.forEach(function(project, projectIndex) {
       spacingX = 8
       spacingY = 40
-      margin = 20
-      projectsPerLine = Math.floor((w - margin - spacingX) / spacingX)
+      margin = 40
+      projectsPerLine = Math.floor((w - 2*margin) / spacingX)
       px = margin + (projectIndex % projectsPerLine) * spacingX
       py = margin + Math.floor(projectIndex / projectsPerLine) * spacingY
       pw = 5
       ph = 20
       budgetArea = project.rows[0]['AreaBudgetHolder']
       var color = budgetAreaToColor(budgetArea);
-      makeRect(px, py, pw, ph, color, 'project');
+      for(var i=0; i<project.rows.length; i++) {
+        makeRect(px, py + 3*i, pw, 2, color, 'project');
+      }
+      //makeRect(px, py, pw, ph, color, 'project');
       //makeRect(px, py + ph/2+1, pw, ph/2-2, color, 'project');
     })
   });
