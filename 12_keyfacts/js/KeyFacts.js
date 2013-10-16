@@ -4,8 +4,8 @@ var odiColors = [
   '#D60303', '#EF3AAB', '#E6007C', '#B13198'
 ];
 
-var unusedShapes = ['Ireland', 'IsleOfMan', 'ChannelIslands', 'Border1', 'Border2', 'Border3'];
-
+var unusedShapes = ['Ireland', 'IsleOfMan', 'ChannelIslands', 'Border1', 'Border2', 'Border3', 'lloegr'];
+var regions = ['London', 'SouthEast', 'EastOfEngland', 'SouthWest', 'EastMidlands', 'NorthWest', 'WestMidlands', 'YorkshireAndTheHumber', 'Scotland', 'NorthEast', 'Wales', 'NorthernIreland', 'SouthEast', 'SouthWest', 'NorthEast'];
 var mapSVG = '../data/United_Kingdom_Map_-_Region.svg';
 var mapScale = 0.25;
 
@@ -19,7 +19,7 @@ var svg;
 
 function loadData() {
   var n = 15, // number of layers
-  m = 50, // number of samples per layer
+  m = 20, // number of samples per layer
   stack = d3.layout.stack().offset('wiggle'),
   layers0 = stack(d3.range(n).map(function() { return bumpLayer(m); })),
   layers1 = stack(d3.range(n).map(function() { return bumpLayer(m); }));
@@ -48,6 +48,7 @@ function loadData() {
 
   var stackedGraph = svg.append('g')
     .attr("clip-path", "url(#clipMask)");
+
   var circleRight = stackedGraph.append('circle')
     .attr('cx', marginLeft + 2*spacing)
     .attr('cy', h/2)
@@ -79,12 +80,14 @@ function loadData() {
   }
 
   stackedGraph.on('mouseenter', function(e) {
+    label.transition().attr('fill', '#000');
     circleRight.transition().attr('fill', '#FFDD00');
     stackedGraphInside.transition().duration(2000).attr('transform', 'translate('+(marginLeft+spacing*1.5-30)+',80)');
     transition();
   })
   stackedGraph.on('mouseleave', function(e) {
     circleRight.transition().attr('fill', '#DDD')
+    label.transition().attr('fill', '#FFDD00');
     stackedGraphInside.transition().duration(2000).attr('transform', 'translate('+(marginLeft+spacing*1.5+20)+',80)');
     transition();
   })
@@ -107,6 +110,14 @@ function loadData() {
     for (i = 0; i < 5; ++i) bump(a);
     return a.map(function(d, i) { return {x: i, y: Math.max(0, d)}; });
   }
+
+  var label = stackedGraph.append('text')
+      .text('PROGRAMS')
+      .attr('dx', marginLeft + 2*spacing)
+      .attr('dy', h/2 + 10)
+      .style('font-size', '2em')
+      .attr('fill', '#FFDD00')
+      .attr('text-anchor', 'middle')
 }
 
 function loadMap() {
@@ -128,27 +139,109 @@ function loadMap() {
     var mapContainer = svg.append('g')
       .attr("clip-path", "url(#clipMask)");
 
+    var circleCenter = mapContainer.append('circle')
+      .attr('cx', marginLeft + spacing)
+      .attr('cy', h/2)
+      .attr('r', h/3)
+      .attr('fill', '#DDD');
+
     mapContainer[0][0].appendChild(svgMap);
+
+    d3.select(svgMap).selectAll('path').attr('style', '').attr('stroke', 'none');
+    d3.select(svgMap).attr('style', '').attr('stroke', 'none');
+
+    regions.forEach(function(region) {
+      d3.select('#' + region).selectAll('path').attr('fill', '#777')
+      d3.select('#' + region).attr('fill', '#777')
+    })
 
     unusedShapes.forEach(function(unusedShapeId) {
       svg.select('#' + unusedShapeId).style('display', 'none');
     });
+
+    mapContainer.on('mouseenter', function(e) {
+      label.transition().attr('fill', '#000');
+      circleCenter.transition().attr('fill', '#00B7FA');
+      regions.forEach(function(region) {
+        d3.select('#' + region).selectAll('path').transition().attr('fill', '#EEE')
+        d3.select('#' + region).transition().attr('fill', '#EEE')
+      });
+      d3.select(svgMap)
+        .transition().duration(2000)
+        .attr('transform', 'translate(' + (mapX-20) + ',' + (mapY-20) + ') scale(' + mapScale*1.2 + ',' + mapScale*1.2 + ')');
+    })
+    mapContainer.on('mouseleave', function(e) {
+      label.transition().attr('fill', '#00B7FA');
+      circleCenter.transition().attr('fill', '#DDD')
+      regions.forEach(function(region) {
+        d3.select('#' + region).selectAll('path').transition().attr('fill', '#777')
+        d3.select('#' + region).transition().attr('fill', '#777')
+      });
+      d3.select(svgMap)
+        .transition().duration(2000)
+        .attr('transform', 'translate(' + mapX + ',' + mapY + ') scale(' + mapScale + ',' + mapScale + ')');
+    })
+
+    var label = mapContainer.append('text')
+      .text('REGIONS')
+      .attr('dx', marginLeft + spacing)
+      .attr('dy', h/2 + 10)
+      .style('font-size', '2em')
+      .attr('fill', '#00B7FA')
+      .attr('text-anchor', 'middle')
   });
 }
 
-function makeLayout() {
+function loadMoney() {
+  console.log('loadMap');
+  var moneyContainer = svg.append('g')
+    .attr("clip-path", "url(#clipMask)");
 
-  svg.append('circle')
+  var circleLeft = moneyContainer.append('circle')
     .attr('cx', marginLeft)
     .attr('cy', h/2)
     .attr('r', h/3)
-    .attr('fill', '#00BB4D');
+    .attr('fill', '#DDD');
 
-  svg.append('circle')
-    .attr('cx', marginLeft + spacing)
-    .attr('cy', h/2)
-    .attr('r', h/3)
-    .attr('fill', '#00B7FA');
+  var texts = moneyContainer.append('g');
+
+  for(var i=0; i<20; i++) {
+    texts.append('text')
+      .text("1000000")
+      .attr('dx', marginLeft - spacing/2 + Math.random() * spacing)
+      .attr('dy', Math.random() * h)
+      .attr('fill', '#333')
+  }
+
+   var label = moneyContainer.append('text')
+    .text('FUNDS')
+    .attr('dx', marginLeft)
+    .attr('dy', h/2 + 10)
+    .style('font-size', '2em')
+    .attr('fill', '#00BB4D')
+    .attr('text-anchor', 'middle')
+
+
+  moneyContainer.on('mouseenter', function(e) {
+    circleLeft.transition().attr('fill', '#00BB4D');
+    label.transition().attr('fill', '#000');
+    texts.selectAll('text').transition().duration(1000).attr('fill', '#FFF').attr('transform', function(d) {
+      var s = 1 + Math.random();
+      return 'scale(' + s + ',' + s + ')';
+    });
+  })
+  moneyContainer.on('mouseleave', function(e) {
+    circleLeft.transition().attr('fill', '#DDD')
+    label.transition().attr('fill', '#00BB4D');
+    texts.selectAll('text').transition().attr('fill', '#333')
+    texts.selectAll('text').transition().duration(1000).attr('fill', '#FFF').attr('transform', function(d) {
+      var s = 1;
+      return 'scale(' + s + ',' + s + ')';
+    });
+  })
+}
+
+function makeLayout() {
 
   var clip = svg.append("clipPath")
     .attr('id', 'clipMask');
@@ -186,6 +279,7 @@ function init() {
   makeLayout();
   loadData();
   loadMap();
+  loadMoney();
 }
 
 
