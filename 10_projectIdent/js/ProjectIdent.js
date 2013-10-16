@@ -1,5 +1,5 @@
 var odiColors = [
-  '#2254F4', '#00B7FF', '#08DEF9', '#1DD3A7',
+  '#1DD3A7', '#2254F4', '#00B7FF', '#08DEF9',
   '#0DBC37', '#67EF67', '#F9BC26', '#FF6700',
   '#D60303', '#EF3AAB', '#E6007C', '#B13198'
 ];
@@ -37,9 +37,13 @@ function loadData() {
 
     console.log('Loaded', projectList.length, 'projects');
 
+    var numProjects = 0;
+
     var budgetAreaToColor = (function() {
-      var colorMap = {};
-      var idx = 0;
+      var colorMap = {
+        'TSBProgrammes' : '#2254F4'
+      };
+      var idx = 1;
       return function(area) {
         if (area.trim() == 'TSB Programmes') area = 'TSBProgrammes';
         if (!colorMap[area]) {
@@ -61,9 +65,13 @@ function loadData() {
         .attr('x', x).attr('y', y+h)
         .attr('width', w).attr('height', 0)
         .attr('fill', color)
-        .transition().delay(Math.random()*50000)
+        .style('opacity', 0.5)
+        .transition().delay(Math.random()*120000)
         .attr('y', y)
-        .attr('height', h);
+        .attr('height', h)
+        .each('end', function() {
+          projectCount.text(numProjects++ + ' projects');
+        })
     }
 
     projectList.forEach(function(project, projectIndex) {
@@ -77,11 +85,30 @@ function loadData() {
       ph = 15
       budgetArea = project.rows[0]['AreaBudgetHolder']
       var color = budgetAreaToColor(budgetArea);
-      //for(var i=0; i<project.rows.length; i++) {
-      //  makeRect(px, py + 3*i, pw, 2, color, 'project');
-      //}
       makeRect(px, py, pw, ph, color, 'project');
     })
+
+    var labelGroup = svg.append('g');
+    labelGroup.append('text')
+      .text('In 2012 we funded')
+      .attr('dx', 100)
+      .attr('dy', 200)
+      .attr('fill', '#FFF')
+      .style('font-size', '6em')
+      .style('font-weight', '100')
+
+    var projectCount = labelGroup.append('text')
+      .text('0 projects')
+      .attr('dx', 100)
+      .attr('dy', 320)
+      .attr('fill', '#FFF')
+      .style('font-size', '6em')
+      .style('font-weight', '100')
+
+    labelGroup
+      .style('opacity', 0)
+      .transition().duration(2000)
+      .style('opacity', 1)
   });
 }
 
