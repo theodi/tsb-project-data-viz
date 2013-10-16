@@ -64,6 +64,10 @@ function inital(list, n) {
   return list.slice(0, n);
 }
 
+function randomInRange(a, b) {
+  return a + Math.random() * (b - a);
+}
+
 function superPoints(r, p) {
   var npoints = 64;
   return seq(npoints).map(function(i) {
@@ -168,7 +172,11 @@ var budgetAreaToColor = (function() {
     return function(area) {
       if (area.trim() == 'TSB Programmes') area = 'TSBProgrammes';
       if (!colorMap[area]) {
-        colorMap[area] = odiColors[idx++];
+        colorMap[area] = {
+          color: odiColors[idx],
+          index: idx
+        };
+        idx++;
         if (!colorMap[area]) {
           colorMap[area] = '#DDD';
         }
@@ -188,6 +196,8 @@ function pullCollaborators(academicOrg, academicOrgIndex) {
     small: 3,
     micro: 2
   };
+  var numAreas = 9;
+  var angleStep = Math.PI * 2 / numAreas;
   ds.getOrganizationCollaborators(academicOrg.org).then(function(data) {
     randomPoints = seq(data.rows.length).map(function() {
       while(true) {
@@ -204,11 +214,19 @@ function pullCollaborators(academicOrg, academicOrgIndex) {
         return;
       }
 
+      var areaColor = budgetAreaToColor(collaboratorInfo.budgetAreaLabel);
+      var angle = randomInRange(angleStep * areaColor.index, angleStep * (areaColor.index + 1))
+      var radius = randomInRange(minr, r);
+      var x = radius * Math.cos(angle);
+      var y = radius * Math.sin(angle);
+
       g.append('circle')
-        .attr('cx', randomPoints[collaboratorIndex].x)
-        .attr('cy', randomPoints[collaboratorIndex].y)
+        //.attr('cx', randomPoints[collaboratorIndex].x)
+        //.attr('cy', randomPoints[collaboratorIndex].y)
+        .attr('cx', x)
+        .attr('cy', y)
         .attr('r', sizes[collaboratorInfo.collaboratorSizeLabel])
-        .style('fill', budgetAreaToColor(collaboratorInfo.budgetAreaLabel))
+        .style('fill', areaColor.color)
         .style('opacity', 0.5)
     });
   })
