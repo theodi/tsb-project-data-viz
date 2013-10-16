@@ -121,27 +121,38 @@ function loadAcademicInstitutions() {
       return b.numProjects - a.numProjects;
     })
 
-    var top50 = inital(data.rows, 50);
+    var topBest = inital(data.rows, 20);
 
-    var maxNumProjects = _.max(top50, 'numProjects').numProjects;
+    console.log(topBest[0])
 
-    var sizeScale = d3.scale.linear().domain([0, maxNumProjects]).range([10, 40]);
+    var maxNumProjects = _.max(topBest, 'numProjects').numProjects;
+
+    var sizeScale = d3.scale.linear().domain([0, maxNumProjects]).range([5, 20]);
 
     var point = svg.selectAll(".point")
-      .data(rectGrid(top50));
+      .data(rectGrid(topBest));
+      point.enter()
+      .append('g')
+      .attr("transform", function(d) {
+        return "translate(" + (margin + d.x + rectGrid.nodeSize()[0]/2) + "," + (margin + d.y + rectGrid.nodeSize()[1]/2) + ")";
+      });
 
-    point.enter().append("path")
+    point.append("path")
       .attr("class", "point")
       .attr("stroke", "none")
       .attr("stroke-width", 2)
       .attr("fill", "red")
-      .attr("transform", function(d) {
-        return "translate(" + (margin + d.x + rectGrid.nodeSize()[0]/2) + "," + (margin + d.y + rectGrid.nodeSize()[1]/2) + ")"; 
-      })
       .attr("d", function(d) { return lineFunction(superPoints(0, 4)); })
       .transition().duration(1000)
       .delay(function(d, i) { return i * 100; })
-      .attr("d", function(d) { return lineFunction(superPoints(sizeScale(d.numProjects), 4)); });
+      .attr("d", function(d) { return lineFunction(superPoints(sizeScale(d.numProjects), 4)); })
+
+    point.append("text")
+      .attr("class", "pointLabel")
+      .attr('y', 50)
+      .attr('text-anchor', 'middle')
+      .text(function(d) { return d.orgLabel })
+      .attr('fill', 'black')
   });
 }
 
