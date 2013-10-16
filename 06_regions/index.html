@@ -18,6 +18,10 @@ text {
   font-size: 200%;
 }
 
+.medNum {
+  font-size: 160%;
+}
+
 .nameLabel {
   xdisplay: none;
   opacity: 0;
@@ -124,7 +128,7 @@ function loadData() {
 
       var regionData = regionalData[regionId];
       var projects = regionData.groupBy('TSBProjectNumber');
-      console.log(regionId, projects.uniqueValues.length);
+      //console.log(regionId, projects.uniqueValues.length);
 
       svg.transition().select('#' + regionId)
         .style('fill', odiColors[i%odiColors.length])
@@ -135,16 +139,60 @@ function loadData() {
       if (region.size() == 0) return;
       var regionBbox = region.node().getBoundingClientRect();
 
-      var regionX = -regionBbox.left - (regionBbox.right - regionBbox.left)/2 + w*0.05 + w*0.1 + i * w*0.7/regionIds.length;
+      var regionX = -regionBbox.left - (regionBbox.right - regionBbox.left)/2 + w*0.05 + w*0.05 + i * w*0.8/regionIds.length;
       var regionY = -regionBbox.top + offsetFromTop;
       if (i == 11) {
         regionX -= 70;
       }
       region.transition().delay(1000).duration(2000).attr('transform', 'translate('+regionX/mapScale+','+regionY/mapScale+')');
 
-      var cx = w*0.1 + (i + 0.25) * w*0.7/regionIds.length;
+      var cx = w*0.05 + (i + 0.25) * w*0.8/regionIds.length;
       if (i == 11) {
         cx -= 40;
+      }
+
+
+      var totalGrant = 0;
+      var totalGrantByArea = {};
+
+      projects.uniqueValues.forEach(function(projectId, pi) {
+        if (!projects[projectId]) return;
+        var project = projects[projectId].rows[0];
+        var grant = Number(project.OfferGrant);;
+        totalGrant += grant;
+
+        var areaHash = project.AreaBudgetHolder.trim().replace(/ /g, '');
+        if (!totalGrantByArea[areaHash]) {
+          totalGrantByArea[areaHash] = 0;
+        }
+        totalGrantByArea[areaHash] += grant;
+      });
+
+      var areas = [];
+      for(var a in totalGrantByArea) {
+        areas.push({name:a, value:totalGrantByArea[a]})
+      }
+      areas.sort(function(a, b) {
+        return b.value - a.value;
+      })
+
+      for(var i=0; i<3; i++) {
+        svg.append('text')
+        .text(areas[i].name.substr(0, 7))
+        .attr('class', 'label')
+        .attr('dx', cx)
+        .attr('dy', 100 + i*20)
+        .style('opacity', 0)
+        .transition()
+        .delay(3000)
+        .duration(1000)
+        .style('opacity', 1 - i/3)
+      }
+
+      console.log(areas)
+
+      function toMillion(m) {
+        return Math.floor(m/1000000);
       }
 
       svg.append('text')
@@ -178,6 +226,28 @@ function loadData() {
         .delay(3000)
         .duration(1000)
         .style('opacity', 1)
+
+      svg.append('text')
+        .text('Grant')
+        .attr('class', 'label')
+        .attr('dx', cx)
+        .attr('dy', 200)
+        .style('opacity', 0)
+        .transition()
+        .delay(3000)
+        .duration(1000)
+        .style('opacity', 1)
+
+      svg.append('text')
+        .text(toMillion(totalGrant)+'M')
+        .attr('class', 'medNum')
+        .attr('dx', cx)
+        .attr('dy', 230)
+        .style('opacity', 0)
+        .transition()
+        .delay(3000)
+        .duration(1000)
+        .style('opacity', toMillion(totalGrant)/150)
     })
 
     unusedShapes.forEach(function(unusedShapeId) {
