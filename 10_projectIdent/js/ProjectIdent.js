@@ -4,6 +4,12 @@ var odiColors = [
   '#D60303', '#EF3AAB', '#E6007C', '#B13198'
 ];
 
+var odiColorsBest = [
+  '#2254F4', '#08DEF9',
+  '#0DBC37', '#67EF67', '#F9BC26', '#FF6700',
+  '#D60303', '#E6007C'
+];
+
 var regionNameMap = [
   ['North West England', 'North West'],
   ['North East England', 'North East'],
@@ -35,22 +41,41 @@ function loadData() {
       projectList.push(projects[projectId]);
     });
 
+    var budgetAreaToColor = (function() {
+      var colorMap = {};
+      var idx = 0;
+      return function(area) {
+        if (!colorMap[area]) {
+          colorMap[area] = odiColorsBest[idx++];
+          console.log('new mapping', area, colorMap[area], idx);
+        }
+        return colorMap[area];
+      }
+    })();
+
+    function makeRect(x, y, w, h, color, className) {
+      svg
+        .append('g')
+        .append('rect')
+        .attr('class', className)
+        .attr('x', x).attr('y', y)
+        .attr('width', w).attr('height', h)
+        .attr('fill', color)
+    }
+
     projectList.forEach(function(project, projectIndex) {
-      spacingX = 10
+      spacingX = 8
       spacingY = 40
       margin = 20
-      projectsPerLine = Math.floor((w - margin) / 10)
+      projectsPerLine = Math.floor((w - margin - spacingX) / spacingX)
       px = margin + (projectIndex % projectsPerLine) * spacingX
       py = margin + Math.floor(projectIndex / projectsPerLine) * spacingY
       pw = 5
       ph = 20
-      svg
-        .append('g')
-        .append('rect')
-        .attr('class', 'project')
-        .attr('x', px).attr('y', py)
-        .attr('width', pw).attr('height', ph)
-        .attr('fill', 'yellow')
+      budgetArea = project.rows[0]['AreaBudgetHolder']
+      var color = budgetAreaToColor(budgetArea);
+      makeRect(px, py, pw, ph, color, 'project');
+      //makeRect(px, py + ph/2+1, pw, ph/2-2, color, 'project');
     })
   });
 }
@@ -64,7 +89,7 @@ function init() {
     .append('rect')
     .attr('class', 'bg')
     .attr('width', w).attr('height', h)
-    .attr('fill', 'red')
+    .attr('fill', '#222')
 
   loadData();
 }
