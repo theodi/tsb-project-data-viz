@@ -122,7 +122,7 @@ function loadAcademicInstitutions() {
       return b.numProjects - a.numProjects;
     })
 
-    var topBest = inital(data.rows, 20);
+    var topBest = inital(data.rows, 12);
 
     console.log(topBest[0])
 
@@ -151,7 +151,7 @@ function loadAcademicInstitutions() {
 
     point.append("text")
       .attr("class", "pointLabel")
-      .attr('y', 50)
+      .attr('y', 100)
       .attr('text-anchor', 'middle')
       .text(function(d) { return d.orgLabel })
       .attr('fill', 'black')
@@ -161,9 +161,38 @@ function loadAcademicInstitutions() {
 }
 
 function pullCollaborators(academicOrg, academicOrgIndex) {
-  var g = d3.select('g_' + academicOrg.id);
+  var g = d3.select('#g_' + academicOrg.id);
+  var r = 80;
+  var minr = 20;
+  var sizes = {
+    large: 7,
+    medium: 5,
+    small: 3,
+    micro: 2
+  };
   ds.getOrganizationCollaborators(academicOrg.org).then(function(data) {
-    console.log('Got data for', academicOrg.orgLabel, data);
+    randomPoints = seq(data.rows.length).map(function() {
+      while(true) {
+        x = Math.random() * 2 * r - r
+        y = Math.random() * 2 * r - r
+        len = Math.sqrt(x*x + y*y)
+        if (len < r && len > minr) {
+          return {x:x, y:y};
+        }
+      }
+    })
+    data.rows.forEach(function(collaboratorInfo, collaboratorIndex) {
+      if (collaboratorInfo.collaborator == academicOrg.org) {
+        return;
+      }
+
+      g.append('circle')
+        .attr('cx', randomPoints[collaboratorIndex].x)
+        .attr('cy', randomPoints[collaboratorIndex].y)
+        .attr('r', sizes[collaboratorInfo.collaboratorSizeLabel])
+        .style('fill', odiColors[1])
+        .style('opacity', 0.5)
+    });
   })
 }
 
