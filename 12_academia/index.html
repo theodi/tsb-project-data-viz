@@ -123,6 +123,10 @@ function loadAcademicInstitutions() {
 
     var top50 = inital(data.rows, 50);
 
+    var maxNumProjects = _.max(top50, 'numProjects').numProjects;
+
+    var sizeScale = d3.scale.linear().domain([0, maxNumProjects]).range([10, 40]);
+
     var point = svg.selectAll(".point")
       .data(rectGrid(top50));
 
@@ -134,10 +138,10 @@ function loadAcademicInstitutions() {
       .attr("transform", function(d) {
         return "translate(" + (margin + d.x + rectGrid.nodeSize()[0]/2) + "," + (margin + d.y + rectGrid.nodeSize()[1]/2) + ")"; 
       })
-      .attr("d", lineFunction(superPoints(0, 4)))
+      .attr("d", function(d) { return lineFunction(superPoints(0, 4)); })
       .transition().duration(1000)
       .delay(function(d, i) { return i * 100; })
-      .attr("d", lineFunction(superPoints(20, 4)))
+      .attr("d", function(d) { return lineFunction(superPoints(sizeScale(d.numProjects), 4)); });
   });
 }
 
