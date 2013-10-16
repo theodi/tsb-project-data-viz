@@ -132,7 +132,7 @@ function loadAcademicInstitutions() {
 
     var maxNumProjects = _.max(topBest, 'numProjects').numProjects;
 
-    var sizeScale = d3.scale.linear().domain([0, maxNumProjects]).range([5, 20]);
+    var sizeScale = d3.scale.linear().domain([0, maxNumProjects]).range([5, 10]);
 
     var point = svg.selectAll(".point")
       .data(rectGrid(topBest));
@@ -145,9 +145,9 @@ function loadAcademicInstitutions() {
 
     point.append("path")
       .attr("class", "point")
-      .attr("stroke", "none")
-      .attr("stroke-width", 2)
-      .attr("fill", "red")
+      .attr("stroke", "black")
+      .attr("stroke-width", 1)
+      .attr("fill", "none")
       .attr("d", function(d) { return lineFunction(superPoints(0, 4)); })
       .transition().duration(1000)
       .delay(function(d, i) { return i * 100; })
@@ -155,7 +155,7 @@ function loadAcademicInstitutions() {
 
     point.append("text")
       .attr("class", "pointLabel")
-      .attr('y', 100)
+      .attr('y', 110)
       .attr('text-anchor', 'middle')
       .text(function(d) { return d.orgLabel })
       .attr('fill', 'black')
@@ -191,13 +191,14 @@ function pullCollaborators(academicOrg, academicOrgIndex) {
   var r = 80;
   var minr = 20;
   var sizes = {
-    large: 7,
-    medium: 5,
-    small: 3,
-    micro: 2
+    large: 4,
+    medium: 3,
+    small: 2,
+    micro: 1
   };
   var numAreas = 9;
   var angleStep = Math.PI * 2 / numAreas;
+  var radiusStep = (r - minr)/3;
   ds.getOrganizationCollaborators(academicOrg.org).then(function(data) {
     randomPoints = seq(data.rows.length).map(function() {
       while(true) {
@@ -215,8 +216,10 @@ function pullCollaborators(academicOrg, academicOrgIndex) {
       }
 
       var areaColor = budgetAreaToColor(collaboratorInfo.budgetAreaLabel);
+      var size = sizes[collaboratorInfo.collaboratorSizeLabel];
       var angle = randomInRange(angleStep * areaColor.index, angleStep * (areaColor.index + 1))
-      var radius = randomInRange(minr, r);
+      var radius = randomInRange(minr + radiusStep * (size - 1), minr + radiusStep * (size));
+
       var x = radius * Math.cos(angle);
       var y = radius * Math.sin(angle);
 
@@ -225,8 +228,9 @@ function pullCollaborators(academicOrg, academicOrgIndex) {
         //.attr('cy', randomPoints[collaboratorIndex].y)
         .attr('cx', x)
         .attr('cy', y)
-        .attr('r', sizes[collaboratorInfo.collaboratorSizeLabel])
-        .style('fill', areaColor.color)
+        .attr('r', size)
+        .style('stroke', areaColor.color)
+        .style('fill', 'none')
         .style('opacity', 0.5)
     });
   })
