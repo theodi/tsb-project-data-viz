@@ -63,6 +63,7 @@ var svg;
 var uniqueAreasOnce = true;
 var institutionSize = 'academic';
 var institutionTopCount = 12;
+var institutionsOnlyLocal = false;
 
 function seq(n) {
   var result = [];
@@ -191,7 +192,7 @@ var colorMap = {
   Energy:         { index: 6, color:'#FF6700' },
   Digital:        { index: 7, color:'#EF3AAB' },
   Space:          { index: 8, color:'#999999' },
-  Other:          { index: 10, color:'#1DD3A7' }
+  Other:          { index: 9, color:'#1DD3A7' }
 };
 
 function pullCollaborators(academicOrg, academicOrgIndex) {
@@ -224,6 +225,10 @@ function pullCollaborators(academicOrg, academicOrgIndex) {
       if (collaboratorInfo.collaborator == academicOrg.org) {
         return;
       }
+      var isLocal = true;
+      if (institutionsOnlyLocal && collaboratorInfo.collaboratorRegion != academicOrg.orgRegion) {
+        isLocal = false;
+      }
 
       var areaName = collaboratorInfo.budgetAreaLabel.trim().replace(/ /g, '');
       var areaColor = colorMap[areaName];
@@ -245,7 +250,7 @@ function pullCollaborators(academicOrg, academicOrgIndex) {
         .attr('r', size)
         .style('stroke', areaColor.color)
         .style('fill', (sizeLabel=='academic') ? areaColor.color : 'none')
-        .style('opacity', 0.75)
+        .style('opacity', isLocal ? 0.75 : 0.15)
         //.attr('cx', randomPoints[collaboratorIndex].x)
         //.attr('cy', randomPoints[collaboratorIndex].y)
         .attr('cx', x)
@@ -276,6 +281,12 @@ function onInstitutionTopChange(e) {
   init();
 }
 
+function onInstitutionLocalChange(e) {
+  var reach = e.target.options[e.target.selectedIndex].value;
+  institutionsOnlyLocal = reach == 'local';
+  init();
+}
+
 window.onload = init;
 
 </script>
@@ -296,6 +307,13 @@ window.onload = init;
       <select onchange="onInstitutionTopChange(event)">
         <option value='12' selected>12</option>
         <option value='20'>20</option>
+      </select>
+    </label>
+     <label>
+      collab
+      <select onchange="onInstitutionLocalChange(event)">
+        <option value='national' selected>national</option>
+        <option value='local'>local only</option>
       </select>
     </label>
   </div>

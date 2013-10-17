@@ -129,16 +129,18 @@ SPARQLDataSource.prototype.getInstitutions = function(size) {
   PREFIX tsb: <http://tsb-projects.labs.theodi.org/def/> \
   PREFIX esize: <http://tsb-projects.labs.theodi.org/def/concept/enterprise-size/> \
   PREFIX rdf: <http://www.w3.org/2000/01/rdf-schema#> \
-  SELECT ?org (count(?org) as ?numProjects) ?orgLabel \
+  SELECT ?org (count(?org) as ?numProjects) ?orgLabel ?orgRegion \
   WHERE { \
     ?org a tsb:Organization . \
     ?org rdf:label ?orgLabel . \
     ?org tsb:participatesIn ?project . \
     ?project a tsb:Project . \
     ?project rdf:label ?projectLabel . \
+    ?org w3:hasSite ?orgSite . \
+    ?orgSite tsb:region ?orgRegion . \
     ?org tsb:enterpriseSize esize:"+size+" . \
   } \
-  GROUP BY ?org ?orgLabel \
+  GROUP BY ?org ?orgLabel ?orgRegion \
   ";
   return this.query(q);
 }
@@ -153,7 +155,8 @@ SPARQLDataSource.prototype.getOrganizationCollaborators = function(orgId) {
   PREFIX tsb: <http://tsb-projects.labs.theodi.org/def/> \
   PREFIX esize: <http://tsb-projects.labs.theodi.org/def/concept/enterprise-size/> \
   PREFIX rdf: <http://www.w3.org/2000/01/rdf-schema#> \
-  select ?collaborator ?collaboratorLabel ?collaboratorSizeLabel ?budgetAreaLabel \
+  PREFIX w3: <http://www.w3.org/ns/org#> \
+  select ?collaborator ?collaboratorLabel ?collaboratorSizeLabel ?budgetAreaLabel ?collaboratorRegion \
   where { \
        <" + orgId + "> tsb:participatesIn ?project . \
        ?org tsb:participatesIn ?project . \
@@ -163,9 +166,11 @@ SPARQLDataSource.prototype.getOrganizationCollaborators = function(orgId) {
        ?project tsb:hasParticipant ?collaborator . \
        ?collaborator rdf:label ?collaboratorLabel . \
        ?collaborator tsb:enterpriseSize ?collaboratorSize . \
+       ?collaborator w3:hasSite ?collaboratorSite . \
+       ?collaboratorSite tsb:region ?collaboratorRegion . \
        ?collaboratorSize rdf:label ?collaboratorSizeLabel . \
   } \
-  group by ?collaborator ?collaboratorLabel ?collaboratorSizeLabel ?budgetAreaLabel \
+  group by ?collaborator ?collaboratorLabel ?collaboratorSizeLabel ?budgetAreaLabel ?collaboratorRegion \
   ";
   return this.query(q);
 }
