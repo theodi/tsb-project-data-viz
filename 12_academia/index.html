@@ -32,6 +32,13 @@ var odiColors = [
   '#D60303', '#EF3AAB', '#E6007C', '#B13198'
 ];
 
+var odiColorsMixed = [
+  '#444444', '#2254F4', '#D60303',
+  '#0DBC37', '#FF6700', '#00B7FF',
+  '#E6007C', '#444444', '#444444',
+  '#444444', '#444444', '#444444'
+];
+
 var regionsMap = {
   'E12000001' : 'North East',
   'E12000002' : 'North West',
@@ -51,6 +58,7 @@ var w = window.innerWidth;
 var h = window.innerHeight;
 
 var ds = new SPARQLDataSource();
+var svg;
 
 var uniqueAreasOnce = true;
 
@@ -99,6 +107,9 @@ function superPoints(r, p) {
 }
 
 function init() {
+  if (svg) {
+    svg.remove();
+  }
   svg = d3.select('#charts').append('svg')
     .attr('width', w)
     .attr('height', h);
@@ -129,12 +140,11 @@ function loadAcademicInstitutions() {
     })
 
     var topBest = inital(data.rows, 12);
-
     console.log(topBest[0])
 
     var maxNumProjects = _.max(topBest, 'numProjects').numProjects;
 
-    var sizeScale = d3.scale.linear().domain([0, maxNumProjects]).range([5, 10]);
+    var sizeScale = d3.scale.linear().domain([0, maxNumProjects]).range([5, 15]);
 
     var point = svg.selectAll(".point")
       .data(rectGrid(topBest));
@@ -166,30 +176,18 @@ function loadAcademicInstitutions() {
   });
 }
 
-var uniqueAreas = [];
-
-var budgetAreaToColor = (function() {
-    var colorMap = {
-      'TSBProgrammes' : '#2254F4'
-    };
-    var idx = 1;
-    return function(area) {
-      if (area.trim() == 'TSB Programmes') area = 'TSBProgrammes';
-      if (!colorMap[area]) {
-        colorMap[area] = {
-          color: odiColors[idx],
-          index: idx
-        };
-        uniqueAreas.push(area);
-        idx++;
-        if (!colorMap[area]) {
-          colorMap[area] = '#DDD';
-        }
-        console.log('new mapping', area, colorMap[area], idx);
-      }
-      return colorMap[area];
-    }
-  })();
+var colorMap = {
+  TSBProgrammes:  { index: 0, color:'#333333' },
+  Manufacturing:  { index: 1, color:'#2254F4' },
+  Technology:     { index: 2, color:'#D60303' },
+  Transport:      { index: 3, color:'#08DEF9' },
+  Sustainability: { index: 4, color:'#0DBC37' },
+  Healthcare:     { index: 5, color:'#00B7FF' },
+  Energy:         { index: 6, color:'#FF6700' },
+  Digital:        { index: 7, color:'#EF3AAB' },
+  Space:          { index: 8, color:'#999999' },
+  Other:          { index: 10, color:'#1DD3A7' }
+};
 
 function pullCollaborators(academicOrg, academicOrgIndex) {
   var g = d3.select('#g_' + academicOrg.id);
@@ -199,7 +197,8 @@ function pullCollaborators(academicOrg, academicOrgIndex) {
     large: 4,
     medium: 3,
     small: 2,
-    micro: 1
+    micro: 1,
+    academic: 2
   };
   var numAreas = 9;
   var angleStep = Math.PI * 2 / numAreas;
@@ -217,10 +216,15 @@ function pullCollaborators(academicOrg, academicOrgIndex) {
     })
     data.rows.forEach(function(collaboratorInfo, collaboratorIndex) {
       if (collaboratorInfo.collaborator == academicOrg.org) {
-        return;
+        //return;
       }
 
-      var areaColor = budgetAreaToColor(collaboratorInfo.budgetAreaLabel);
+      var areaName = collaboratorInfo.budgetAreaLabel.trim().replace(/ /g, '');
+      var areaColor = colorMap[areaName];
+      if (!areaColor) {
+        areaColor = colorMap.Other;
+        if (Math.random() > 0.9) console.log("'" + areaName + "' not found");
+      }
       var size = sizes[collaboratorInfo.collaboratorSizeLabel];
       var angle = randomInRange(angleStep * areaColor.index, angleStep * (areaColor.index + 1))
       var radius = randomInRange(minr + radiusStep * (size - 1), minr + radiusStep * (size));
@@ -228,27 +232,28 @@ function pullCollaborators(academicOrg, academicOrgIndex) {
       var x = radius * Math.cos(angle);
       var y = radius * Math.sin(angle);
 
-      g.append('circle')
+      circle = g.append('circle')
         .attr('r', size)
         .style('stroke', areaColor.color)
         .style('fill', 'none')
-        .style('opacity', 0.5)
+        .style('opacity', 0.75)
         //.attr('cx', randomPoints[collaboratorIndex].x)
         //.attr('cy', randomPoints[collaboratorIndex].y)
         .attr('cx', x)
         .attr('cy', y)
+      }
     });
 
     if (uniqueAreasOnce) {
       uniqueAreasOnce = false;
-      uniqueAreas.forEach(function(area) {
-        var color = budgetAreaToColor(area);
+      for(var areaName in colorMap) {
+        var color = colorMap[areaName];
         svg.append('text')
-          .text(area)
-          .attr('x', color.index * 100)
+          .text(areaName)
+          .attr('x', 50 + color.index * 100)
           .attr('y', 30)
           .style('fill', color.color)
-      })
+      }
     }
   })
 }
