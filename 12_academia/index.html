@@ -144,7 +144,7 @@ function loadAcademicInstitutions() {
 
     var maxNumProjects = _.max(topBest, 'numProjects').numProjects;
 
-    var sizeScale = d3.scale.linear().domain([0, maxNumProjects]).range([5, 15]);
+    var sizeScale = d3.scale.linear().domain([0, maxNumProjects]).range([5, 10]);
 
     var point = svg.selectAll(".point")
       .data(rectGrid(topBest));
@@ -216,7 +216,7 @@ function pullCollaborators(academicOrg, academicOrgIndex) {
     })
     data.rows.forEach(function(collaboratorInfo, collaboratorIndex) {
       if (collaboratorInfo.collaborator == academicOrg.org) {
-        //return;
+        return;
       }
 
       var areaName = collaboratorInfo.budgetAreaLabel.trim().replace(/ /g, '');
@@ -225,9 +225,12 @@ function pullCollaborators(academicOrg, academicOrgIndex) {
         areaColor = colorMap.Other;
         if (Math.random() > 0.9) console.log("'" + areaName + "' not found");
       }
-      var size = sizes[collaboratorInfo.collaboratorSizeLabel];
+      var sizeLabel = collaboratorInfo.collaboratorSizeLabel;
+      var size = sizes[sizeLabel];
       var angle = randomInRange(angleStep * areaColor.index, angleStep * (areaColor.index + 1))
       var radius = randomInRange(minr + radiusStep * (size - 1), minr + radiusStep * (size));
+
+      if (sizeLabel=='academic') radius = minr * 0.8;
 
       var x = radius * Math.cos(angle);
       var y = radius * Math.sin(angle);
@@ -235,7 +238,7 @@ function pullCollaborators(academicOrg, academicOrgIndex) {
       circle = g.append('circle')
         .attr('r', size)
         .style('stroke', areaColor.color)
-        .style('fill', 'none')
+        .style('fill', (sizeLabel=='academic') ? areaColor.color : 'none')
         .style('opacity', 0.75)
         //.attr('cx', randomPoints[collaboratorIndex].x)
         //.attr('cy', randomPoints[collaboratorIndex].y)
