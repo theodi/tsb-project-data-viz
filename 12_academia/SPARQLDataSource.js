@@ -123,7 +123,8 @@ SPARQLDataSource.prototype.getOrganisationProjects = function(organisationId) {
   return this.query(q);
 }
 
-SPARQLDataSource.prototype.getAcademicInstitutions = function() {
+SPARQLDataSource.prototype.getInstitutions = function(size) {
+  if (!size) size = 'academic';
   var q =" \
   PREFIX tsb: <http://tsb-projects.labs.theodi.org/def/> \
   PREFIX esize: <http://tsb-projects.labs.theodi.org/def/concept/enterprise-size/> \
@@ -135,7 +136,7 @@ SPARQLDataSource.prototype.getAcademicInstitutions = function() {
     ?org tsb:participatesIn ?project . \
     ?project a tsb:Project . \
     ?project rdf:label ?projectLabel . \
-    ?org tsb:enterpriseSize esize:academic . \
+    ?org tsb:enterpriseSize esize:"+size+" . \
   } \
   GROUP BY ?org ?orgLabel \
   ";

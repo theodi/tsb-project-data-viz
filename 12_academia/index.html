@@ -8,7 +8,7 @@ html, body {
   height: 100%;
   overflow: hidden;
 }
-text {
+text, label {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 12px;
 }
@@ -61,6 +61,8 @@ var ds = new SPARQLDataSource();
 var svg;
 
 var uniqueAreasOnce = true;
+var institutionSize = 'academic';
+var institutionTopCount = 12;
 
 function seq(n) {
   var result = [];
@@ -107,6 +109,7 @@ function superPoints(r, p) {
 }
 
 function init() {
+  uniqueAreasOnce = true;
   if (svg) {
     svg.remove();
   }
@@ -129,7 +132,7 @@ function loadAcademicInstitutions() {
                            .y(function(d) { return d.y; })
                            .interpolate("linear");
 
-  ds.getAcademicInstitutions().then(function(data) {
+  ds.getInstitutions(institutionSize).then(function(data) {
     data.rows.forEach(function(row) {
       row.numProjects = Number(row.numProjects);
       row.id = row.org.substr(row.org.lastIndexOf('/')+1)
@@ -139,8 +142,7 @@ function loadAcademicInstitutions() {
       return b.numProjects - a.numProjects;
     })
 
-    var topBest = inital(data.rows, 12);
-    console.log(topBest[0])
+    var topBest = inital(data.rows, institutionTopCount);
 
     var maxNumProjects = _.max(topBest, 'numProjects').numProjects;
 
@@ -165,9 +167,12 @@ function loadAcademicInstitutions() {
       .delay(function(d, i) { return i * 100; })
       .attr("d", function(d) { return lineFunction(superPoints(sizeScale(d.numProjects), 4)); })
 
+    var textTop = 110;
+    if (institutionTopCount == 20) textTop = 90;
+
     point.append("text")
       .attr("class", "pointLabel")
-      .attr('y', 110)
+      .attr('y', textTop)
       .attr('text-anchor', 'middle')
       .text(function(d) { return d.orgLabel })
       .attr('fill', 'black')
@@ -192,6 +197,7 @@ var colorMap = {
 function pullCollaborators(academicOrg, academicOrgIndex) {
   var g = d3.select('#g_' + academicOrg.id);
   var r = 70;
+  if (institutionTopCount == 20) r = 50;
   var minr = 20;
   var sizes = {
     large: 4,
@@ -260,11 +266,38 @@ function pullCollaborators(academicOrg, academicOrgIndex) {
   })
 }
 
+function onInstitutionSizeChange(e) {
+  institutionSize = e.target.options[e.target.selectedIndex].value;
+  init();
+}
+
+function onInstitutionTopChange(e) {
+  institutionTopCount = e.target.options[e.target.selectedIndex].value;
+  init();
+}
+
 window.onload = init;
 
 </script>
 </head>
 <body>
   <div id="charts"></div>
+  <div id="options" style="position:absolute; top: 20px; right:20px">
+    <label>size
+      <select onchange="onInstitutionSizeChange(event)">
+        <option value='academic' selected>academic</option>
+        <option value='large'>large</option>
+        <option value='medium'>medium</option>
+        <option value='small'>small</option>
+        <option value='micro'>micro</option>
+      </select>
+    </label>
+    <label>top
+      <select onchange="onInstitutionTopChange(event)">
+        <option value='12' selected>12</option>
+        <option value='20'>20</option>
+      </select>
+    </label>
+  </div>
 </body>
 </html>
