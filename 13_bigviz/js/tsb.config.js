@@ -27,7 +27,26 @@ tsb.config.regionsMap = {
 };
 
 tsb.config.themes = {
-  odi: {
+  odiDark: {
+    introTextColor: '#FFFFFF',
+    introBgColor: '#222222',
+    budgetAreaColorAlpha: 0.65,
+    budgetAreaColor : {
+      'TRAN'            : '#00B7FF',
+      'TECH'            : '#D60303',
+      'MANF'            : '#FF6700',
+      'SUST'            : '#0DBC37',
+      'tsb-programmes'  : '#B13198',
+      'DIGS'            : '#EF3AAB',
+      'ENRG'            : '#F9BC26',
+      'HLTHCR'          : '#1DD3A7',
+      'SPAC'            : '#08DEF9',
+    }
+  },
+  odiBright: {
+    introTextColor: '#3333333',
+    introBgColor: '#EEEEEE',
+    budgetAreaColorAlpha: 0.35,
     budgetAreaColor : {
       'TRAN'            : '#00B7FF',
       'TECH'            : '#D60303',
@@ -42,5 +61,6 @@ tsb.config.themes = {
   }
 }
 
-tsb.config.themes.current = tsb.config.themes.odi;
+//tsb.config.themes.current = tsb.config.themes.odiDark;
+tsb.config.themes.current = tsb.config.themes.odiBright;
 

@@ -13,7 +13,13 @@ tsb.viz.intro = {
     this.w = w;
     this.h = h;
     this.year = 2013;
-    this.loadData()
+    this.loadData();
+
+    svg
+    .append('rect')
+    .attr('class', 'bg')
+    .attr('width', tsb.state.w).attr('height', tsb.state.h)
+    .attr('fill', tsb.config.themes.current.introBgColor)
   },
   loadData: function() {
     this.numProjects = 0;
@@ -49,7 +55,7 @@ tsb.viz.intro = {
       .attr('x', x).attr('y', y+h)
       .attr('width', w).attr('height', 0)
       .attr('fill', color)
-      .style('opacity', 0.5)
+      .style('opacity', tsb.config.themes.current.budgetAreaColorAlpha)
       .transition().delay(Math.random()*120000)
       .attr('y', y)
       .attr('height', h)
@@ -64,7 +70,7 @@ tsb.viz.intro = {
       .text('In ' + this.year + ' we funded')
       .attr('dx', 100)
       .attr('dy', 200)
-      .attr('fill', '#FFF')
+      .attr('fill', tsb.config.themes.current.introTextColor)
       .style('font-size', '6em')
       .style('font-weight', '100');
 
@@ -72,7 +78,7 @@ tsb.viz.intro = {
       .text('0 projects')
       .attr('dx', 100)
       .attr('dy', 320)
-      .attr('fill', '#FFF')
+      .attr('fill', tsb.config.themes.current.introTextColor)
       .style('font-size', '6em')
       .style('font-weight', '100');
 
