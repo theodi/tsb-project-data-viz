@@ -55,7 +55,7 @@ tsb.viz.intro = {
       .each('end', this.onProjectAnimComplete.bind(this))
   },
   onProjectAnimComplete: function() {
-    this.projectCount.text(this.numProjects++ + ' projects');
+    this.projectCount.text(++this.numProjects + ' projects');
   },
   addLabels: function() {
     var labelGroup = this.labelGroup = this.svg.append('g');
