@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>
+Your App Name Here
+</title>
+
+<link href="assets/application.css" media="screen" rel="stylesheet" type="text/css" />
+<meta content='width=device-width, initial-scale=1.0' name='viewport'>
+</head>
+<body>
+<div id='home-viz'>
+</div>
+<div id='wrap'>
+  <header>
+    <nav>
+    <div class='branding'>
+    <a href="/"><img alt="TSB logo" src="assets/tsb-logo.png" />
+    </a></div>
+    </nav>
+  </header>
+  <main>
+  <div id='home'>
+  <div id='home-header'>
+  <div class='container'>
+  <div id='home-header-title'>
+  <h1>
+  Lorem ipsum dolor sit amet, consectetur adipisicing elit tempor incididunt
+  </h1>
+  </div>
+  <div id='home-header-actions'>
+  <div id='home-header-search'>
+  <form accept-charset="UTF-8" action="/projects" method="get"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#x2713;" /></div>
+  <input autocomplete="off" id="search_string" name="search_string" placeholder="Enter a project search term..." type="text" />
+  <input name="commit" type="submit" value="Search" />
+  </form>
+  <p class='help'>
+  Try searching by name, organisation, region or competition.
+  </p>
+  </div>
+  <div id='home-header-browse'>
+  <a href='/projects'>Browse the data</a>
+  </div>
+  </div>
+  </div>
+  </div>
+  </main>
+</div>
+<script type="text/javascript" src="lib/d3.v3.min.js"></script>
+<script type="text/javascript" src="lib/sparql.js"></script>
+<script type="text/javascript" src="lib/d3-grid.js"></script>
+<script type="text/javascript" src="lib/q.min.js"></script>
+<script type="text/javascript" src="js/DataSet.js"></script>
+<script type="text/javascript" src="js/SPARQLDataSource.js"></script>
+<script type="text/javascript" src="js/tsb.common.js"></script>
+<script type="text/javascript" src="js/tsb.viz.collaboration.js"></script>
+</body>
+</html>
