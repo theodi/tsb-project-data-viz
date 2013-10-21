@@ -201,7 +201,7 @@ tsb.SPARQLDataSource = (function() {
   }
 
 
-  SPARQLDataSource.prototype.getProjectsByYear = function(year) {
+  SPARQLDataSource.prototype.getProjectsForYear = function(year) {
     var q =" \
     PREFIX tsb: <http://tsb-projects.labs.theodi.org/def/> \
     PREFIX ptime: <http://purl.org/NET/c4dm/timeline.owl#> \
