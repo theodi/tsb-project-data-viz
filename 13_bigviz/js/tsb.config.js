@@ -43,7 +43,7 @@ tsb.config.themes = {
       'DIGS'            : '#EF3AAB',
       'ENRG'            : '#F9BC26',
       'HLTHCR'          : '#1DD3A7',
-      'SPAC'            : '#08DEF9',
+      'SPAC'            : '#08DEF9'
     },
     priorityAreasBgColor: '#FFFFFF'
   },
