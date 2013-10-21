@@ -182,7 +182,7 @@ tsb.SPARQLDataSource = (function() {
     PREFIX esize: <http://tsb-projects.labs.theodi.org/def/concept/enterprise-size/> \
     PREFIX rdf: <http://www.w3.org/2000/01/rdf-schema#> \
     PREFIX w3: <http://www.w3.org/ns/org#> \
-    select ?collaborator ?collaboratorLabel ?collaboratorSizeLabel ?budgetAreaLabel ?collaboratorRegion \
+    select ?collaborator ?collaboratorLabel ?collaboratorSizeLabel ?budgetArea ?collaboratorRegion \
     where { \
          <" + orgId + "> tsb:participatesIn ?project . \
          ?org tsb:participatesIn ?project . \
@@ -196,7 +196,7 @@ tsb.SPARQLDataSource = (function() {
          ?collaboratorSite tsb:region ?collaboratorRegion . \
          ?collaboratorSize rdf:label ?collaboratorSizeLabel . \
     } \
-    group by ?collaborator ?collaboratorLabel ?collaboratorSizeLabel ?budgetAreaLabel ?collaboratorRegion \
+    group by ?collaborator ?collaboratorLabel ?collaboratorSizeLabel ?budgetArea ?collaboratorRegion \
     ";
     return this.query(q);
   }

@@ -12,3 +12,13 @@ tsb.common.inital = function(list, n) {
 tsb.common.randomInRange = function(a, b) {
   return a + Math.random() * (b - a);
 }
+
+tsb.common.max = function(list, prop) {
+  var m = 0;
+  list.forEach(function(o) {
+    if (o[prop] > m) {
+      m = o[prop];
+    }
+  })
+  return m;
+}
