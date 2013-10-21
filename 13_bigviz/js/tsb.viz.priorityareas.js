@@ -7,7 +7,7 @@ tsb.viz.priorityAreas = {
     this.svg = svg;
     this.w = w;
     this.h = h;
-    this.startYear = 2004;
+    this.startYear = 2002;
     this.endYear = (new Date().getFullYear());
     this.duration = 60000;
     this.loadData();
@@ -37,10 +37,13 @@ tsb.viz.priorityAreas = {
 
     var width = this.w;
     var height = this.h * 0.8;
+    var margin = 0;
+    var startYear = this.startYear;
+    var endYear = this.endYear;
 
     var x = d3.scale.linear()
       .domain([this.startYear, this.endYear])
-      .range([0, width]);
+      .range([margin, width-margin]);
 
     var y = d3.scale.linear()
       .domain([0, d3.max(layers.concat(layers), function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); })])
@@ -59,11 +62,42 @@ tsb.viz.priorityAreas = {
       .style('fill', function(d) {
         return tsb.config.themes.current.budgetAreaColor[d[0].budgetArea];
       });
+
+    //axis
+    var yearLines = this.svg.selectAll('line.priorityAreas')
+      .data(d3.range(this.startYear, this.endYear+1))
+      .enter()
+        .append('line')
+        .attr('x1', x)
+        .attr('y1', 0)
+        .attr('x2', x)
+        .attr('y2', this.h)
+        .style('stroke', 'black')
+
+    var yearLabels = this.svg.selectAll('text.priorityAreas')
+      .data(d3.range(this.startYear, this.endYear+1))
+      .enter()
+        .append('text')
+        .text(function(d) { return d; })
+        .attr('text-anchor', function(d) {
+          if (d == startYear) return 'start';
+          else if (d == endYear) return 'end';
+          else return 'middle';
+        })
+        .attr('dx', function(d) {
+          if (d == startYear) return '1em';
+          else if (d == endYear) return '-1em';
+          else return 0;
+        })
+        .attr('x', x)
+        .attr('y', this.h-20)
+        .attr('font-size', '80%')
   },
   mapData: function(data) {
     var byArea = {};
     var areas = [];
     var startYear = this.startYear;
+    var endYear = this.endYear;
     tsb.config.bugetAreas.forEach(function(areaId) {
       var areaStats = [];
       byArea[areaId] = areaStats;
@@ -73,11 +107,14 @@ tsb.viz.priorityAreas = {
       }
     }.bind(this));
     data.forEach(function(year) {
+      if (year.rows.length == 1 && year.rows[0].numGrants == 0) return;
       year.rows.forEach(function(grantArea) {
         var budgetAreaId = tsb.common.extractBudgetAreaCode(grantArea.budgetArea);
         byArea[budgetAreaId][grantArea.year-startYear].y = Number(grantArea.grantsSum);
         byArea[budgetAreaId][grantArea.year-startYear].grantsSum = grantArea.grantsSum;
         byArea[budgetAreaId][grantArea.year-startYear].numGrants = grantArea.numGrants;
+        if (grantArea.year < endYear)
+          byArea[budgetAreaId][grantArea.year-startYear+1].y = Number(grantArea.grantsSum);
       });
     });
     return areas;
