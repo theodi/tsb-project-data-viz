@@ -12,40 +12,72 @@ Your App Name Here
 <body>
 <div id='home-viz'>
 </div>
-<div id='wrap'>
-  <header>
-    <nav>
-    <div class='branding'>
-    <a href="/"><img alt="TSB logo" src="assets/tsb-logo.png" />
-    </a></div>
-    </nav>
-  </header>
-  <main>
-  <div id='home'>
-  <div id='home-header'>
-  <div class='container'>
-  <div id='home-header-title'>
-  <h1>
-  Lorem ipsum dolor sit amet, consectetur adipisicing elit tempor incididunt
-  </h1>
-  </div>
-  <div id='home-header-actions'>
-  <div id='home-header-search'>
-  <form accept-charset="UTF-8" action="/projects" method="get"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#x2713;" /></div>
-  <input autocomplete="off" id="search_string" name="search_string" placeholder="Enter a project search term..." type="text" />
-  <input name="commit" type="submit" value="Search" />
-  </form>
-  <p class='help'>
-  Try searching by name, organisation, region or competition.
-  </p>
-  </div>
-  <div id='home-header-browse'>
-  <a href='/projects'>Browse the data</a>
-  </div>
-  </div>
-  </div>
-  </div>
-  </main>
+
+<div id="wrap">
+<header>
+<nav>
+<div class="branding">
+<a href="/"><img alt="TSB logo" src="assets/tsb-logo.png">
+</a></div>
+</nav>
+</header>
+<main>
+<div id="home">
+<div id="home-header">
+<div class="container">
+<div id="home-header-title">
+<h1>
+Explore projects funded by the Technology Strategy Board
+</h1>
+</div>
+<div id="home-header-actions">
+<div id="home-header-search">
+<form accept-charset="UTF-8" action="/projects" method="get"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="✓"></div>
+<input autocomplete="off" id="search_string" name="search_string" placeholder="Enter a project search term..." type="text">
+<input name="commit" type="submit" value="Go">
+</form>
+
+<p class="help">
+Try searching by name, organisation, region or competition.
+</p>
+</div>
+<div id="home-header-browse">
+<a href="/projects">Browse the data</a>
+</div>
+</div>
+</div>
+</div>
+<div class="container">
+<div id="home-main">
+<div id="home-intro">
+<p>The Technology Strategy Board funds innovative projects to invest in the growth of businesses, technologies and sectors.</p>
+
+<p>This site aims to provide greater understanding of which projects, businesses, regions and sectors receive grants.</p>
+
+<p>All the data that underpins this site is available <a href="/dumps/projects.csv">for download</a> so that other people can present or analyse it in other ways.</p>
+
+<p>This is an alpha site. Please <a href="mailto:Nic.Jefferis@tsb.gov.uk">send us feedback</a> about how the site could be improved to make it more useful to you.</p>
+</div>
+<div id="home-panels">
+<div class="home-panel">
+<h3>About the Data</h3>
+
+<p>The projects covered on this site date between 2003 and the present day, and are updated each month.</p>
+
+<p><a href="/about">Read More »</a></p>
+</div>
+<div class="home-panel">
+<h3>Developers</h3>
+
+<p>This is a linked data site: each project and organisation has its own page and its own URL. You can access CSV, JSON and Atom feeds of new projects from the <a href="/search">search page</a> and can access data about projects and organisations in JSON and RDF formats.</p>
+
+<p><a href="/data">Explore the Linked Data »</a></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
 </div>
 <script type="text/javascript" src="lib/d3.v3.min.js"></script>
 <script type="text/javascript" src="lib/sparql.js"></script>
