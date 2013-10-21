@@ -32,7 +32,7 @@ tsb.viz.priorityAreas = {
     console.log('drawGraph', data);
     var n = tsb.config.bugetAreas.length; // number of layers / budget areas
     var m = this.endYear - this.startYear + 1; // number of samples per layer / years
-    var stack = d3.layout.stack().offset("wiggle");
+    var stack = d3.layout.stack().offset('wiggle');
     var layers = stack(data);
 
     var width = this.w;
@@ -49,14 +49,14 @@ tsb.viz.priorityAreas = {
     var area = d3.svg.area()
       .x(function(d) { return x(d.x); })
       .y0(function(d) { return y(d.y0); })
-      .y1(function(d) { return y(d.y0 + d.y); });
+      .y1(function(d) { return y(d.y0 + d.y); })
 
-    this.svg.selectAll("path")
+    this.svg.selectAll('path')
       .data(layers)
-    .enter().append("path")
-      .attr("d", area)
-      .style("fill", function(d) {
-        return tsb.config.themes.current.budgetAreaColor[d[0].budgetArea]; 
+    .enter().append('path')
+      .attr('d', area)
+      .style('fill', function(d) {
+        return tsb.config.themes.current.budgetAreaColor[d[0].budgetArea];
       });
   },
   mapData: function(data) {
