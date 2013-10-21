@@ -17,6 +17,25 @@ tsb.viz.priorityAreas = {
     .attr('class', 'bg')
     .attr('width', tsb.state.w).attr('height', tsb.state.h)
     .attr('fill', tsb.config.themes.current.priorityAreasBgColor)
+
+    var title = svg
+      .append('text')
+      .attr('x', '1em')
+      .attr('y', '2em')
+      .style('fill', '#333')
+      .style('font-size', '200%')
+      .style('font-weight', '300')
+      .text('TSB spending by priority area')
+
+    this.subTitle = svg
+      .append('text')
+      .attr('x', '1em')
+      .attr('y', '3.2em')
+      .style('fill', '#F00')
+      .style('font-size', '200%')
+      .style('font-weight', '100')
+      .text('Space xploration')
+      .style('opacity', 0)
   },
   loadData: function() {
     var results = [];
@@ -40,6 +59,7 @@ tsb.viz.priorityAreas = {
     var margin = 0;
     var startYear = this.startYear;
     var endYear = this.endYear;
+    var subTitle = this.subTitle;
 
     var x = d3.scale.linear()
       .domain([this.startYear, this.endYear])
@@ -62,15 +82,21 @@ tsb.viz.priorityAreas = {
       .style('fill', function(d) {
         return tsb.config.themes.current.budgetAreaColor[d[0].budgetArea];
       })
-      .on('mouseenter', function(od) {
+      .on('mouseenter', function(d) {
         layerPaths.transition()
-        .style('opacity', function(d) {
-          return (od == d) ? 1 : 0.5
+        .style('opacity', function(od) {
+          return (od == d) ? 1 : 0.25
         })
+        subTitle
+          .style('fill', tsb.config.themes.current.budgetAreaColor[d[0].budgetArea])
+        subTitle.transition()
+          .style('opacity', 1)
       })
       .on('mouseleave', function(d) {
         layerPaths.transition()
-        .style('opacity', 1)
+          .style('opacity', 1)
+        subTitle.transition()
+          .style('opacity', 0)
       })
 
     //axis
@@ -83,7 +109,7 @@ tsb.viz.priorityAreas = {
         .attr('x2', x)
         .attr('y2', this.h)
         .style('stroke', 'black')
-        .style('opacity', 0.2)
+        .style('opacity', 0.1)
 
     var yearLabels = this.svg.selectAll('text.priorityAreas')
       .data(d3.range(this.startYear+1, this.endYear+1))
