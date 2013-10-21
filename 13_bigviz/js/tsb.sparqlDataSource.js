@@ -204,17 +204,17 @@ tsb.SPARQLDataSource = (function() {
   SPARQLDataSource.prototype.getProjectsByYear = function(year) {
     var q =" \
     PREFIX tsb: <http://tsb-projects.labs.theodi.org/def/> \
-    PREFIX esize: <http://tsb-projects.labs.theodi.org/def/concept/enterprise-size/> \
-    PREFIX rdf: <http://www.w3.org/2000/01/rdf-schema#> \
-    PREFIX w3: <http://www.w3.org/ns/org#> \
-    select ?project ?projectLabel ?budgetArea ?budgetAreaLabel ?competitionYear \
+    PREFIX ptime: <http://purl.org/NET/c4dm/timeline.owl#> \
+    PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \
+    select ?budgetArea ?projectStartDate \
     where { \
-         ?project a  tsb:Project . \
-         ?project rdf:label ?projectLabel . \
-         ?project tsb:competition ?competition . \
-         ?competition tsb:budgetArea ?budgetArea . \
-         ?budgetArea rdf:label ?budgetAreaLabel . \
-         ?competition tsb:competitionYear <http://reference.data.gov.uk/id/year/" + year + "> \
+        ?project a tsb:Project . \
+        ?project tsb:projectDuration ?projectDuration . \
+        ?projectDuration ptime:start ?projectStartDate . \
+        ?project tsb:competition ?competition . \
+        ?competition tsb:budgetArea ?budgetArea . \
+        FILTER(?projectStartDate >= \""+year+"-01-01\"^^xsd:date) . \
+        FILTER(?projectStartDate <= \""+year+"-12-31\"^^xsd:date) . \
     } \
     ";
     return this.query(q);

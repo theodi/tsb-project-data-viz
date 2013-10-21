@@ -12,7 +12,7 @@ tsb.viz.intro = {
     this.svg = svg;
     this.w = w;
     this.h = h;
-    this.year = 2012;
+    this.year = 2013;
     this.loadData()
   },
   loadData: function() {
@@ -29,6 +29,7 @@ tsb.viz.intro = {
     var spacingX = 8;
     var spacingY = 25;
     var margin = 40;
+    console.log('tsb.viz.intro.createProjects', rows.length);
     rows.forEach(function(project, projectIndex) {
       var projectsPerLine = Math.floor((this.w - 2*margin) / spacingX);
       var px = margin + (projectIndex % projectsPerLine) * spacingX;
@@ -60,7 +61,7 @@ tsb.viz.intro = {
   addLabels: function() {
     var labelGroup = this.labelGroup = this.svg.append('g');
     labelGroup.append('text')
-      .text('In 2012 we funded')
+      .text('In ' + this.year + ' we funded')
       .attr('dx', 100)
       .attr('dy', 200)
       .attr('fill', '#FFF')
