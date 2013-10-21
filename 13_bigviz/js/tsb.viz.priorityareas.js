@@ -61,6 +61,7 @@ tsb.viz.priorityAreas = {
     var endYear = this.endYear;
     var subTitle = this.subTitle;
     var svg = this.svg;
+    var self = this;
 
     var x = d3.scale.linear()
       .domain([this.startYear, this.endYear])
@@ -103,6 +104,14 @@ tsb.viz.priorityAreas = {
           })
           .transition()
           .style('opacity', 1)
+        svg.selectAll('text.priorityAreasGrants')
+          .data(d)
+          .attr('fill', function(d) {
+            return tsb.config.themes.current.budgetAreaColor[d.budgetArea];
+          })
+          .text(function(d) { return d.numGrants + ' GRANTS'; })
+          .transition()
+          .style('opacity', 1)
       })
       .on('mouseleave', function(d) {
         layerPaths.transition()
@@ -111,6 +120,13 @@ tsb.viz.priorityAreas = {
           .style('opacity', 0)
         svg.selectAll('text.priorityAreasTotal').transition()
           .style('opacity', 0)
+        svg.selectAll('text.priorityAreasGrants').transition()
+          .style('opacity', 0)
+      })
+      .on('click', function(d) {
+        var clickedYear = startYear + Math.floor((endYear - startYear + 1) * d3.event.clientX / width);
+        var clickedArea = d[0].budgetArea;
+        self.openLink(clickedYear, clickedArea)
       })
 
     //axis
@@ -136,8 +152,7 @@ tsb.viz.priorityAreas = {
         .attr('y', this.h-20)
         .attr('font-size', '80%')
 
-    var yearTotalLabels = this.svg.selectAll('text.priorityAreasTotal');
-    yearTotalLabels
+    this.svg.selectAll('text.priorityAreasTotal')
       .data(data[0])
       .enter()
         .append('text')
@@ -145,9 +160,30 @@ tsb.viz.priorityAreas = {
         .attr('text-anchor', 'middle')
         .attr('dx', -width / (this.endYear - this.startYear) /2)
         .attr('x', function(d) { return x(d.x); })
-        .attr('y', this.h-50)
+        .attr('y', this.h-80)
+      .style('opacity', 0)
         .attr('font-size', '120%')
         .attr('class', 'priorityAreasTotal')
+
+    this.svg.selectAll('text.priorityAreasGrants')
+      .data(data[0])
+      .enter()
+        .append('text')
+        .text(function(d) { return d.numGrants + ' grants'; })
+        .attr('text-anchor', 'middle')
+        .attr('dx', -width / (this.endYear - this.startYear) /2)
+        .attr('x', function(d) { return x(d.x); })
+        .attr('y', this.h-50)
+        .style('opacity', 0)
+        .attr('font-size', '70%')
+        .attr('class', 'priorityAreasGrants')
+  },
+  openLink: function(year, area) {
+    var areaLabel = tsb.config.budgetAreaLabels[area]
+    var start = year + '-01-01';
+    var end = year + '-12-31';
+    document.location.href = tsb.config.domain +
+      '/projects?utf8=✓&search_string=&date_from='+start+'&date_to='+end+'&budget_area_label%5B'+areaLabel+'%5D=true';
   },
   mapData: function(data) {
     var byArea = {};

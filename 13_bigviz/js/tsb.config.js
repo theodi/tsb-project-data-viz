@@ -34,7 +34,7 @@ tsb.config.budgetAreaLabels = {
   'MANF' : 'Manufacturing',
   'SUST' : 'Sustainability',
   'tsb-programmes' : 'TSB Programmes',
-  'DIGS' : 'Digital Economy',
+  'DIGS' : 'Digital',
   'ENRG' : 'Energy' ,
   'HLTHCR' : 'Healthcare'
 };
