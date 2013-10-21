@@ -1,14 +1,49 @@
 function SPARQLDataSource() {
-
 }
 
 SPARQLDataSource.endpoint = "http://tsb-projects.labs.theodi.org/sparql.json";
+
+SPARQLDataSource.prototype.createCORSRequest = function(method, url) {
+  var xhr = new XMLHttpRequest();
+  if ("withCredentials" in xhr) {
+    xhr.open(method, url, true);
+  } else if (typeof XDomainRequest != "undefined") {
+    xhr = new XDomainRequest();
+    xhr.open(method, url);
+  } else {
+    xhr = null;
+  }
+  return xhr;
+}
+
+SPARQLDataSource.prototype.executeQuery = function(endpoint, query) {
+  var deferred = Q.defer();
+  var url = endpoint + '?query=' + encodeURIComponent(query);
+
+  var xhr = this.createCORSRequest('GET', url);
+  if (!xhr) {
+    deferred.reject(new Error('CORS not supported!'));
+    return;
+  }
+
+  xhr.onload = function() {
+    deferred.resolve(JSON.parse(xhr.responseText));
+  };
+
+  xhr.onerror = function() {
+    deferred.reject(new Error('Error making request to ' + url));
+  };
+
+  xhr.send();
+
+  return deferred.promise;
+}
 
 SPARQLDataSource.prototype.query = function(queryStr) {
   var deferred = Q.defer();
   var self = this;
 
-  tsb.sparqlQuery(SPARQLDataSource.endpoint, queryStr).then(function(json) {
+  this.executeQuery(SPARQLDataSource.endpoint, queryStr).then(function(json) {
     var data = json.results.bindings.map(self.extractValues);
     var dataSet = DataSet.fromArray(data);
     deferred.resolve(dataSet);

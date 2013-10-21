@@ -31,51 +31,13 @@ tsb.regionsMap = {
 tsb.themes = {
 }
 
-tsb.sparqlQuery = (function() {
-  function createCORSRequest(method, url) {
-    var xhr = new XMLHttpRequest();
-    if ("withCredentials" in xhr) {
-      // XHR for Chrome/Firefox/Opera/Safari.
-      xhr.open(method, url, true);
-    } else if (typeof XDomainRequest != "undefined") {
-      // XDomainRequest for IE.
-      xhr = new XDomainRequest();
-      xhr.open(method, url);
-    } else {
-      // CORS not supported.
-      xhr = null;
-    }
-    return xhr;
-  }
-
-  function makeQuery(sparqlEndpoint, query) {
-    var deferred = Q.defer();
-
-    var url = sparqlEndpoint + '?query=' + encodeURIComponent(query);
-
-    var xhr = createCORSRequest('GET', url);
-    if (!xhr) {
-      deferred.reject(new Error('CORS not supported!'));
-      return;
-    }
-
-    // Response handlers.
-    xhr.onload = function() {
-      console.log(xhr);
-      deferred.resolve(JSON.parse(xhr.responseText));
-    };
-
-    xhr.onerror = function() {
-      deferred.reject(new Error('Error making request to ' + url));
-    };
-
-    xhr.send();
-
-    return deferred.promise;
-  }
-
-  return makeQuery;
-
-})();
-
-
+//http://tsb-projects.labs.theodi.org/id/budget-area/TRAN
+//http://tsb-projects.labs.theodi.org/id/budget-area/TECH
+//http://tsb-projects.labs.theodi.org/id/budget-area/MANF
+//http://tsb-projects.labs.theodi.org/id/budget-area/SUST
+//http://tsb-projects.labs.theodi.org/id/budget-area/tsb-programmes
+//http://tsb-projects.labs.theodi.org/id/budget-area/DIGS
+//http://tsb-projects.labs.theodi.org/id/budget-area/ENRG
+//http://tsb-projects.labs.theodi.org/id/budget-area/HLTHCR
+//http://tsb-projects.labs.theodi.org/id/budget-area/SPAC
+//
