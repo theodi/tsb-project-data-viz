@@ -35,8 +35,8 @@ tsb.viz.intro = {
       var py = margin + Math.floor(projectIndex / projectsPerLine) * spacingY;
       var pw = 5;
       var ph = 15;
-      var budgetArea = project.budgetArea;
-      var color = "#FF0000";//budgetAreaToColor(budgetArea);
+      var budgetAreaCode = tsb.common.extractBudgetAreaCode(project.budgetArea);
+      var color = tsb.config.themes.current.budgetAreaColor[budgetAreaCode];
       this.makeRect(px, py, pw, ph, color, 'project');
     }.bind(this));
   },
