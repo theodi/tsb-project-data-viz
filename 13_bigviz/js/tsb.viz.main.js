@@ -15,7 +15,8 @@ function init() {
     .attr('height', tsb.state.h);
 
   //tsb.viz.intro.init(svg, tsb.state.w, tsb.state.h);
-  tsb.viz.priorityAreas.init(svg, tsb.state.w, tsb.state.h);
+  //tsb.viz.priorityAreas.init(svg, tsb.state.w, tsb.state.h);
+  tsb.viz.collaborations.init(svg, tsb.state.w, tsb.state.h);
 }
 
 window.onload = init;

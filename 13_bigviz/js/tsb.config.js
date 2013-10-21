@@ -56,7 +56,8 @@ tsb.config.themes = {
       'HLTHCR'          : '#1DD3A7',
       'SPAC'            : '#08DEF9'
     },
-    priorityAreasBgColor: '#FFFFFF'
+    priorityAreasBgColor: '#FFFFFF',
+    collaborationsBgColor: '#FFFFFF'
   },
   odiBright: {
     introTextColor: '#3333333',
@@ -74,7 +75,8 @@ tsb.config.themes = {
       'HLTHCR'          : '#1DD3A7',
       'SPAC'            : '#08DEF9',
     },
-    priorityAreasBgColor: '#FFFFFF'
+    priorityAreasBgColor: '#FFFFFF',
+    collaborationsBgColor: '#FFFFFF'
   }
 }
 
