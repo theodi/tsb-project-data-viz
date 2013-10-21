@@ -1,4 +1,6 @@
-var DataSet = (function() {
+var tsb = tsb || {};
+
+tsb.DataSet = (function() {
 
   function extract(list, propertyName) {
     return list.map(function(item) { return item[propertyName] || 'Unknown' });

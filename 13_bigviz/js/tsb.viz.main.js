@@ -8,7 +8,7 @@ var tsb = {
 };
 
 function init() {
-  tsb.dataSource = new SPARQLDataSource();
+  tsb.dataSource = new tsb.SPARQLDataSource();
 
   var svg = tsb.settings.svg = d3.select('#home-viz').append('svg')
     .attr('width', tsb.settings.w)
