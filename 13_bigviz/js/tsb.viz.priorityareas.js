@@ -24,7 +24,8 @@ tsb.viz.priorityAreas = {
       results.push(tsb.state.dataSource.getAreaSummaryForYear(year))
     }
     Q.all(results).then(function(data) {
-      this.drawGraph(data);
+      var mappedData = this.mapData(data);
+      this.drawGraph(mappedData);
     }.bind(this))
   },
   drawGraph: function(data) {
@@ -32,17 +33,16 @@ tsb.viz.priorityAreas = {
     var n = 9; // number of layers / budget areas
     var m = this.endYear - this.startYear + 1; // number of samples per layer / years
     var stack = d3.layout.stack().offset("wiggle");
-    var layers = stack(d3.range(n).map(function() { return bumpLayer(m); }));
+    var layers = stack(data);
 
     var width = this.w;
     var height = this.h * 0.8;
 
     var x = d3.scale.linear()
-      .domain([0, m - 1])
+      .domain([this.startYear, this.endYear])
       .range([0, width]);
 
-    console.log(bumpLayer(m));
-
+    console.log('max', d3.max(layers.concat(layers), function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); }));
     var y = d3.scale.linear()
       .domain([0, d3.max(layers.concat(layers), function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); })])
       .range([height, (this.h - height)/2]);
@@ -60,24 +60,27 @@ tsb.viz.priorityAreas = {
     .enter().append("path")
       .attr("d", area)
       .style("fill", function() { return color(Math.random()); });
-
-    console.log(bumpLayer(m));
-
-    function bumpLayer(n) {
-      function bump(a) {
-        var x = 1 / (.1 + Math.random()),
-            y = 2 * Math.random() - .5,
-            z = 10 / (.1 + Math.random());
-        for (var i = 0; i < n; i++) {
-          var w = (i / n - y) * z;
-          a[i] += x * Math.exp(-w * w);
-        }
+  },
+  mapData: function(data) {
+    var byArea = {};
+    var areas = [];
+    var startYear = this.startYear;
+    tsb.config.bugetAreas.forEach(function(areaId) {
+      var areaStats = [];
+      byArea[areaId] = areaStats;
+      areas.push(areaStats);
+      for(var year=this.startYear; year<=this.endYear; year++) {
+        areaStats[year-startYear] = { x: year, y: 0, grantsSum:0, numGrants:0, budgetArea: areaId };
       }
-
-      var a = [], i;
-      for (i = 0; i < n; ++i) a[i] = 0;
-      for (i = 0; i < 5; ++i) bump(a);
-      return a.map(function(d, i) { return {x: i, y: Math.max(0, d)}; });
-    }
+    }.bind(this));
+    data.forEach(function(year) {
+      year.rows.forEach(function(grantArea) {
+        var budgetAreaId = tsb.common.extractBudgetAreaCode(grantArea.budgetArea);
+        byArea[budgetAreaId][grantArea.year-startYear].y = Number(grantArea.grantsSum);
+        byArea[budgetAreaId][grantArea.year-startYear].grantsSum = grantArea.grantsSum;
+        byArea[budgetAreaId][grantArea.year-startYear].numGrants = grantArea.numGrants;
+      });
+    });
+    return areas;
   }
 };
