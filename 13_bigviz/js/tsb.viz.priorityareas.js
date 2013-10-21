@@ -42,13 +42,9 @@ tsb.viz.priorityAreas = {
       .domain([this.startYear, this.endYear])
       .range([0, width]);
 
-    console.log('max', d3.max(layers.concat(layers), function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); }));
     var y = d3.scale.linear()
       .domain([0, d3.max(layers.concat(layers), function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); })])
       .range([height, (this.h - height)/2]);
-
-    var color = d3.scale.linear()
-      .range(["#aad", "#556"]);
 
     var area = d3.svg.area()
       .x(function(d) { return x(d.x); })
