@@ -1,5 +1,3 @@
-
-
 var tsb = tsb || { viz : {} };
 
 tsb.viz.priorityAreas = {
