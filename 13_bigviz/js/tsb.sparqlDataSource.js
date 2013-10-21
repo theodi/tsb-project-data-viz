@@ -49,7 +49,7 @@ tsb.SPARQLDataSource = (function() {
       var dataSet = tsb.DataSet.fromArray(data);
       deferred.resolve(dataSet);
     }).fail(function(err) {
-      deferred.fail(err);
+      deferred.reject(err);
     })
 
     return deferred.promise;
