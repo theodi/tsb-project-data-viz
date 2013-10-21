@@ -29,17 +29,18 @@ tsb.config.regionsMap = {
 tsb.config.themes = {
   odi: {
     budgetAreaColor : {
-      'TRAN'            : '#FF0000',
-      'TECH'            : '#FF0000',
-      'MANF'            : '#FF0000',
-      'SUST'            : '#FF0000',
-      'tsb-programmes'  : '#FF0000',
-      'DIGS'            : '#FF0000',
-      'ENRG'            : '#FF0000',
-      'HLTHCR'          : '#FF0000',
-      'SPAC'            : '#FF0000',
+      'TRAN'            : '#00B7FF',
+      'TECH'            : '#D60303',
+      'MANF'            : '#FF6700',
+      'SUST'            : '#0DBC37',
+      'tsb-programmes'  : '#B13198',
+      'DIGS'            : '#EF3AAB',
+      'ENRG'            : '#F9BC26',
+      'HLTHCR'          : '#1DD3A7',
+      'SPAC'            : '#08DEF9',
     }
   }
 }
 
+tsb.config.themes.current = tsb.config.themes.odi;
 
