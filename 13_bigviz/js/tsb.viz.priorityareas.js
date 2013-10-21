@@ -50,6 +50,7 @@ tsb.viz.priorityAreas = {
       .x(function(d) { return x(d.x); })
       .y0(function(d) { return y(d.y0); })
       .y1(function(d) { return y(d.y0 + d.y); })
+      //.interpolate('cardinal')
 
     this.svg.selectAll('path')
       .data(layers)
