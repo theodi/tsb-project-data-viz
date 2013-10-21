@@ -59,7 +59,9 @@ tsb.viz.priorityAreas = {
       .data(layers)
     .enter().append("path")
       .attr("d", area)
-      .style("fill", function() { return color(Math.random()); });
+      .style("fill", function(d) {
+        return tsb.config.themes.current.budgetAreaColor[d[0].budgetArea]; 
+      });
   },
   mapData: function(data) {
     var byArea = {};
