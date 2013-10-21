@@ -20,7 +20,7 @@ tsb.viz.intro = {
     var svg = this.svg;
     var w = this.w;
     var h = this.h;
-    tsb.dataSource.getProjectsByYear(this.year).then(function(projects) {
+    tsb.state.dataSource.getProjectsByYear(this.year).then(function(projects) {
       this.createProjects(projects.rows);
       this.addLabels();
     }.bind(this));
