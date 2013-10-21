@@ -13,7 +13,7 @@ tsb.viz.intro = {
     this.w = w;
     this.h = h;
     this.year = (new Date().getFullYear());
-    this.duration = 12000;
+    this.duration = 60000;
     this.loadData();
 
     svg
