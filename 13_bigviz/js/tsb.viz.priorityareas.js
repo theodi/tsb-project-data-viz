@@ -55,13 +55,23 @@ tsb.viz.priorityAreas = {
       .y1(function(d) { return y(d.y0 + d.y); })
       //.interpolate('cardinal')
 
-    this.svg.selectAll('path')
+    var layerPaths = this.svg.selectAll('path')
       .data(layers)
     .enter().append('path')
       .attr('d', area)
       .style('fill', function(d) {
         return tsb.config.themes.current.budgetAreaColor[d[0].budgetArea];
-      });
+      })
+      .on('mouseenter', function(od) {
+        layerPaths.transition()
+        .style('opacity', function(d) {
+          return (od == d) ? 1 : 0.5
+        })
+      })
+      .on('mouseleave', function(d) {
+        layerPaths.transition()
+        .style('opacity', 1)
+      })
 
     //axis
     var yearLines = this.svg.selectAll('line.priorityAreas')
@@ -73,22 +83,15 @@ tsb.viz.priorityAreas = {
         .attr('x2', x)
         .attr('y2', this.h)
         .style('stroke', 'black')
+        .style('opacity', 0.2)
 
     var yearLabels = this.svg.selectAll('text.priorityAreas')
-      .data(d3.range(this.startYear, this.endYear+1))
+      .data(d3.range(this.startYear+1, this.endYear+1))
       .enter()
         .append('text')
         .text(function(d) { return d; })
-        .attr('text-anchor', function(d) {
-          if (d == startYear) return 'start';
-          else if (d == endYear) return 'end';
-          else return 'middle';
-        })
-        .attr('dx', function(d) {
-          if (d == startYear) return '1em';
-          else if (d == endYear) return '-1em';
-          else return 0;
-        })
+        .attr('text-anchor', 'middle')
+        .attr('dx', -width / (this.endYear - this.startYear) /2)
         .attr('x', x)
         .attr('y', this.h-20)
         .attr('font-size', '80%')
