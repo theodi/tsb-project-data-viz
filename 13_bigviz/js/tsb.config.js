@@ -29,6 +29,7 @@ tsb.config.regionsMap = {
 tsb.config.themes = {
   odiDark: {
     introTextColor: '#FFFFFF',
+    introTextFontWegith: 100,
     introBgColor: '#222222',
     budgetAreaColorAlpha: 0.65,
     budgetAreaColor : {
@@ -45,8 +46,9 @@ tsb.config.themes = {
   },
   odiBright: {
     introTextColor: '#3333333',
+    introTextFontWegith: 100,
     introBgColor: '#EEEEEE',
-    budgetAreaColorAlpha: 0.35,
+    budgetAreaColorAlpha: 0.15,
     budgetAreaColor : {
       'TRAN'            : '#00B7FF',
       'TECH'            : '#D60303',
@@ -61,6 +63,6 @@ tsb.config.themes = {
   }
 }
 
-//tsb.config.themes.current = tsb.config.themes.odiDark;
-tsb.config.themes.current = tsb.config.themes.odiBright;
+tsb.config.themes.current = tsb.config.themes.odiDark;
+//tsb.config.themes.current = tsb.config.themes.odiBright;
 

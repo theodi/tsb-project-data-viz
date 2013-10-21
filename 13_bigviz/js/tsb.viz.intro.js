@@ -12,7 +12,8 @@ tsb.viz.intro = {
     this.svg = svg;
     this.w = w;
     this.h = h;
-    this.year = 2013;
+    this.year = (new Date().getFullYear());
+    this.duration = 12000;
     this.loadData();
 
     svg
@@ -32,16 +33,16 @@ tsb.viz.intro = {
     }.bind(this));
   },
   createProjects: function(rows) {
-    var spacingX = 8;
-    var spacingY = 25;
+    var pw = 8;
+    var ph = 20;
+    var spacingX = pw + 5;
+    var spacingY = ph + 10;
     var margin = 40;
     console.log('tsb.viz.intro.createProjects', rows.length);
     rows.forEach(function(project, projectIndex) {
       var projectsPerLine = Math.floor((this.w - 2*margin) / spacingX);
       var px = margin + (projectIndex % projectsPerLine) * spacingX;
       var py = margin + Math.floor(projectIndex / projectsPerLine) * spacingY;
-      var pw = 5;
-      var ph = 15;
       var budgetAreaCode = tsb.common.extractBudgetAreaCode(project.budgetArea);
       var color = tsb.config.themes.current.budgetAreaColor[budgetAreaCode];
       this.makeRect(px, py, pw, ph, color, 'project');
@@ -56,7 +57,7 @@ tsb.viz.intro = {
       .attr('width', w).attr('height', 0)
       .attr('fill', color)
       .style('opacity', tsb.config.themes.current.budgetAreaColorAlpha)
-      .transition().delay(Math.random()*120000)
+      .transition().delay(Math.random()*this.duration)
       .attr('y', y)
       .attr('height', h)
       .each('end', this.onProjectAnimComplete.bind(this))
@@ -72,7 +73,7 @@ tsb.viz.intro = {
       .attr('dy', 200)
       .attr('fill', tsb.config.themes.current.introTextColor)
       .style('font-size', '6em')
-      .style('font-weight', '100');
+      .style('font-weight', tsb.config.themes.current.introTextFontWegith);
 
     this.projectCount = labelGroup.append('text')
       .text('0 projects')
@@ -80,7 +81,7 @@ tsb.viz.intro = {
       .attr('dy', 320)
       .attr('fill', tsb.config.themes.current.introTextColor)
       .style('font-size', '6em')
-      .style('font-weight', '100');
+      .style('font-weight', tsb.config.themes.current.introTextFontWegith);
 
     labelGroup
       .style('opacity', 0)
