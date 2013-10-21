@@ -4,8 +4,6 @@ tsb.SPARQLDataSource = (function() {
   function SPARQLDataSource() {
   }
 
-  SPARQLDataSource.endpoint = "http://tsb-projects.labs.theodi.org/sparql.json";
-
   SPARQLDataSource.prototype.createCORSRequest = function(method, url) {
     var xhr = new XMLHttpRequest();
     if ("withCredentials" in xhr) {
@@ -46,7 +44,7 @@ tsb.SPARQLDataSource = (function() {
     var deferred = Q.defer();
     var self = this;
 
-    this.executeQuery(SPARQLDataSource.endpoint, queryStr).then(function(json) {
+    this.executeQuery(tsb.config.sparqlEndpoint, queryStr).then(function(json) {
       var data = json.results.bindings.map(self.extractValues);
       var dataSet = tsb.DataSet.fromArray(data);
       deferred.resolve(dataSet);
