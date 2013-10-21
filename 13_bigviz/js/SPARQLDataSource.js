@@ -2,31 +2,19 @@ function SPARQLDataSource() {
 
 }
 
-SPARQLDataSource.endpoint = "proxy.php";
-//SPARQLDataSource.endpoint = "http://tsb-projects.labs.theodi.org/sparql?format=json";
+SPARQLDataSource.endpoint = "http://tsb-projects.labs.theodi.org/sparql.json";
 
 SPARQLDataSource.prototype.query = function(queryStr) {
   var deferred = Q.defer();
   var self = this;
 
-  var sparqler = new SPARQL.Service(SPARQLDataSource.endpoint);
-  sparqler.setPrefix("tsb", "http://tsb-projects.labs.theodi.org/def/");
-  sparqler.setPrefix("rdf", "http://www.w3.org/2000/01/rdf-schema#");
-  sparqler.setPrefix("w3", "http://www.w3.org/ns/org#");
-  sparqler.setOutput("json");
-  var query = sparqler.createQuery();
-  query.query(queryStr, {
-    failure: function(err) { deferred.reject(new Error(err)); },
-    success: function(json) {
-      if (!json) {
-        deferred.reject(new Error('No data'));
-        return;
-      }
-      var data = json.results.bindings.map(self.extractValues);
-      var dataSet = DataSet.fromArray(data);
-      deferred.resolve(dataSet);
-    }
-  });
+  tsb.sparqlQuery(SPARQLDataSource.endpoint, queryStr).then(function(json) {
+    var data = json.results.bindings.map(self.extractValues);
+    var dataSet = DataSet.fromArray(data);
+    deferred.resolve(dataSet);
+  }).fail(function(err) {
+    deferred.fail(err);
+  })
 
   return deferred.promise;
 }

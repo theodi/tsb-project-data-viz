@@ -27,3 +27,55 @@ tsb.regionsMap = {
   'N92000002' : 'Northern Ireland',
   'W92000004' : 'Wales'
 };
+
+tsb.themes = {
+}
+
+tsb.sparqlQuery = (function() {
+  function createCORSRequest(method, url) {
+    var xhr = new XMLHttpRequest();
+    if ("withCredentials" in xhr) {
+      // XHR for Chrome/Firefox/Opera/Safari.
+      xhr.open(method, url, true);
+    } else if (typeof XDomainRequest != "undefined") {
+      // XDomainRequest for IE.
+      xhr = new XDomainRequest();
+      xhr.open(method, url);
+    } else {
+      // CORS not supported.
+      xhr = null;
+    }
+    return xhr;
+  }
+
+  function makeQuery(sparqlEndpoint, query) {
+    var deferred = Q.defer();
+
+    var url = sparqlEndpoint + '?query=' + encodeURIComponent(query);
+
+    var xhr = createCORSRequest('GET', url);
+    if (!xhr) {
+      deferred.reject(new Error('CORS not supported!'));
+      return;
+    }
+
+    // Response handlers.
+    xhr.onload = function() {
+      console.log(xhr);
+      deferred.resolve(JSON.parse(xhr.responseText));
+    };
+
+    xhr.onerror = function() {
+      deferred.reject(new Error('Error making request to ' + url));
+    };
+
+    xhr.send();
+
+    return deferred.promise;
+  }
+
+  return makeQuery;
+
+})();
+
+
