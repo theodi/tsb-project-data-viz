@@ -14,7 +14,8 @@ function init() {
     .attr('width', tsb.state.w)
     .attr('height', tsb.state.h);
 
-  tsb.viz.intro.init(svg, tsb.state.w, tsb.state.h);
+  //tsb.viz.intro.init(svg, tsb.state.w, tsb.state.h);
+  tsb.viz.priorityAreas.init(svg, tsb.state.w, tsb.state.h);
 }
 
 window.onload = init;

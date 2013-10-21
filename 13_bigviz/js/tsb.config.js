@@ -42,7 +42,8 @@ tsb.config.themes = {
       'ENRG'            : '#F9BC26',
       'HLTHCR'          : '#1DD3A7',
       'SPAC'            : '#08DEF9',
-    }
+    },
+    priorityAreasBgColor: '#FFFFFF'
   },
   odiBright: {
     introTextColor: '#3333333',
@@ -59,7 +60,8 @@ tsb.config.themes = {
       'ENRG'            : '#F9BC26',
       'HLTHCR'          : '#1DD3A7',
       'SPAC'            : '#08DEF9',
-    }
+    },
+    priorityAreasBgColor: '#FFFFFF'
   }
 }
 
