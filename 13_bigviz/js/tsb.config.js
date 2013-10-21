@@ -26,7 +26,7 @@ tsb.config.regionsMap = {
   'W92000004' : 'Wales'
 };
 
-tsb.config.bugetAreas = [ 'TRAN', 'TECH', 'MANF', 'SUST', 'tsb-programmes', 'DIGS', 'ENRG', 'HLTHCR', 'SPAC'];
+tsb.config.bugetAreas = [ 'SPAC', 'TRAN', 'TECH', 'MANF', 'SUST', 'tsb-programmes', 'DIGS', 'ENRG', 'HLTHCR'];
 
 tsb.config.themes = {
   odiDark: {
