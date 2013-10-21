@@ -57,7 +57,8 @@ tsb.config.themes = {
       'SPAC'            : '#08DEF9'
     },
     priorityAreasBgColor: '#FFFFFF',
-    collaborationsBgColor: '#FFFFFF'
+    collaborationsBgColor: '#FFFFFF',
+    regionsBgColor: '#FFFFFF'
   },
   odiBright: {
     introTextColor: '#3333333',
@@ -76,7 +77,8 @@ tsb.config.themes = {
       'SPAC'            : '#08DEF9',
     },
     priorityAreasBgColor: '#FFFFFF',
-    collaborationsBgColor: '#FFFFFF'
+    collaborationsBgColor: '#FFFFFF',
+    regionsBgColor: '#FFFFFF'
   }
 }
 
