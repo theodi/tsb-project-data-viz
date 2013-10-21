@@ -25,7 +25,7 @@ tsb.viz.priorityAreas = {
       .style('fill', '#333')
       .style('font-size', '200%')
       .style('font-weight', '300')
-      .text('TSB spending by priority area')
+      .text('TSB spending by priority area (£)')
 
     this.subTitle = svg
       .append('text')
@@ -60,6 +60,7 @@ tsb.viz.priorityAreas = {
     var startYear = this.startYear;
     var endYear = this.endYear;
     var subTitle = this.subTitle;
+    var svg = this.svg;
 
     var x = d3.scale.linear()
       .domain([this.startYear, this.endYear])
@@ -89,13 +90,26 @@ tsb.viz.priorityAreas = {
         })
         subTitle
           .style('fill', tsb.config.themes.current.budgetAreaColor[d[0].budgetArea])
+          .text(tsb.config.budgetAreaLabels[d[0].budgetArea])
         subTitle.transition()
+          .style('opacity', 1)
+        svg.selectAll('text.priorityAreasTotal')
+          .data(d)
+          .attr('fill', function(d) {
+            return tsb.config.themes.current.budgetAreaColor[d.budgetArea];
+          })
+          .text(function(d) {
+            return Math.floor(d.grantsSum/1000000*100)/100 + 'M';
+          })
+          .transition()
           .style('opacity', 1)
       })
       .on('mouseleave', function(d) {
         layerPaths.transition()
           .style('opacity', 1)
         subTitle.transition()
+          .style('opacity', 0)
+        svg.selectAll('text.priorityAreasTotal').transition()
           .style('opacity', 0)
       })
 
@@ -121,6 +135,19 @@ tsb.viz.priorityAreas = {
         .attr('x', x)
         .attr('y', this.h-20)
         .attr('font-size', '80%')
+
+    var yearTotalLabels = this.svg.selectAll('text.priorityAreasTotal');
+    yearTotalLabels
+      .data(data[0])
+      .enter()
+        .append('text')
+        .text(function(d) { return d.grantsSum; })
+        .attr('text-anchor', 'middle')
+        .attr('dx', -width / (this.endYear - this.startYear) /2)
+        .attr('x', function(d) { return x(d.x); })
+        .attr('y', this.h-50)
+        .attr('font-size', '120%')
+        .attr('class', 'priorityAreasTotal')
   },
   mapData: function(data) {
     var byArea = {};

@@ -26,7 +26,18 @@ tsb.config.regionsMap = {
   'W92000004' : 'Wales'
 };
 
-tsb.config.budgetAreas = [ 'SPAC', 'TRAN', 'TECH', 'MANF', 'SUST', 'tsb-programmes', 'DIGS', 'ENRG', 'HLTHCR'];
+tsb.config.budgetAreas = [ 'SPAC', 'TRAN', 'TECH', 'MANF', 'SUST', 'tsb-programmes', 'DIGS', 'ENRG', 'HLTHCR' ];
+tsb.config.budgetAreaLabels = {
+  'SPAC' : 'Space',
+  'TRAN' : 'Transport',
+  'TECH' : 'Technology',
+  'MANF' : 'Manufacturing',
+  'SUST' : 'Sustainability',
+  'tsb-programmes' : 'TSB Programmes',
+  'DIGS' : 'Digital Economy',
+  'ENRG' : 'Energy' ,
+  'HLTHCR' : 'Healthcare'
+};
 
 tsb.config.themes = {
   odiDark: {
