@@ -3,6 +3,7 @@ function SPARQLDataSource() {
 }
 
 SPARQLDataSource.endpoint = "proxy.php";
+//SPARQLDataSource.endpoint = "http://tsb-projects.labs.theodi.org/sparql?format=json";
 
 SPARQLDataSource.prototype.query = function(queryStr) {
   var deferred = Q.defer();
@@ -171,6 +172,26 @@ SPARQLDataSource.prototype.getOrganizationCollaborators = function(orgId) {
        ?collaboratorSize rdf:label ?collaboratorSizeLabel . \
   } \
   group by ?collaborator ?collaboratorLabel ?collaboratorSizeLabel ?budgetAreaLabel ?collaboratorRegion \
+  ";
+  return this.query(q);
+}
+
+
+SPARQLDataSource.prototype.getProjectsByYear = function(year) {
+  var q =" \
+  PREFIX tsb: <http://tsb-projects.labs.theodi.org/def/> \
+  PREFIX esize: <http://tsb-projects.labs.theodi.org/def/concept/enterprise-size/> \
+  PREFIX rdf: <http://www.w3.org/2000/01/rdf-schema#> \
+  PREFIX w3: <http://www.w3.org/ns/org#> \
+  select ?project ?projectLabel ?budgetArea ?budgetAreaLabel ?competitionYear \
+  where { \
+       ?project a  tsb:Project . \
+       ?project rdf:label ?projectLabel . \
+       ?project tsb:competition ?competition . \
+       ?competition tsb:budgetArea ?budgetArea . \
+       ?budgetArea rdf:label ?budgetAreaLabel . \
+       ?competition tsb:competitionYear <http://reference.data.gov.uk/id/year/" + year + "> \
+  } \
   ";
   return this.query(q);
 }
