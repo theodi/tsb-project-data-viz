@@ -20,7 +20,7 @@ tsb.viz.priorityAreas = {
 
     var title = svg
       .append('text')
-      .attr('x', '1em')
+      .attr('x', (w - 1140)/2)
       .attr('y', '2em')
       .style('fill', '#333')
       .style('font-size', '200%')
@@ -29,7 +29,7 @@ tsb.viz.priorityAreas = {
 
     this.subTitle = svg
       .append('text')
-      .attr('x', '1em')
+      .attr('x', (w - 1140)/2)
       .attr('y', '3.2em')
       .style('fill', '#F00')
       .style('font-size', '200%')
