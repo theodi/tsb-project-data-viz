@@ -1,12 +1,5 @@
 var tsb = tsb || { viz : {} };
 
-var regionNameMap = [
-  ['North West England', 'North West'],
-  ['North East England', 'North East'],
-  ['South West England', 'South West'],
-  ['South East England', 'South East']
-];
-
 tsb.viz.intro = {
   init: function(svg, w, h) {
     this.svg = svg;
