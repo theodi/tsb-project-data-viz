@@ -8,6 +8,7 @@ tsb.viz.regions = {
     this.mapScale = 0.25;
     this.offsetFromTop = 290;
     this.unusedShapes = ['Ireland', 'IsleOfMan', 'ChannelIslands', 'Border1', 'Border2', 'Border3'];
+    this.year = (new Date()).getFullYear();
 
     svg
     .append('rect')
@@ -109,57 +110,64 @@ tsb.viz.regions = {
 
       var statsTop = 120;
 
-      this.svg.append('text')
-        .text('Projects')
-        //.attr('class', 'label')
-        .attr('dx', cx + dx)
-        .attr('dy', statsTop)
-        .style('fill', '#222')
-        .style('opacity', 0)
-        .style('font-size', '60%')
-        .style('text-transform', 'uppercase')
-        .transition()
-        .delay(mapAnimDelay+mapAnimTime)
-        .duration(labelAnimTime)
-        .style('opacity', 1)
+      tsb.state.dataSource.getAreaSummaryForYearInRegion(this.year, regionCode).then(function(data) {
+        console.log(regionInfo.name, data);
+        var totalGrantsSum = data.rows.reduce(function(prev, grant) {
+          return prev + Number(grant.grantsSum);
+        }, 0);
+        var totalGrantsSumStr = Math.floor(totalGrantsSum/1000000*10)/10 + 'M';
+        this.svg.append('text')
+          .text('Projects')
+          //.attr('class', 'label')
+          .attr('dx', cx + dx)
+          .attr('dy', statsTop)
+          .style('fill', '#222')
+          .style('opacity', 0)
+          .style('font-size', '60%')
+          .style('text-transform', 'uppercase')
+          .transition()
+          .delay(mapAnimDelay+mapAnimTime)
+          .duration(labelAnimTime)
+          .style('opacity', 1)
 
-      this.svg.append('text')
-        .text('1000')
-        //.attr('class', 'bigNum')
-        .attr('dx', cx + dx)
-        .attr('dy', statsTop + 25)
-        .style('opacity', 0)
-        .style('font-size', '120%')
-        .transition()
-        .delay(mapAnimDelay+mapAnimTime)
-        .duration(labelAnimTime)
-        .style('opacity', 1)
+        this.svg.append('text')
+          .text(0)
+          //.attr('class', 'bigNum')
+          .attr('dx', cx + dx)
+          .attr('dy', statsTop + 25)
+          .style('opacity', 0)
+          .style('font-size', '120%')
+          .transition()
+          .delay(mapAnimDelay+mapAnimTime)
+          .duration(labelAnimTime)
+          .style('opacity', 1)
 
-      this.svg.append('text')
-        .text('Grants')
-        //.attr('class', 'label')
-        .attr('dx', cx + dx)
-        .attr('dy', statsTop + 60)
-        .style('fill', '#222')
-        .style('opacity', 0)
-        .style('font-size', '60%')
-        .style('text-transform', 'uppercase')
-        .transition()
-        .delay(mapAnimDelay+mapAnimTime)
-        .duration(labelAnimTime)
-        .style('opacity', 1)
+        this.svg.append('text')
+          .text('Grants')
+          //.attr('class', 'label')
+          .attr('dx', cx + dx)
+          .attr('dy', statsTop + 60)
+          .style('fill', '#222')
+          .style('opacity', 0)
+          .style('font-size', '60%')
+          .style('text-transform', 'uppercase')
+          .transition()
+          .delay(mapAnimDelay+mapAnimTime)
+          .duration(labelAnimTime)
+          .style('opacity', 1)
 
-      this.svg.append('text')
-        .text('1000')
-        //.attr('class', 'bigNum')
-        .attr('dx', cx + dx)
-        .attr('dy', statsTop + 85)
-        .style('opacity', 0)
-        .style('font-size', '120%')
-        .transition()
-        .delay(mapAnimDelay+mapAnimTime)
-        .duration(labelAnimTime)
-        .style('opacity', 1)
+        this.svg.append('text')
+          .text(totalGrantsSumStr)
+          //.attr('class', 'bigNum')
+          .attr('dx', cx + dx)
+          .attr('dy', statsTop + 85)
+          .style('opacity', 0)
+          .style('font-size', '120%')
+          .transition()
+          .delay(mapAnimDelay+mapAnimTime)
+          .duration(labelAnimTime)
+          .style('opacity', 1)
+      }.bind(this));
 
     }.bind(this));
   },

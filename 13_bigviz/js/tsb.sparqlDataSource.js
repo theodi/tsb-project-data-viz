@@ -248,11 +248,15 @@ tsb.SPARQLDataSource = (function() {
       PREFIX tsb: <http://tsb-projects.labs.theodi.org/def/> \
       PREFIX ptime: <http://purl.org/NET/c4dm/timeline.owl#> \
       PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \
+      PREFIX w3: <http://www.w3.org/ns/org#> \
       SELECT ?budgetArea (COUNT(?projectGrant) as ?numGrants) (SUM(?offerGrant) as ?grantsSum) ?year \
       WHERE { \
           ?project a tsb:Project . \
           ?project tsb:projectDuration ?projectDuration . \
           ?project tsb:supportedBy ?projectGrant . \
+          ?project tsb:hasParticipant ?participant . \
+          ?participant w3:hasSite ?participantSite . \
+          ?participantSite tsb:region <http://statistics.data.gov.uk/id/statistical-geography/" + region + "> .\
           ?projectGrant tsb:offerGrant ?offerGrant . \
           ?projectDuration ptime:start ?projectStartDate . \
           ?project tsb:competition ?competition . \
