@@ -16,6 +16,25 @@ tsb.viz.collaborations = {
     .attr('width', tsb.state.w).attr('height', tsb.state.h)
     .attr('fill', tsb.config.themes.current.collaborationsBgColor);
 
+    this.backBtn = svg.append('g')
+
+    this.backBtnHit = this.backBtn.append('rect')
+      .attr('x', '0.3em')
+      .attr('y', '2.3em')
+      .attr('width', '2em')
+      .attr('height', '2em')
+      .style('fill', 'none')
+      .attr('rx', '5px')
+      .attr('ry', '5px')
+
+    this.backBtnArrow = this.backBtn.append('text')
+      .attr('x', this.w * 0.01)
+      .attr('y', '2em')
+      .style('fill', '#AAA')
+      .style('font-size', '200%')
+      .style('font-weight', '300')
+      .text('«')
+
     this.title = svg
       .append('text')
       .attr('x', this.w * 0.03)
@@ -24,6 +43,18 @@ tsb.viz.collaborations = {
       .style('font-size', '200%')
       .style('font-weight', '300')
       .text('University collaborations per TSB priority area')
+
+    this.backBtn.on('mouseover', function() {
+      this.backBtnArrow.style('fill', '#000');
+    }.bind(this));
+
+    this.backBtn.on('mouseleave', function() {
+      this.backBtnArrow.style('fill', '#AAA');
+    }.bind(this));
+
+    this.backBtn.on('click', function() {
+      document.location.href = "#intro";
+    }.bind(this));
 
     this.loadData();
   },
