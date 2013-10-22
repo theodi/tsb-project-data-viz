@@ -2,7 +2,6 @@ var tsb = tsb || { viz : {} };
 
 tsb.viz.regions = {
   init: function(svg, w, h) {
-    console.log('wtf');
     this.svg = svg;
     this.w = w;
     this.h = h;
