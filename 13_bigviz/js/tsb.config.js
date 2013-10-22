@@ -59,7 +59,8 @@ tsb.config.themes = {
     },
     priorityAreasBgColor: '#FFFFFF',
     collaborationsBgColor: '#FFFFFF',
-    regionsBgColor: '#FFFFFF'
+    regionsBgColor: '#FFFFFF',
+    regionsRegionColor: '#DDDDDD'
   },
   odiBright: {
     introTextColor: '#3333333',
@@ -79,7 +80,8 @@ tsb.config.themes = {
     },
     priorityAreasBgColor: '#FFFFFF',
     collaborationsBgColor: '#FFFFFF',
-    regionsBgColor: '#FFFFFF'
+    regionsBgColor: '#FFFFFF',
+    regionsRegionColor: '#DDDDDD'
   }
 }
 

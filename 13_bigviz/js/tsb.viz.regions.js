@@ -84,6 +84,11 @@ tsb.viz.regions = {
         .delay(mapAnimDelay).duration(mapAnimTime)
         .attr('transform', 'translate('+regionX/this.mapScale+','+regionY/this.mapScale+')');
 
+      region
+        .style('fill', tsb.config.themes.current.regionsRegionColor)
+        .selectAll('path')
+        .style('fill', tsb.config.themes.current.regionsRegionColor);
+
       var name = regionInfo.name;
       if (name.indexOf('Yorkshire') == 0) name = 'Yorkshire';
 
