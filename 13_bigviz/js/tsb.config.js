@@ -4,6 +4,7 @@ tsb.config = {};
 tsb.config.domain = 'http://tsb-projects.labs.theodi.org/';
 tsb.config.sparqlEndpoint = 'http://tsb-projects.labs.theodi.org/sparql.json';
 tsb.config.budgetAreaBase = 'http://tsb-projects.labs.theodi.org/id/budget-area/';
+tsb.config.ukMapSVG = 'assets/United_Kingdom_Map_-_Region.svg';
 
 tsb.config.odiColors = [
   '#2254F4', '#00B7FF', '#08DEF9', '#1DD3A7',
