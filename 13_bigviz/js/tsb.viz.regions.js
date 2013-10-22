@@ -114,8 +114,11 @@ tsb.viz.regions = {
 
       tsb.state.dataSource.getAreaSummaryForYearInRegion(this.year, regionCode).then(function(data) {
         console.log(regionInfo.name, data);
-        var totalGrantsSum = data.rows.reduce(function(prev, grant) {
-          return prev + Number(grant.grantsSum);
+        var totalGrantsSum = data.rows.reduce(function(prev, area) {
+          return prev + Number(area.grantsSum);
+        }, 0);
+        var totalNumProjects = data.rows.reduce(function(prev, area) {
+          return prev + Number(area.numProjects);
         }, 0);
         var totalGrantsSumStr = Math.floor(totalGrantsSum/1000000*10)/10 + 'M';
         this.svg.append('text')
@@ -133,7 +136,7 @@ tsb.viz.regions = {
           .style('opacity', 1)
 
         this.svg.append('text')
-          .text(0)
+          .text(totalNumProjects)
           //.attr('class', 'bigNum')
           .attr('dx', cx + dx)
           .attr('dy', statsTop + 25)

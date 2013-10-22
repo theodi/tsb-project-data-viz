@@ -249,7 +249,7 @@ tsb.SPARQLDataSource = (function() {
       PREFIX ptime: <http://purl.org/NET/c4dm/timeline.owl#> \
       PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \
       PREFIX w3: <http://www.w3.org/ns/org#> \
-      SELECT ?budgetArea (COUNT(?projectGrant) as ?numGrants) (SUM(?offerGrant) as ?grantsSum) ?year \
+      SELECT ?budgetArea (COUNT(DISTINCT ?project) as ?numProjects) (COUNT(?projectGrant) as ?numGrants) (SUM(?offerGrant) as ?grantsSum) ?year \
       WHERE { \
           ?project a tsb:Project . \
           ?project tsb:projectDuration ?projectDuration . \
