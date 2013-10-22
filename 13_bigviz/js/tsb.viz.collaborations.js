@@ -7,7 +7,7 @@ tsb.viz.collaborations = {
     this.w = w;
     this.h = h;
     this.institutionSize = 'academic';
-    this.institutionTopCount = 6;
+    this.institutionTopCount = 8;
     this.institutionsOnlyLocal = false;
 
     svg
@@ -16,17 +16,27 @@ tsb.viz.collaborations = {
     .attr('width', tsb.state.w).attr('height', tsb.state.h)
     .attr('fill', tsb.config.themes.current.collaborationsBgColor);
 
+    this.title = svg
+      .append('text')
+      .attr('x', this.w * 0.03)
+      .attr('y', '2em')
+      .style('fill', '#333')
+      .style('font-size', '200%')
+      .style('font-weight', '300')
+      .text('University collaborations per TSB priority area')
+
     this.loadData();
   },
   loadData: function() {
-    var margin = 50;
+    var margin = 80;
     var w = this.w;
     var h = this.h;
     var self = this;
     var rectGrid = d3.layout.grid()
+      .cols(4)
       .bands()
       .size([w-2*margin, h-2*margin])
-      .padding([0, 0]);
+      .padding([0, 0.4]);
 
     var lineFunction = d3.svg.line()
                              .x(function(d) { return d.x; })
@@ -75,6 +85,7 @@ tsb.viz.collaborations = {
         .attr("class", "pointLabel")
         .attr('y', textTop)
         .attr('text-anchor', 'middle')
+        .attr('font-size', '80%')
         .text(function(d) { return d.orgLabel })
         .attr('fill', 'black')
 
@@ -83,7 +94,7 @@ tsb.viz.collaborations = {
   },
   pullCollaborators: function(academicOrg, academicOrgIndex) {
     var g = d3.select('#g_' + academicOrg.id);
-    var r = 70;
+    var r = 60;
     if (this.institutionTopCount == 20) r = 50;
     var minr = 20;
     var sizes = {
