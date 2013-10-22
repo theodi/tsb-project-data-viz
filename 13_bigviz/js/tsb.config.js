@@ -13,18 +13,18 @@ tsb.config.odiColors = [
 ];
 
 tsb.config.regionsMap = {
-  'E12000001' : { index:  0, name: 'North East', id: 'NorthEast'} ,
-  'E12000002' : { index:  1, name: 'North West', id: 'NorthWest'} ,
-  'E12000003' : { index:  2, name: 'Yorkshire and The Humber', id: 'YorkshireAndTheHumber'} ,
-  'E12000004' : { index:  3, name: 'East Midlands', id: 'EastMidlands'} ,
-  'E12000005' : { index:  4, name: 'West Midlands', id: 'WestMidlands'} ,
-  'E12000006' : { index:  5, name: 'East of England', id: 'EastOfEngland'} ,
-  'E12000007' : { index:  6, name: 'London', id: 'London'} ,
-  'E12000008' : { index:  7, name: 'South East', id: 'SouthEast'} ,
-  'E12000009' : { index:  8, name: 'South West', id: 'SouthWest'} ,
-  'S92000003' : { index:  9, name: 'Scotland', id: 'Scotland'} ,
-  'N92000002' : { index: 10, name: 'Northern Ireland', id: 'NorthernIreland'} ,
-  'W92000004' : { index: 11, name: 'Wales', id: 'Wales' }
+  'E12000001' : { name: 'North East', id: 'NorthEast'} ,
+  'E12000002' : { name: 'North West', id: 'NorthWest'} ,
+  'E12000003' : { name: 'Yorkshire and The Humber', id: 'YorkshireAndTheHumber'} ,
+  'E12000004' : { name: 'East Midlands', id: 'EastMidlands'} ,
+  'E12000005' : { name: 'West Midlands', id: 'WestMidlands'} ,
+  'E12000006' : { name: 'East of England', id: 'EastOfEngland'} ,
+  'E12000007' : { name: 'London', id: 'London'} ,
+  'E12000008' : { name: 'South East', id: 'SouthEast'} ,
+  'E12000009' : { name: 'South West', id: 'SouthWest'} ,
+  'N92000002' : { name: 'Northern Ireland', id: 'NorthernIreland'} ,
+  'W92000004' : { name: 'Wales', id: 'Wales' },
+  'S92000003' : { name: 'Scotland', id: 'Scotland'} ,
 };
 
 tsb.config.budgetAreas = [ 'SPAC', 'TRAN', 'TECH', 'MANF', 'SUST', 'tsb-programmes', 'DIGS', 'ENRG', 'HLTHCR' ];
