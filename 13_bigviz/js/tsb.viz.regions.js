@@ -6,7 +6,7 @@ tsb.viz.regions = {
     this.w = w;
     this.h = h;
     this.mapScale = 0.25;
-    this.offsetFromTop = 290;
+    this.offsetFromTop = 350;
     this.unusedShapes = ['Ireland', 'IsleOfMan', 'ChannelIslands', 'Border1', 'Border2', 'Border3'];
     this.year = (new Date()).getFullYear();
 
@@ -16,7 +16,16 @@ tsb.viz.regions = {
     .append('rect')
     .attr('class', 'bg')
     .attr('width', tsb.state.w).attr('height', tsb.state.h)
-    .attr('fill', tsb.config.themes.current.regionsBgColor)
+    .attr('fill', tsb.config.themes.current.regionsBgColor);
+
+    this.title = svg
+      .append('text')
+      .attr('x', this.w * 0.03)
+      .attr('y', '2em')
+      .style('fill', '#333')
+      .style('font-size', '200%')
+      .style('font-weight', '300')
+      .text('TSB spending by region (£)')
 
     this.loadMap();
   },
@@ -110,7 +119,7 @@ tsb.viz.regions = {
       var nameLabelBBox = nameLabel.node().getBoundingClientRect();
       var dx = -(nameLabelBBox.right - nameLabelBBox.left)/2;
 
-      var statsTop = 120;
+      var statsTop = 180;
 
       tsb.state.dataSource.getAreaSummaryForYearInRegion(this.year, regionCode).then(function(data) {
         console.log(regionInfo.name, data);
