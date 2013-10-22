@@ -97,8 +97,9 @@ tsb.viz.intro = {
     var links = ['#priorityareas', '#regions', '#collaborations'];
 
     var imageSize = 240;
-    var margin = 300;
-    var spacing = (this.w - 2 * margin - images.length * imageSize) / (images.length - 1);
+    var margin = 160;
+    var spacing = (1160 - 2 * margin - images.length * imageSize) / (images.length - 1);
+    margin += (this.w - 1160) / 2
     images.forEach(function(image, imageIndex) {
       var keyFactBtn = this.svg.append('g');
 
