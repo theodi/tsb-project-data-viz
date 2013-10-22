@@ -31,7 +31,7 @@ tsb.viz.regions = {
     this.tooltip.style('display', 'none');
 
     this.tooltipBg = this.tooltip.append('rect')
-      .attr('width', '200px')
+      .attr('width', '240px')
       .attr('height', '1.3em')
       .style('fill', 'red')
       .attr('rx', '5px')
@@ -41,7 +41,7 @@ tsb.viz.regions = {
       .text('BLA BLA')
       .attr('dx', '0.5em')
       .attr('dy', '1.5em')
-      .style('fill', '#000')
+      .style('fill', '#FFF')
       .style('font-size', '12px')
 
     this.svg.on('mousemove', function(e) {
@@ -224,7 +224,7 @@ tsb.viz.regions = {
             this.tooltip.style('display', 'block')
             var areaName = tsb.config.budgetAreaLabels[budgetAreaCode];
             var grantsSum = Math.floor(area.grantsSum/1000000*10)/10 + 'M'
-            this.tooltipText.text(areaName + ' : ' + grantsSum);
+            this.tooltipText.text(areaName + ' : ' + grantsSum + ' for ' + area.numProjects + ' projects');
             this.tooltipBg.style('fill', tsb.config.themes.current.budgetAreaColor[budgetAreaCode])
           }.bind(this))
 
