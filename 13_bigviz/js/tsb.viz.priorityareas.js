@@ -18,7 +18,7 @@ tsb.viz.priorityAreas = {
 
     var title = svg
       .append('text')
-      .attr('x', (w - 1140)/2)
+      .attr('x', '1em')
       .attr('y', '2em')
       .style('fill', '#333')
       .style('font-size', '200%')
@@ -27,13 +27,44 @@ tsb.viz.priorityAreas = {
 
     this.subTitle = svg
       .append('text')
-      .attr('x', (w - 1140)/2)
+      .attr('x', '1em')
       .attr('y', '3.2em')
       .style('fill', '#F00')
       .style('font-size', '200%')
       .style('font-weight', '100')
       .text('Space xploration')
       .style('opacity', 0)
+
+    this.backBtn = svg.append('g')
+
+    this.backBtnHit = this.backBtn.append('rect')
+      .attr('x', '0.3em')
+      .attr('y', '2.3em')
+      .attr('width', '2em')
+      .attr('height', '2em')
+      .style('fill', 'none')
+      .attr('rx', '5px')
+      .attr('ry', '5px')
+
+    this.backBtnArrow = this.backBtn.append('text')
+      .attr('x', this.w * 0.01)
+      .attr('y', '2em')
+      .style('fill', '#AAA')
+      .style('font-size', '200%')
+      .style('font-weight', '300')
+      .text('«')
+
+    this.backBtn.on('mouseover', function() {
+      this.backBtnArrow.style('fill', '#000');
+    }.bind(this));
+
+    this.backBtn.on('mouseleave', function() {
+      this.backBtnArrow.style('fill', '#AAA');
+    }.bind(this));
+
+    this.backBtn.on('click', function() {
+      document.location.href = "#introopened";
+    }.bind(this));
   },
   loadData: function() {
     var results = [];
