@@ -23,6 +23,7 @@ tsb.viz.intro = {
     tsb.state.dataSource.getProjectsForYear(this.year).then(function(projects) {
       this.createProjects(projects.rows);
       this.addLabels();
+      this.addKeyFacts();
     }.bind(this));
   },
   createProjects: function(rows) {
@@ -80,5 +81,21 @@ tsb.viz.intro = {
       .style('opacity', 0)
       .transition().duration(2000)
       .style('opacity', 1);
+  },
+  addKeyFacts: function() {
+    var images = ['assets/priorityAreas.png', 'assets/regions.png', 'assets/collaborations.png'];
+    var imageSize = 120;
+    var margin = 50;
+    var spacing = (this.h - 2 * margin - images.length * imageSize) / (images.length - 1);
+    images.forEach(function(image, imageIndex) {
+      this.svg.append('image')
+      .attr('x', this.w - margin - imageSize)
+      .attr('y', margin + (spacing + imageSize) * imageIndex)
+      .attr('width', imageSize)
+      .attr('height', imageSize)
+      .attr('xlink:href', image)
+    }.bind(this))
+    //<image x="20" y="20" width="300" height="80"
+    // xlink:href="http://jenkov.com/images/layout/top-bar-logo.png" />
   }
 }
