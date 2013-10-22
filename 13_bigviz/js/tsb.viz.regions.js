@@ -25,7 +25,7 @@ tsb.viz.regions = {
       .style('fill', '#333')
       .style('font-size', '200%')
       .style('font-weight', '300')
-      .text('TSB spending by region (£)')
+      .text('TSB spending by region in ' + this.year)
 
     this.loadMap();
   },
@@ -181,6 +181,22 @@ tsb.viz.regions = {
           .delay(mapAnimDelay+mapAnimTime)
           .duration(labelAnimTime)
           .style('opacity', 0.2 + 0.8*totalGrantsSum/this.maxGrant)
+
+        data.rows.forEach(function(area, areaIndex) {
+          var h = Math.max(5, 20 * area.grantsSum/10000000);
+          var budgetAreaCode = tsb.common.extractBudgetAreaCode(area.budgetArea);
+          this.svg.append('rect')
+            .attr('x', cx + dx + areaIndex * 7)
+            .attr('fill', tsb.config.themes.current.budgetAreaColor[budgetAreaCode])
+            .attr('width', 5)
+            .attr('y', statsTop - 20)
+            .attr('height', 0)
+            .transition()
+            .delay(mapAnimDelay+mapAnimTime+50*areaIndex)
+            .duration(labelAnimTime)
+            .attr('y', statsTop - 20 - h)
+            .attr('height', h)
+        }.bind(this))
       }.bind(this));
 
     }.bind(this));
