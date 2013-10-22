@@ -6,6 +6,7 @@ tsb.viz.regions = {
     this.w = w;
     this.h = h;
     this.mapScale = 0.25;
+    this.offsetFromTop = 230;
     this.unusedShapes = ['Ireland', 'IsleOfMan', 'ChannelIslands', 'Border1', 'Border2', 'Border3'];
 
     svg
@@ -37,6 +38,23 @@ tsb.viz.regions = {
       this.loadData();
     }.bind(this));
   },
+  explodeMap: function() {
+    var regionCodeList = tsb.common.keys(tsb.config.regionsMap);
+    regionCodeList.forEach(function(regionCode, regionIndex) {
+      var regionInfo = tsb.config.regionsMap[regionCode];
+      var region = this.svg.select('.' + regionInfo.id);
+      var regionBbox = region.node().getBoundingClientRect();
+      var regionX = -regionBbox.left - (regionBbox.right - regionBbox.left)/2 + this.w*0.05 + this.w*0.05 + regionIndex * this.w*0.8/regionCodeList.length;
+      var regionY = -regionBbox.top + this.offsetFromTop;
+      if (regionIndex == 11) {
+        regionX -= 70;
+      }
+      region.transition()
+        .delay(1000).duration(2000)
+        .attr('transform', 'translate('+regionX/this.mapScale+','+regionY/this.mapScale+')');
+    }.bind(this));
+  },
   loadData:function(){
+    this.explodeMap();
   }
 }

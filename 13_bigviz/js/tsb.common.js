@@ -22,3 +22,11 @@ tsb.common.max = function(list, prop) {
   })
   return m;
 }
+
+tsb.common.keys = function(o) {
+  var keys = [];
+  for(var i in o) {
+    keys.push(i);
+  }
+  return keys;
+}
