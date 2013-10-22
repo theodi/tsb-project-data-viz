@@ -6,7 +6,7 @@ tsb.viz.regions = {
     this.w = w;
     this.h = h;
     this.mapScale = 0.25;
-    this.offsetFromTop = 270;
+    this.offsetFromTop = 290;
     this.unusedShapes = ['Ireland', 'IsleOfMan', 'ChannelIslands', 'Border1', 'Border2', 'Border3'];
 
     svg
@@ -39,7 +39,7 @@ tsb.viz.regions = {
     }.bind(this));
   },
   explodeMap: function() {
-    var speedup = 1;
+    var speedup = 10;
     var mapAnimDelay = 1000/speedup;
     var mapAnimTime = 2000/speedup;
     var labelAnimTime = 1000/speedup;
@@ -92,10 +92,10 @@ tsb.viz.regions = {
       var name = regionInfo.name;
       if (name.indexOf('Yorkshire') == 0) name = 'Yorkshire';
 
-      this.svg.append('text')
+      var nameLabel = this.svg.append('text')
         .text(name)
         .attr('dx', cx)
-        .attr('dy', this.offsetFromTop - 50)
+        .attr('dy', this.offsetFromTop - 40)
         .style('font-size', 12)
         .style('opacity', 0)
         .transition()
@@ -103,6 +103,63 @@ tsb.viz.regions = {
         .duration(labelAnimTime)
         .style('opacity', 1)
         .attr('text-anchor', 'middle')
+
+      var nameLabelBBox = nameLabel.node().getBoundingClientRect();
+      var dx = -(nameLabelBBox.right - nameLabelBBox.left)/2;
+
+      var statsTop = 120;
+
+      this.svg.append('text')
+        .text('Projects')
+        //.attr('class', 'label')
+        .attr('dx', cx + dx)
+        .attr('dy', statsTop)
+        .style('fill', '#222')
+        .style('opacity', 0)
+        .style('font-size', '60%')
+        .style('text-transform', 'uppercase')
+        .transition()
+        .delay(mapAnimDelay+mapAnimTime)
+        .duration(labelAnimTime)
+        .style('opacity', 1)
+
+      this.svg.append('text')
+        .text('1000')
+        //.attr('class', 'bigNum')
+        .attr('dx', cx + dx)
+        .attr('dy', statsTop + 25)
+        .style('opacity', 0)
+        .style('font-size', '120%')
+        .transition()
+        .delay(mapAnimDelay+mapAnimTime)
+        .duration(labelAnimTime)
+        .style('opacity', 1)
+
+      this.svg.append('text')
+        .text('Grants')
+        //.attr('class', 'label')
+        .attr('dx', cx + dx)
+        .attr('dy', statsTop + 60)
+        .style('fill', '#222')
+        .style('opacity', 0)
+        .style('font-size', '60%')
+        .style('text-transform', 'uppercase')
+        .transition()
+        .delay(mapAnimDelay+mapAnimTime)
+        .duration(labelAnimTime)
+        .style('opacity', 1)
+
+      this.svg.append('text')
+        .text('1000')
+        //.attr('class', 'bigNum')
+        .attr('dx', cx + dx)
+        .attr('dy', statsTop + 85)
+        .style('opacity', 0)
+        .style('font-size', '120%')
+        .transition()
+        .delay(mapAnimDelay+mapAnimTime)
+        .duration(labelAnimTime)
+        .style('opacity', 1)
 
     }.bind(this));
   },

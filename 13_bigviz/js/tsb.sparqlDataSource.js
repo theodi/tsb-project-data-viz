@@ -243,5 +243,27 @@ tsb.SPARQLDataSource = (function() {
     return this.query(q);
   }
 
+  SPARQLDataSource.prototype.getAreaSummaryForYearInRegion = function(year, region) {
+    var q =" \
+      PREFIX tsb: <http://tsb-projects.labs.theodi.org/def/> \
+      PREFIX ptime: <http://purl.org/NET/c4dm/timeline.owl#> \
+      PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \
+      SELECT ?budgetArea (COUNT(?projectGrant) as ?numGrants) (SUM(?offerGrant) as ?grantsSum) ?year \
+      WHERE { \
+          ?project a tsb:Project . \
+          ?project tsb:projectDuration ?projectDuration . \
+          ?project tsb:supportedBy ?projectGrant . \
+          ?projectGrant tsb:offerGrant ?offerGrant . \
+          ?projectDuration ptime:start ?projectStartDate . \
+          ?project tsb:competition ?competition . \
+          ?competition tsb:budgetArea ?budgetArea . \
+          FILTER(?projectStartDate >= \""+year+"-01-01\"^^xsd:date) . \
+          FILTER(?projectStartDate <= \""+year+"-12-31\"^^xsd:date) . \
+      } \
+      GROUP BY ?budgetArea (YEAR(?projectStartDate) as ?year)\
+    ";
+    return this.query(q);
+  }
+
   return SPARQLDataSource;
 })();
