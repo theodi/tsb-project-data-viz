@@ -27,6 +27,27 @@ tsb.viz.regions = {
       .style('font-weight', '300')
       .text('TSB spending by region in ' + this.year)
 
+    this.tooltip = this.svg.append('g');
+    this.tooltip.style('display', 'none');
+
+    this.tooltipBg = this.tooltip.append('rect')
+      .attr('width', '200px')
+      .attr('height', '1.3em')
+      .style('fill', 'red')
+      .attr('rx', '5px')
+      .attr('ry', '5px')
+
+    this.tooltipText = this.tooltip.append('text')
+      .text('BLA BLA')
+      .attr('dx', '0.5em')
+      .attr('dy', '1.5em')
+      .style('fill', '#000')
+      .style('font-size', '12px')
+
+    this.svg.on('mousemove', function(e) {
+      this.tooltip.attr('transform', function(d) { return 'translate(' + (d3.event.x + 10) + ',' + (d3.event.y-20) + ')'; });
+    }.bind(this))
+
     this.loadMap();
   },
   loadMap: function() {
@@ -185,7 +206,9 @@ tsb.viz.regions = {
         data.rows.forEach(function(area, areaIndex) {
           var h = Math.max(5, 20 * area.grantsSum/10000000);
           var budgetAreaCode = tsb.common.extractBudgetAreaCode(area.budgetArea);
-          this.svg.append('rect')
+          var areaBar = this.svg.append('rect');
+
+          areaBar
             .attr('x', cx + dx + areaIndex * 7)
             .attr('fill', tsb.config.themes.current.budgetAreaColor[budgetAreaCode])
             .attr('width', 5)
@@ -195,7 +218,21 @@ tsb.viz.regions = {
             .delay(mapAnimDelay+mapAnimTime+50*areaIndex)
             .duration(labelAnimTime)
             .attr('y', statsTop - 20 - h)
-            .attr('height', h)
+            .attr('height', h);
+
+          areaBar.on('mouseover', function() {
+            this.tooltip.style('display', 'block')
+            var areaName = tsb.config.budgetAreaLabels[budgetAreaCode];
+            var grantsSum = Math.floor(area.grantsSum/1000000*10)/10 + 'M'
+            this.tooltipText.text(areaName + ' : ' + grantsSum);
+            this.tooltipBg.style('fill', tsb.config.themes.current.budgetAreaColor[budgetAreaCode])
+          }.bind(this))
+
+          areaBar.on('mouseout', function() {
+            this.tooltip.style('display', 'none');
+          }.bind(this))
+
+            this.tooltip.node().parentNode.appendChild(this.tooltip.node());
         }.bind(this))
       }.bind(this));
 
