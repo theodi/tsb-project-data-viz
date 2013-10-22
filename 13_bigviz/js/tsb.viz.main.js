@@ -20,7 +20,7 @@ function init() {
     svg = tsb.state.svg = d3.select('#home-viz').append('svg')
     .attr('width', tsb.state.w)
     .attr('height', tsb.state.h);
-    if (document.location.hash == '#intro') {
+    if (document.location.hash == '#introopened') {
       tsb.viz.intro.init(svg, tsb.state.w, tsb.state.h);
     }
     else if (document.location.hash == '#priorityareas') {

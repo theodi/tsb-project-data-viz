@@ -53,7 +53,7 @@ tsb.viz.collaborations = {
     }.bind(this));
 
     this.backBtn.on('click', function() {
-      document.location.href = "#intro";
+      document.location.href = "#introopened";
     }.bind(this));
 
     this.loadData();

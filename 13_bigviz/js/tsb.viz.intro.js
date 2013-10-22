@@ -24,7 +24,9 @@ tsb.viz.intro = {
       this.createProjects(projects.rows);
       this.addLabels();
       this.addKeyFacts();
-      setTimeout(this.showKeyFacts.bind(this), 3000);
+      if (document.location.hash != '#introopened') {
+        setTimeout(this.showKeyFacts.bind(this), 3000);
+      }
     }.bind(this));
   },
   createProjects: function(rows) {
@@ -82,6 +84,11 @@ tsb.viz.intro = {
       .style('opacity', 0)
       .transition().duration(2000)
       .style('opacity', 1);
+
+    if (document.location.hash == '#introopened') {
+      this.labelGroup
+        .attr('transform', 'scale(0.5, 0.5)')
+    }
   },
   addKeyFacts: function() {
     var images = ['assets/priorityAreas.png', 'assets/regions.png', 'assets/collaborations.png'];
@@ -96,8 +103,12 @@ tsb.viz.intro = {
       var keyFactBtn = this.svg.append('g');
 
       keyFactBtn
-        .attr('class', 'keyFactBtn')
-        .style('opacity', 0);
+        .attr('class', 'keyFactBtn');
+
+      if (document.location.hash != '#introopened') {
+        keyFactBtn
+          .style('opacity', 0);
+      }
 
       keyFactBtn.on('click', function() {
         document.location.href = links[imageIndex];
