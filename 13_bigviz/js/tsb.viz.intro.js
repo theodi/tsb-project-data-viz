@@ -24,6 +24,7 @@ tsb.viz.intro = {
       this.createProjects(projects.rows);
       this.addLabels();
       this.addKeyFacts();
+      setTimeout(this.showKeyFacts.bind(this), 3000);
     }.bind(this));
   },
   createProjects: function(rows) {
@@ -84,18 +85,54 @@ tsb.viz.intro = {
   },
   addKeyFacts: function() {
     var images = ['assets/priorityAreas.png', 'assets/regions.png', 'assets/collaborations.png'];
-    var imageSize = 120;
-    var margin = 50;
-    var spacing = (this.h - 2 * margin - images.length * imageSize) / (images.length - 1);
+    var labels = ['PRIORITY AREAS', 'REGIONS', 'COLLABORATIONS'];
+    var colors = ['#2254F4', '#FF6700', '#EF3AAB'];
+    var links = ['#priorityareas', '#regions', '#collaborations'];
+
+    var imageSize = 240;
+    var margin = 300;
+    var spacing = (this.w - 2 * margin - images.length * imageSize) / (images.length - 1);
     images.forEach(function(image, imageIndex) {
-      this.svg.append('image')
-      .attr('x', this.w - margin - imageSize)
-      .attr('y', margin + (spacing + imageSize) * imageIndex)
-      .attr('width', imageSize)
-      .attr('height', imageSize)
-      .attr('xlink:href', image)
+      var keyFactBtn = this.svg.append('g');
+
+      keyFactBtn
+        .attr('class', 'keyFactBtn')
+        .style('opacity', 0);
+
+      keyFactBtn.on('click', function() {
+        document.location.href = links[imageIndex];
+      })
+
+      keyFactBtn.append('image')
+        .attr('x', margin + (spacing + imageSize) * imageIndex)
+        .attr('y', this.h/2 - imageSize/2 + 30)
+        .attr('width', imageSize)
+        .attr('height', imageSize)
+        .attr('xlink:href', image);
+
+      keyFactBtn.append('text')
+        .attr('x', margin + (spacing + imageSize) * imageIndex + imageSize/2)
+        .attr('y', this.h/2 + 40)
+        .style('fill', colors[imageIndex])
+        .style('fill', '#333')
+        .style('font-size', '120%')
+        .style('font-weight', '200')
+        .attr('text-anchor', 'middle')
+        .text(labels[imageIndex])
+
     }.bind(this))
-    //<image x="20" y="20" width="300" height="80"
-    // xlink:href="http://jenkov.com/images/layout/top-bar-logo.png" />
+  },
+  showKeyFacts: function() {
+    this.labelGroup
+      .attr('transform', 'scale(1, 1)')
+      .transition()
+      .duration(2000)
+      .attr('transform', 'scale(0.5, 0.5)')
+
+    this.svg.selectAll('.keyFactBtn')
+      .transition()
+      .duration(2000)
+      .delay(2000)
+      .style('opacity', 1)
   }
 }
