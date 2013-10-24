@@ -56,7 +56,33 @@ tsb.viz.collaborations = {
       document.location.href = "#introopened";
     }.bind(this));
 
+    this.initDebugLayout();
+
     this.loadData();
+  },
+  resize: function(w, h) {
+    this.w = w;
+    this.h = h;
+    this.updateDebugLayout();
+  },
+  initDebugLayout: function() {
+    this.debugContainer = this.svg.append('rect')
+      .attr('class', 'debug-bg')
+      .style('fill', 'rgba(255,0,0,0.2)')
+    this.updateDebugLayout();
+  },
+  updateDebugLayout: function() {
+    var targetW = 0;
+    //tab stops based on http://getbootstrap.com/css/#grid
+    if (this.w >= 1200) targetW = 1170;
+    else if (this.w >= 992) targetW = 970;
+    else if (this.w >= 768) targetW = 750;
+    else targetW = this.w;
+    this.svg.select('rect.debug-bg')
+      .attr('x', (this.w - targetW)/2)
+      .attr('y', 0)
+      .attr('width', targetW)
+      .attr('height', this.h)
   },
   loadData: function() {
     var margin = 80;
