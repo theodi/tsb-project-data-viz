@@ -167,7 +167,7 @@ tsb.viz.priorityAreas = {
         .attr('y1', 0)
         .attr('x2', x)
         .attr('y2', this.h)
-        .style('stroke', 'black')
+        .style('stroke', '#333')
         .style('opacity', 0.1)
 
     var yearLabels = this.svg.selectAll('text.priorityAreas')
@@ -179,6 +179,7 @@ tsb.viz.priorityAreas = {
         .attr('dx', -width / (this.endYear - this.startYear) /2)
         .attr('x', x)
         .attr('y', this.h-20)
+        .attr('fill', '#999')
         .attr('font-size', '80%')
 
     this.svg.selectAll('text.priorityAreasTotal')
@@ -189,7 +190,7 @@ tsb.viz.priorityAreas = {
         .attr('text-anchor', 'middle')
         .attr('dx', -width / (this.endYear - this.startYear) /2)
         .attr('x', function(d) { return x(d.x); })
-        .attr('y', this.h-80)
+        .attr('y', this.h-70)
       .style('opacity', 0)
         .attr('font-size', '120%')
         .attr('class', 'priorityAreasTotal')
@@ -205,6 +206,7 @@ tsb.viz.priorityAreas = {
         .attr('y', this.h-50)
         .style('opacity', 0)
         .attr('font-size', '70%')
+        .attr('font-weight', '200')
         .attr('class', 'priorityAreasGrants')
   },
   openLink: function(year, area) {
