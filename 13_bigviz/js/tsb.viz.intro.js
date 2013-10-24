@@ -12,8 +12,11 @@ tsb.viz.intro = {
     this.minimizeDelay = 3000;
     this.minimizeTime = 2000;
     this.cropDelay = 240;
+    this.titleScale = 1;
+    this.titleX = 0;
+    this.titleY = 0;
 
-    svg
+    this.bg = svg
     .append('rect')
     .attr('class', 'bg')
     .attr('width', this.w).attr('height', this.h)
@@ -159,8 +162,20 @@ tsb.viz.intro = {
     var containerMargin = tsb.config.themes.current.containerMargin;
     var titleFontSize = tsb.config.themes.current.titleFontSize;
 
+    if (this.titleScale == 1) {
+      this.titleX = leftMargin + containerMargin;
+      this.titleY = this.h/2 - tsb.config.themes.current.titleFontSize * 1.5;
+    }
+    else {
+      this.titleX = leftMargin + containerMargin;
+      this.titleY = titleFontSize + containerMargin;
+    }
+
+    this.bg
+      .attr('width', this.w);
+
     this.labelGroup
-      .attr('transform', 'translate('+(leftMargin + containerMargin)+','+(this.h/2 - tsb.config.themes.current.titleFontSize * 1.5)+') scale(1,1)');
+      .attr('transform', 'translate('+(this.titleX)+','+(this.titleY)+') scale('+this.titleScale+','+this.titleScale+')');
   },
   addKeyFacts: function() {
     var images = ['assets/priorityAreas.png', 'assets/regions.png', 'assets/collaborations.png'];
@@ -216,7 +231,12 @@ tsb.viz.intro = {
       .transition()
       .delay(this.minimizeDelay)
       .duration(this.minimizeTime)
-      .attr('transform', 'translate('+(leftMargin + containerMargin)+','+(titleFontSize + containerMargin)+') scale(0.5, 0.5)');
+      .attr('transform', 'translate('+(leftMargin + containerMargin)+','+(titleFontSize + containerMargin)+') scale(0.5, 0.5)')
+      .each('end', function() {
+        this.titleX = leftMargin + containerMargin;
+        this.titleY = titleFontSize + containerMargin;
+        this.titleScale = 0.5;
+      }.bind(this));
 
     this.svg.selectAll('.keyFactBtn')
       .transition()
