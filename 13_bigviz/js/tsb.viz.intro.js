@@ -59,11 +59,11 @@ tsb.viz.intro = {
 
     projects.forEach(function(project, projectIndex) {
       var row = Math.floor(projectIndex / projectsPerRow);
-      if (row >= numFullRows) return;
       var px = leftMargin + containerMargin + (projectIndex % projectsPerRow) * (pw + spacingX);
       var py = marginY + row * (ph + spacingY);
       var budgetAreaCode = tsb.common.extractBudgetAreaCode(project.budgetArea);
       var color = tsb.config.themes.current.budgetAreaColor[budgetAreaCode];
+      if (row >= numFullRows) ph = 0;
       this.makeRect(px, py, pw, ph, color, 'project', projectIndex);
     }.bind(this));
   },
