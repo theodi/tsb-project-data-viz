@@ -9,11 +9,13 @@ tsb.viz.intro = {
     this.year = (new Date().getFullYear());
     this.duration = 60000;
     this.loadData();
+    this.minimizeDelay = 3000;
+    this.minimizeTime = 2000;
 
     svg
     .append('rect')
     .attr('class', 'bg')
-    .attr('width', tsb.state.w).attr('height', tsb.state.h)
+    .attr('width', this.w).attr('height', this.h)
     .attr('fill', tsb.config.themes.current.introBgColor)
   },
   loadData: function() {
@@ -25,80 +27,125 @@ tsb.viz.intro = {
     tsb.state.dataSource.getProjectsForYear(this.year).then(function(projects) {
       this.createProjects(projects.rows);
       this.addLabels();
-      if (this.staticMode) {
-        this.projectCount.text(projects.rows.length + ' innovate projects');
-      }
-      else {
+      if (!this.staticMode) {
         this.addKeyFacts();
         if (document.location.hash != '#introopened') {
-          setTimeout(this.showKeyFacts.bind(this), 3000);
+          this.showKeyFacts();
         }
       }
     }.bind(this));
   },
-  createProjects: function(rows) {
+  createProjects: function(projects) {
     var pw = 8;
     var ph = 20;
-    var spacingX = pw + 5;
-    var spacingY = ph + 10;
-    var margin = 40;
-    console.log('tsb.viz.intro.createProjects', rows.length);
-    rows.forEach(function(project, projectIndex) {
-      var projectsPerLine = Math.floor((this.w - 2*margin) / spacingX);
-      var px = margin + (projectIndex % projectsPerLine) * spacingX;
-      var py = margin + Math.floor(projectIndex / projectsPerLine) * spacingY;
+    var spacingX = 4;
+    var spacingY = 8;
+    var marginY = 8;
+
+    var maxWidth = tsb.common.getMaxWidth(this.w);
+    var leftMargin = this.leftMargin = (this.w - maxWidth)/2;
+    var containerMargin = tsb.config.themes.current.containerMargin;
+
+    maxWidth = this.w;
+    leftMargin = 0;
+    containerMargin = 0;
+    marginY = 0;
+
+    var projectsPerRow = Math.floor((maxWidth + spacingX - containerMargin*2) / (pw + spacingX));
+
+    var numFullRows = Math.floor(projects.length / projectsPerRow);
+
+    ph = Math.floor((this.h - marginY*2 + spacingY - numFullRows * spacingY)/numFullRows);
+
+    projects.forEach(function(project, projectIndex) {
+      var row = Math.floor(projectIndex / projectsPerRow);
+      if (row >= numFullRows) return;
+      var px = leftMargin + containerMargin + (projectIndex % projectsPerRow) * (pw + spacingX);
+      var py = marginY + row * (ph + spacingY);
       var budgetAreaCode = tsb.common.extractBudgetAreaCode(project.budgetArea);
       var color = tsb.config.themes.current.budgetAreaColor[budgetAreaCode];
       this.makeRect(px, py, pw, ph, color, 'project');
     }.bind(this));
   },
   makeRect: function(x, y, w, h, color, className) {
-    this.svg
+    var projectRect = this.svg
       .append('g')
       .append('rect')
       .attr('class', className)
       .attr('x', x).attr('y', y+h)
-      .attr('y', x).attr('y', this.staticMode ? y : 0)
       .attr('width', w).attr('height', this.staticMode ? h : 0)
       .attr('fill', color)
-      .style('opacity', tsb.config.themes.current.budgetAreaColorAlpha)
-      .transition().delay(Math.random()*this.duration)
-      .attr('y', y)
-      .attr('height', h)
-      .each('end', this.onProjectAnimComplete.bind(this))
+      .style('opacity', tsb.config.themes.current.budgetAreaColorAlpha);
+
+    if (this.staticMode) {
+      this.numProjects++;
+    }
+    else {
+      projectRect
+        .transition().delay(Math.random()*this.duration)
+        .attr('y', y)
+        .attr('height', h)
+        .each('end', this.onProjectAnimComplete.bind(this));
+    }
   },
   onProjectAnimComplete: function() {
     if (!this.staticMode) {
-      this.projectCount.text(++this.numProjects + ' innovate projects');
+      this.numProjects++;
+      this.updateLabels();
     }
   },
   addLabels: function() {
     var labelGroup = this.labelGroup = this.svg.append('g');
-    labelGroup.append('text')
-      .text('In ' + this.year + ' we funded')
-      .attr('dx', 100)
-      .attr('dy', 200)
+
+    this.title = labelGroup.append('text')
+      .attr('dx', 0)
+      .attr('dy', tsb.config.themes.current.titleFontSize/2)
       .attr('fill', tsb.config.themes.current.introTextColor)
-      .style('font-size', '5.5em')
+      .style('font-size', tsb.config.themes.current.titleFontSize * 2)
       .style('font-weight', tsb.config.themes.current.introTextFontWegith);
 
     this.projectCount = labelGroup.append('text')
-      .text('0 projects')
-      .attr('dx', 100)
-      .attr('dy', 320)
+      .attr('dx', 0)
+      .attr('dy', tsb.config.themes.current.titleFontSize*2.8)
       .attr('fill', tsb.config.themes.current.introTextColor)
-      .style('font-size', '5.5em')
+      .style('font-size', tsb.config.themes.current.titleFontSize * 2)
       .style('font-weight', tsb.config.themes.current.introTextFontWegith);
 
-    labelGroup
-      .style('opacity', this.staticMode ? 1 : 0)
-      .transition().duration(2000)
-      .style('opacity', 1);
+    var alreadyOpened = document.location.hash == '#introopened';
 
-    if (document.location.hash == '#introopened') {
-      this.labelGroup
-        .attr('transform', 'scale(0.5, 0.5)')
+    labelGroup
+      .style('opacity', (this.staticMode || alreadyOpened) ? 1 : 0)
+
+    if (!this.staticMode) {
+      labelGroup
+        .transition().duration(2000)
+        .style('opacity', 1);
     }
+
+    if (alreadyOpened) {
+      this.minimizeTime = 0;
+      this.minimizeDelay = 0;
+      this.showKeyFacts();
+    }
+
+    this.updateLabels();
+    this.resize(this.w, this.h); //force layout update
+  },
+  updateLabels: function() {
+    this.title.text('In ' + this.year + ' we funded');
+    this.projectCount.text(this.numProjects + ' innovate projects');
+  },
+  resize: function(w, h) {
+    this.w = w;
+    this.h = h;
+
+    var maxWidth = this.maxWidth = tsb.common.getMaxWidth(this.w);
+    var leftMargin = this.leftMargin = (this.w - maxWidth)/2;
+    var containerMargin = tsb.config.themes.current.containerMargin;
+    var titleFontSize = tsb.config.themes.current.titleFontSize;
+
+    this.labelGroup
+      .attr('transform', 'translate('+(leftMargin + containerMargin)+','+(this.h/2 - tsb.config.themes.current.titleFontSize * 2)+') scale(1,1)');
   },
   addKeyFacts: function() {
     var images = ['assets/priorityAreas.png', 'assets/regions.png', 'assets/collaborations.png'];
@@ -145,16 +192,21 @@ tsb.viz.intro = {
     }.bind(this))
   },
   showKeyFacts: function() {
+    var maxWidth = this.maxWidth = tsb.common.getMaxWidth(this.w);
+    var leftMargin = this.leftMargin = (this.w - maxWidth)/2;
+    var containerMargin = tsb.config.themes.current.containerMargin;
+    var titleFontSize = tsb.config.themes.current.titleFontSize;
+
     this.labelGroup
-      .attr('transform', 'scale(1, 1)')
       .transition()
-      .duration(2000)
-      .attr('transform', 'scale(0.5, 0.5)')
+      .delay(this.minimizeDelay)
+      .duration(this.minimizeTime)
+      .attr('transform', 'translate('+(leftMargin + containerMargin)+','+(titleFontSize + containerMargin)+') scale(0.5, 0.5)');
 
     this.svg.selectAll('.keyFactBtn')
       .transition()
-      .duration(2000)
-      .delay(2000)
+      .delay(this.minimizeDelay + this.minimizeTime)
+      .duration(this.minimizeTime)
       .style('opacity', 1)
   }
 }
