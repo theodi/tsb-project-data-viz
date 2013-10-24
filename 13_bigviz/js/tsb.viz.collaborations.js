@@ -7,8 +7,7 @@ tsb.viz.collaborations = {
     this.w = w;
     this.h = h;
     this.institutionSize = 'academic';
-    this.institutionTopCount = 8;
-    this.institutionNumColumns = 4;
+    this.institutionTopCount = 12;
     this.institutionsOnlyLocal = false;
 
     svg
@@ -63,10 +62,14 @@ tsb.viz.collaborations = {
     this.w = w;
     this.h = h;
 
-    var maxWidth = tsb.common.getMaxWidth(this.w);
-    var leftMargin = (this.w - maxWidth)/2;
+    var maxWidth = this.maxWidth = tsb.common.getMaxWidth(this.w);
+    var leftMargin = this.leftMargin = (this.w - maxWidth)/2;
     var containerMargin = tsb.config.themes.current.containerMargin;
     var titleFontSize = tsb.config.themes.current.titleFontSize;
+
+    this.institutionTopCount = 12;
+    this.institutionNumColumns = 6;
+
 
     this.title.attr('x', leftMargin + containerMargin);
     this.title.attr('y', titleFontSize + containerMargin);
@@ -75,7 +78,7 @@ tsb.viz.collaborations = {
   initDebugLayout: function() {
     this.debugContainer = this.svg.append('rect')
       .attr('class', 'debug-bg')
-      .style('fill', 'rgba(255,0,0,0.0)')
+      .style('fill', 'rgba(255,0,0,0.4)')
     this.updateDebugLayout();
   },
   updateDebugLayout: function() {
@@ -87,6 +90,58 @@ tsb.viz.collaborations = {
       .attr('height', this.h)
   },
   loadData: function() {
+   tsb.state.dataSource.getInstitutions(self.institutionSize).then(function(data) {
+      data.rows.forEach(function(row) {
+        row.numProjects = Number(row.numProjects);
+        row.id = row.org.substr(row.org.lastIndexOf('/')+1)
+      });
+
+      data.rows.sort(function(a, b) {
+        return b.numProjects - a.numProjects;
+      });
+
+      var topBest = tsb.common.inital(data.rows, this.institutionTopCount);
+
+      this.addOrganizations(topBest);
+    }.bind(this));
+  },
+  addOrganizations: function(organizations) {
+    var maxNumProjects = tsb.common.max(organizations, 'numProjects');
+    var sizeScale = d3.scale.linear().domain([0, maxNumProjects]).range([5, 10]);
+
+    var containerMargin = tsb.config.themes.current.containerMargin;
+    var titleFontSize = tsb.config.themes.current.titleFontSize;
+    var marginTop = containerMargin*3 + titleFontSize;
+    var marginBottom = 2 * containerMargin
+    var availableHeight = this.h - marginTop - marginBottom;
+    var numRows = 2;
+    var rowHeight = availableHeight / numRows;
+    var numColumns = Math.floor(this.maxWidth / rowHeight);
+    var columnWidth = (this.maxWidth - 2*containerMargin)/numColumns;
+
+    organizations = organizations.slice(0, numColumns * numRows);
+
+    organizations.forEach(function(organization, organizationIndex) {
+      var column = organizationIndex % numColumns;
+      var row = Math.floor(organizationIndex / numColumns);
+      var x = this.leftMargin + containerMargin + columnWidth * column + columnWidth/2;
+      var y = marginTop + rowHeight * row + rowHeight/2;
+      console.log(organizationIndex, column, '/', numColumns, 'row:', row);
+
+      var organizationGroup = this.svg.append('g')
+        .attr('class', 'organizationGroup');
+
+      var organizationCenter = organizationGroup.append('circle')
+        .attr('class', 'organizationCircle')
+        .attr('cx', x)
+        .attr('cy', y)
+        .attr('r', rowHeight/2)
+        .attr('stroke', '#000000')
+    }.bind(this))
+
+    this.resize(this.w, this.h);
+  },
+  loadDataOld: function() {
     var margin = 80;
     var w = this.w;
     var h = this.h;
@@ -96,7 +151,6 @@ tsb.viz.collaborations = {
       .bands()
       .size([w-2*margin, h-2*margin])
       .padding([0, 0.4]);
-
     var lineFunction = d3.svg.line()
                              .x(function(d) { return d.x; })
                              .y(function(d) { return d.y; })
