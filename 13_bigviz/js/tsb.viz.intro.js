@@ -1,12 +1,13 @@
 var tsb = tsb || { viz : {} };
 
 tsb.viz.intro = {
-  init: function(svg, w, h) {
+  init: function(svg, w, h, staticMode) {
     this.svg = svg;
     this.w = w;
     this.h = h;
+    this.staticMode = staticMode;
     this.year = (new Date().getFullYear());
-    this.duration = 60000;
+    this.duration = staticMode ? 0 : 60000;
     this.loadData();
 
     svg
@@ -23,9 +24,11 @@ tsb.viz.intro = {
     tsb.state.dataSource.getProjectsForYear(this.year).then(function(projects) {
       this.createProjects(projects.rows);
       this.addLabels();
-      this.addKeyFacts();
-      if (document.location.hash != '#introopened') {
-        setTimeout(this.showKeyFacts.bind(this), 3000);
+      if (!this.staticMode) {
+        this.addKeyFacts();
+        if (document.location.hash != '#introopened') {
+          setTimeout(this.showKeyFacts.bind(this), 3000);
+        }
       }
     }.bind(this));
   },
@@ -81,7 +84,7 @@ tsb.viz.intro = {
       .style('font-weight', tsb.config.themes.current.introTextFontWegith);
 
     labelGroup
-      .style('opacity', 0)
+      .style('opacity', this.staticMode ? 1 : 0)
       .transition().duration(2000)
       .style('opacity', 1);
 
