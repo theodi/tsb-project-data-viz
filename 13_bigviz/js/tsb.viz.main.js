@@ -15,6 +15,9 @@ function init() {
     .attr('height', tsb.state.h);
 
   window.addEventListener('hashchange', checkScene, false);
+
+  var currentViz = null;
+
   function checkScene() {
     svg.remove();
     svg = tsb.state.svg = d3.select('#home-viz').append('svg')
@@ -22,22 +25,32 @@ function init() {
     .attr('height', tsb.state.h);
     var staticMode = (document.location.search == "?static=true");
     if (document.location.hash == '#introopened') {
-      tsb.viz.intro.init(svg, tsb.state.w, tsb.state.h, staticMode);
+      currentViz = tsb.viz.intro;
     }
     else if (document.location.hash == '#priorityareas') {
-      tsb.viz.priorityAreas.init(svg, tsb.state.w, tsb.state.h, staticMode);
+      currentViz = tsb.viz.priorityAreas;
     }
     else if (document.location.hash == '#collaborations') {
-      tsb.viz.collaborations.init(svg, tsb.state.w, tsb.state.h, staticMode);
+      currentViz = tsb.viz.collaborations;
     }
     else if (document.location.hash == '#regions') {
-      tsb.viz.regions.init(svg, tsb.state.w, tsb.state.h, staticMode);
+      currentViz = tsb.viz.regions;
     }
     else {
-      tsb.viz.intro.init(svg, tsb.state.w, tsb.state.h, staticMode);
+      currentViz = tsb.viz.intro;
     }
+
+    currentViz.init(svg, tsb.state.w, tsb.state.h, staticMode);
   }
   checkScene();
+
+  window.addEventListener('resize', function() {
+    tsb.state.w = window.innerWidth;
+    if (currentViz && currentViz.resize) {
+      currentViz.resize(tsb.state.w, tsb.state.h);
+    }
+
+  })
 }
 
 
