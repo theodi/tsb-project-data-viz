@@ -30,3 +30,14 @@ tsb.common.keys = function(o) {
   }
   return keys;
 }
+
+tsb.common.getMaxWidth = function(windowWidth) {
+  var maxWidth;
+  //tab stops based on http://getbootstrap.com/css/#grid
+  if (windowWidth >= 1200) maxWidth = 1170;
+  else if (windowWidth >= 992) maxWidth = 970;
+  else if (windowWidth >= 768) maxWidth = 750;
+  else maxWidth = windowWidth;
+
+  return maxWidth;
+}

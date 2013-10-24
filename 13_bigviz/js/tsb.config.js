@@ -42,6 +42,8 @@ tsb.config.budgetAreaLabels = {
 
 tsb.config.themes = {
   odiDark: {
+    containerMargin: 15,
+    titleFontSize: 42,
     introTextColor: '#FFFFFF',
     introTextFontWegith: 100,
     introBgColor: '#222222',
@@ -61,30 +63,7 @@ tsb.config.themes = {
     collaborationsBgColor: '#FFFFFF',
     regionsBgColor: '#FFFFFF',
     regionsRegionColor: '#DDDDDD'
-  },
-  odiBright: {
-    introTextColor: '#3333333',
-    introTextFontWegith: 100,
-    introBgColor: '#EEEEEE',
-    budgetAreaColorAlpha: 0.15,
-    budgetAreaColor : {
-      'TRAN'            : '#00B7FF',
-      'TECH'            : '#D60303',
-      'MANF'            : '#FF6700',
-      'SUST'            : '#0DBC37',
-      'tsb-programmes'  : '#B13198',
-      'DIGS'            : '#EF3AAB',
-      'ENRG'            : '#F9BC26',
-      'HLTHCR'          : '#1DD3A7',
-      'SPAC'            : '#08DEF9',
-    },
-    priorityAreasBgColor: '#FFFFFF',
-    collaborationsBgColor: '#FFFFFF',
-    regionsBgColor: '#FFFFFF',
-    regionsRegionColor: '#DDDDDD'
   }
 }
 
 tsb.config.themes.current = tsb.config.themes.odiDark;
-//tsb.config.themes.current = tsb.config.themes.odiBright;
-

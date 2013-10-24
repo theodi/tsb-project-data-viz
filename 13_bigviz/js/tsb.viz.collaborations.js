@@ -8,6 +8,7 @@ tsb.viz.collaborations = {
     this.h = h;
     this.institutionSize = 'academic';
     this.institutionTopCount = 8;
+    this.institutionNumColumns = 4;
     this.institutionsOnlyLocal = false;
 
     svg
@@ -37,10 +38,8 @@ tsb.viz.collaborations = {
 
     this.title = svg
       .append('text')
-      .attr('x', this.w * 0.03)
-      .attr('y', '2em')
       .style('fill', '#333')
-      .style('font-size', '200%')
+      .style('font-size', tsb.config.themes.current.titleFontSize)
       .style('font-weight', '300')
       .text('University collaborations per TSB priority area')
 
@@ -56,32 +55,35 @@ tsb.viz.collaborations = {
       document.location.href = "#introopened";
     }.bind(this));
 
+    this.resize(this.w, this.h);
     this.initDebugLayout();
-
     this.loadData();
   },
   resize: function(w, h) {
     this.w = w;
     this.h = h;
+
+    var maxWidth = tsb.common.getMaxWidth(this.w);
+    var leftMargin = (this.w - maxWidth)/2;
+    var containerMargin = tsb.config.themes.current.containerMargin;
+    var titleFontSize = tsb.config.themes.current.titleFontSize;
+
+    this.title.attr('x', leftMargin + containerMargin);
+    this.title.attr('y', titleFontSize + containerMargin);
     this.updateDebugLayout();
   },
   initDebugLayout: function() {
     this.debugContainer = this.svg.append('rect')
       .attr('class', 'debug-bg')
-      .style('fill', 'rgba(255,0,0,0.2)')
+      .style('fill', 'rgba(255,0,0,0.0)')
     this.updateDebugLayout();
   },
   updateDebugLayout: function() {
-    var targetW = 0;
-    //tab stops based on http://getbootstrap.com/css/#grid
-    if (this.w >= 1200) targetW = 1170;
-    else if (this.w >= 992) targetW = 970;
-    else if (this.w >= 768) targetW = 750;
-    else targetW = this.w;
+    var maxWidth = tsb.common.getMaxWidth(this.w);
     this.svg.select('rect.debug-bg')
-      .attr('x', (this.w - targetW)/2)
+      .attr('x', (this.w - maxWidth)/2)
       .attr('y', 0)
-      .attr('width', targetW)
+      .attr('width', maxWidth)
       .attr('height', this.h)
   },
   loadData: function() {
@@ -90,7 +92,7 @@ tsb.viz.collaborations = {
     var h = this.h;
     var self = this;
     var rectGrid = d3.layout.grid()
-      .cols(4)
+      .cols(this.institutionNumColumns  )
       .bands()
       .size([w-2*margin, h-2*margin])
       .padding([0, 0.4]);
