@@ -211,7 +211,7 @@ tsb.viz.priorityAreas = {
     var areaLabel = tsb.config.budgetAreaLabels[area]
     var start = year + '-01-01';
     var end = year + '-12-31';
-    document.location.href = tsb.config.domain +
+    parent.location.href = tsb.config.domain +
       '/projects?utf8=✓&search_string=&date_from='+start+'&date_to='+end+'&budget_area_label%5B'+areaLabel+'%5D=true';
   },
   mapData: function(data) {
