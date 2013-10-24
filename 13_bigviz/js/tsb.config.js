@@ -27,13 +27,13 @@ tsb.config.regionsMap = {
   'S92000003' : { name: 'Scotland', id: 'Scotland'} ,
 };
 
-tsb.config.budgetAreas = [ 'SPAC', 'TRAN', 'TECH', 'MANF', 'SUST', 'tsb-programmes', 'DIGS', 'ENRG', 'HLTHCR' ];
+tsb.config.budgetAreas = [ 'SPAC', 'TRANSPO', 'TECH', 'MANF', 'ENV_SUS', 'tsb-programmes', 'DIGS', 'ENRG', 'HLTHCR' ];
 tsb.config.budgetAreaLabels = {
   'SPAC' : 'Space',
-  'TRAN' : 'Transport',
+  'TRANSPO' : 'Transport',
   'TECH' : 'Technology',
   'MANF' : 'Manufacturing',
-  'SUST' : 'Sustainability',
+  'ENV_SUS' : 'Sustainability',
   'tsb-programmes' : 'TSB Programmes',
   'DIGS' : 'Digital',
   'ENRG' : 'Energy' ,
@@ -47,10 +47,10 @@ tsb.config.themes = {
     introBgColor: '#222222',
     budgetAreaColorAlpha: 0.65,
     budgetAreaColor : {
-      'TRAN'            : '#00B7FF',
+      'TRANSPO'            : '#00B7FF',
       'TECH'            : '#D60303',
       'MANF'            : '#FF6700',
-      'SUST'            : '#0DBC37',
+      'ENV_SUS'            : '#0DBC37',
       'tsb-programmes'  : '#B13198',
       'DIGS'            : '#EF3AAB',
       'ENRG'            : '#F9BC26',
