@@ -23,7 +23,7 @@ tsb.viz.priorityAreas = {
       .style('fill', '#333')
       .style('font-size', '200%')
       .style('font-weight', '300')
-      .text('TSB spending by priority area (£)')
+      .text('TSB spending by priority area in millions of pounds during ' + this.startYear + ' - ' + this.endYear)
 
     this.subTitle = svg
       .append('text')
