@@ -9,6 +9,7 @@ tsb.viz.collaborations = {
     this.institutionSize = 'academic';
     this.institutionTopCount = 12;
     this.institutionsOnlyLocal = false;
+    this.debug = false;
 
     svg
     .append('rect')
@@ -73,15 +74,18 @@ tsb.viz.collaborations = {
 
     this.title.attr('x', leftMargin + containerMargin);
     this.title.attr('y', titleFontSize + containerMargin);
+
     this.updateDebugLayout();
   },
   initDebugLayout: function() {
+    if (!this.debug) return;
     this.debugContainer = this.svg.append('rect')
       .attr('class', 'debug-bg')
       .style('fill', 'rgba(255,0,0,0.4)')
     this.updateDebugLayout();
   },
   updateDebugLayout: function() {
+    if (!this.debug) return;
     var maxWidth = tsb.common.getMaxWidth(this.w);
     this.svg.select('rect.debug-bg')
       .attr('x', (this.w - maxWidth)/2)
@@ -126,20 +130,52 @@ tsb.viz.collaborations = {
       var row = Math.floor(organizationIndex / numColumns);
       var x = this.leftMargin + containerMargin + columnWidth * column + columnWidth/2;
       var y = marginTop + rowHeight * row + rowHeight/2;
-      console.log(organizationIndex, column, '/', numColumns, 'row:', row);
 
       var organizationGroup = this.svg.append('g')
-        .attr('class', 'organizationGroup');
+        .attr('id', 'organizationGroup_' + organization.id)
+        .attr('class', 'organizationGroup')
+        .attr('transform', 'translate('+x+','+y+')')
 
       var organizationCenter = organizationGroup.append('circle')
         .attr('class', 'organizationCircle')
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', rowHeight/8)
+        .attr('stroke', '#000000')
+        .attr('fill', 'none')
+
+      var organizationLabel = organizationGroup.append("text")
+        .attr("class", "pointLabel")
+        .attr('y', rowHeight/2)
+        .attr('text-anchor', 'middle')
+        .attr('font-size', '80%')
+        .text(organization.orgLabel)
+        .attr('fill', 'black')
+
+      tsb.state.dataSource.getOrganizationCollaborators(organization.org).then(function(data) {
+        this.addCollaborators(organization, organizationGroup, rowHeight/2, data);
+      }.bind(this));
+    }.bind(this))
+  },
+  addCollaborators: function(organization, organizationGroup, radius, collaboratorsDataSet) {
+    collaboratorsDataSet.rows.forEach(function(collaboratorInfo) {
+      collaboratorInfo.budgetAreaCode = tsb.common.extractBudgetAreaCode(collaboratorInfo.budgetArea);
+    });
+    var collaboratorsByBudgetArea = collaboratorsDataSet.groupBy('budgetAreaCode');
+
+    tsb.config.budgetAreas.forEach(function(budgetAreaCode, budgetAreaCodeIndex) {
+      var x = radius/2 * Math.cos(2 * Math.PI * budgetAreaCodeIndex/tsb.config.budgetAreas.length);
+      var y = radius/2 * Math.sin(2 * Math.PI * budgetAreaCodeIndex/tsb.config.budgetAreas.length);
+      var areaColor = tsb.config.themes.current.budgetAreaColor[budgetAreaCode];
+      var collabolatorsInBudgetArea = collaboratorsByBudgetArea[budgetAreaCode];
+      if (collabolatorsInBudgetArea) {
+        organizationGroup.append('circle')
         .attr('cx', x)
         .attr('cy', y)
-        .attr('r', rowHeight/2)
-        .attr('stroke', '#000000')
-    }.bind(this))
-
-    this.resize(this.w, this.h);
+        .attr('fill', areaColor)
+        .attr('r', collabolatorsInBudgetArea.rows.length/5)
+      }
+    })
   },
   loadDataOld: function() {
     var margin = 80;
@@ -205,7 +241,7 @@ tsb.viz.collaborations = {
       topBest.forEach(self.pullCollaborators);
     });
   },
-  pullCollaborators: function(academicOrg, academicOrgIndex) {
+  pullCollaboratorsOld: function(academicOrg, academicOrgIndex) {
     var g = d3.select('#g_' + academicOrg.id);
     var r = 60;
     if (this.institutionTopCount == 20) r = 50;
