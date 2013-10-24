@@ -129,7 +129,7 @@ tsb.viz.priorityAreas = {
             return tsb.config.themes.current.budgetAreaColor[d.budgetArea];
           })
           .text(function(d) {
-            return Math.floor(d.grantsSum/1000000*100)/100 + 'M';
+            return '£'+Math.floor(d.grantsSum/1000000*10)/10 + 'm';
           })
           .transition()
           .style('opacity', 1)
