@@ -40,7 +40,7 @@ tsb.viz.collaborations = {
       .append('text')
       .style('fill', '#333')
       .style('font-size', tsb.config.themes.current.titleFontSize)
-      .style('font-weight', '300')
+      .style('font-weight', tsb.config.themes.current.titleFontWeight)
       .text('University collaborations per TSB priority area')
 
     this.backBtn.on('mouseover', function() {
