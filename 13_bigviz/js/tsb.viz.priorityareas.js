@@ -5,8 +5,8 @@ tsb.viz.priorityAreas = {
     this.svg = svg;
     this.w = w;
     this.h = h;
-    this.startYear = 2002;
     this.endYear = (new Date().getFullYear());
+    this.startYear = this.endYear-11;
     this.duration = 60000;
     this.loadData();
 
