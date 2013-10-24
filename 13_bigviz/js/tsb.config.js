@@ -48,7 +48,7 @@ tsb.config.themes = {
     introTextColor: '#FFFFFF',
     introTextFontWeight: 100,
     introBgColor: '#222222',
-    budgetAreaColorAlpha: 0.65,
+    budgetAreaColorAlpha: 0.55,
     budgetAreaColor : {
       'TRANSPO'            : '#00B7FF',
       'TECH'            : '#D60303',
