@@ -16,10 +16,11 @@ tsb.viz.intro = {
     .append('rect')
     .attr('class', 'bg')
     .attr('width', this.w).attr('height', this.h)
-    .attr('fill', tsb.config.themes.current.introBgColor)
+    .attr('fill', tsb.config.themes.current.introBgColor);
   },
   loadData: function() {
     this.numProjects = 0;
+    this.displayedNumProjects = 0;
     var svg = this.svg;
     var w = this.w;
     var h = this.h;
@@ -63,10 +64,10 @@ tsb.viz.intro = {
       var py = marginY + row * (ph + spacingY);
       var budgetAreaCode = tsb.common.extractBudgetAreaCode(project.budgetArea);
       var color = tsb.config.themes.current.budgetAreaColor[budgetAreaCode];
-      this.makeRect(px, py, pw, ph, color, 'project');
+      this.makeRect(px, py, pw, ph, color, 'project', projectIndex);
     }.bind(this));
   },
-  makeRect: function(x, y, w, h, color, className) {
+  makeRect: function(x, y, w, h, color, className, projectIndex) {
     var projectRect = this.svg
       .append('g')
       .append('rect')
@@ -90,7 +91,7 @@ tsb.viz.intro = {
   onProjectAnimComplete: function() {
     if (!this.staticMode) {
       this.numProjects++;
-      this.updateLabels();
+      //this.updateLabels();
     }
   },
   addLabels: function() {
@@ -127,14 +128,20 @@ tsb.viz.intro = {
       this.showKeyFacts();
     }
 
+    if (this.updateLabelsAnim) {
+      clearInterval(this.updateLabelsAnim);
+    }
+    this.updateLabelsAnim = setInterval(this.updateLabels.bind(this), 1/30);
+
     this.updateLabels();
     this.resize(this.w, this.h); //force layout update
   },
   updateLabels: function() {
     var titleText = 'In ' + this.year + ' we funded ';
+    this.displayedNumProjects++;
     var projectCountText = this.numProjects + ' innovate projects';
 
-    var crop = Math.floor(Math.max(0, (this.numProjects - 100)));
+    var crop = Math.floor(Math.max(0, (this.displayedNumProjects - 240)/2));
 
     titleText += projectCountText.substr(0, crop);
     projectCountText = projectCountText.substr(crop);
@@ -211,7 +218,7 @@ tsb.viz.intro = {
 
     this.svg.selectAll('.keyFactBtn')
       .transition()
-      .delay(this.minimizeDelay + this.minimizeTime)
+      .delay(this.minimizeDelay + this.minimizeTime*1.5)
       .duration(this.minimizeTime)
       .style('opacity', 1)
   }
