@@ -20,7 +20,6 @@ tsb.viz.intro = {
   },
   loadData: function() {
     this.numProjects = 0;
-    this.totalNumProjects = 0;
     var svg = this.svg;
     var w = this.w;
     var h = this.h;
@@ -99,17 +98,17 @@ tsb.viz.intro = {
 
     this.title = labelGroup.append('text')
       .attr('dx', 0)
-      .attr('dy', tsb.config.themes.current.titleFontSize/2)
+      .attr('dy', 0)
       .attr('fill', tsb.config.themes.current.introTextColor)
       .style('font-size', tsb.config.themes.current.titleFontSize * 2)
-      .style('font-weight', tsb.config.themes.current.introTextFontWegith);
+      .style('font-weight', tsb.config.themes.current.introTextFontWeight);
 
     this.projectCount = labelGroup.append('text')
       .attr('dx', 0)
-      .attr('dy', tsb.config.themes.current.titleFontSize*2.8)
+      .attr('dy', tsb.config.themes.current.titleFontSize*2.5)
       .attr('fill', tsb.config.themes.current.introTextColor)
       .style('font-size', tsb.config.themes.current.titleFontSize * 2)
-      .style('font-weight', tsb.config.themes.current.introTextFontWegith);
+      .style('font-weight', tsb.config.themes.current.introTextFontWeight);
 
     var alreadyOpened = document.location.hash == '#introopened';
 
@@ -132,8 +131,15 @@ tsb.viz.intro = {
     this.resize(this.w, this.h); //force layout update
   },
   updateLabels: function() {
-    this.title.text('In ' + this.year + ' we funded');
-    this.projectCount.text(this.numProjects + ' innovate projects');
+    var titleText = 'In ' + this.year + ' we funded ';
+    var projectCountText = this.numProjects + ' innovate projects';
+
+    var crop = Math.floor(Math.max(0, (this.numProjects - 100)));
+
+    titleText += projectCountText.substr(0, crop);
+    projectCountText = projectCountText.substr(crop);
+    this.title.text(titleText);
+    this.projectCount.text(projectCountText);
   },
   resize: function(w, h) {
     this.w = w;
@@ -145,7 +151,7 @@ tsb.viz.intro = {
     var titleFontSize = tsb.config.themes.current.titleFontSize;
 
     this.labelGroup
-      .attr('transform', 'translate('+(leftMargin + containerMargin)+','+(this.h/2 - tsb.config.themes.current.titleFontSize * 2)+') scale(1,1)');
+      .attr('transform', 'translate('+(leftMargin + containerMargin)+','+(this.h/2 - tsb.config.themes.current.titleFontSize * 1.5)+') scale(1,1)');
   },
   addKeyFacts: function() {
     var images = ['assets/priorityAreas.png', 'assets/regions.png', 'assets/collaborations.png'];
