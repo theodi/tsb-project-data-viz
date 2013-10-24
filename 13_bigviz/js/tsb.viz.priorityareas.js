@@ -10,28 +10,25 @@ tsb.viz.priorityAreas = {
     this.duration = 60000;
     this.loadData();
 
-    svg
-    .append('rect')
-    .attr('class', 'bg')
-    .attr('width', tsb.state.w).attr('height', tsb.state.h)
-    .attr('fill', tsb.config.themes.current.priorityAreasBgColor)
+    this.bg = svg
+      .append('rect')
+      .attr('class', 'bg')
+      .attr('width', tsb.state.w).attr('height', tsb.state.h)
+      .attr('fill', tsb.config.themes.current.priorityAreasBgColor);
 
-    var title = svg
+    this.title = svg
       .append('text')
-      .attr('x', '1em')
-      .attr('y', '2em')
       .style('fill', '#333')
-      .style('font-size', '200%')
-      .style('font-weight', '300')
+      .style('font-size', tsb.config.themes.current.titleFontSize)
+      .style('font-weight', tsb.config.themes.current.titleFontWeight)
       .text('TSB spending by priority area during ' + (this.startYear+1) + ' - ' + this.endYear)
 
     this.subTitle = svg
       .append('text')
-      .attr('x', '1em')
-      .attr('y', '3.2em')
+      .attr('dy', tsb.config.themes.current.titleFontSize * 1.25)
       .style('fill', '#F00')
-      .style('font-size', '200%')
-      .style('font-weight', '100')
+      .style('font-size', tsb.config.themes.current.titleFontSize)
+      .style('font-weight', tsb.config.themes.current.subTitleFontWeight)
       .text('Space xploration')
       .style('opacity', 0)
 
@@ -65,6 +62,25 @@ tsb.viz.priorityAreas = {
     this.backBtn.on('click', function() {
       document.location.href = "#introopened";
     }.bind(this));
+
+    this.resize(this.w, this.h);
+  },
+  resize: function(w, h) {
+    this.w = w;
+    this.h = h;
+
+    var maxWidth = this.maxWidth = tsb.common.getMaxWidth(this.w);
+    var leftMargin = this.leftMargin = (this.w - maxWidth)/2;
+    var containerMargin = tsb.config.themes.current.containerMargin;
+    var titleFontSize = tsb.config.themes.current.titleFontSize;
+
+    this.bg
+      .attr('width', this.w);
+
+    this.title.attr('x', leftMargin + containerMargin);
+    this.title.attr('y', titleFontSize + containerMargin);
+    this.subTitle.attr('x', leftMargin + containerMargin);
+    this.subTitle.attr('y', titleFontSize + containerMargin);
   },
   loadData: function() {
     var results = [];

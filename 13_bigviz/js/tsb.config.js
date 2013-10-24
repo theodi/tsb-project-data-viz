@@ -45,6 +45,7 @@ tsb.config.themes = {
     containerMargin: 15,
     titleFontSize: 42,
     titleFontWeight: 300,
+    subTitleFontWeight: 100,
     introTextColor: '#FFFFFF',
     introTextFontWeight: 100,
     introBgColor: '#222222',
