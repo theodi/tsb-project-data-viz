@@ -26,7 +26,7 @@ tsb.viz.intro = {
       this.createProjects(projects.rows);
       this.addLabels();
       if (this.staticMode) {
-        this.projectCount.text(projects.rows.length + ' projects');
+        this.projectCount.text(projects.rows.length + ' innovate projects');
       }
       else {
         this.addKeyFacts();
@@ -69,7 +69,7 @@ tsb.viz.intro = {
   },
   onProjectAnimComplete: function() {
     if (!this.staticMode) {
-      this.projectCount.text(++this.numProjects + ' projects');
+      this.projectCount.text(++this.numProjects + ' innovate projects');
     }
   },
   addLabels: function() {
@@ -79,7 +79,7 @@ tsb.viz.intro = {
       .attr('dx', 100)
       .attr('dy', 200)
       .attr('fill', tsb.config.themes.current.introTextColor)
-      .style('font-size', '6em')
+      .style('font-size', '5.5em')
       .style('font-weight', tsb.config.themes.current.introTextFontWegith);
 
     this.projectCount = labelGroup.append('text')
@@ -87,7 +87,7 @@ tsb.viz.intro = {
       .attr('dx', 100)
       .attr('dy', 320)
       .attr('fill', tsb.config.themes.current.introTextColor)
-      .style('font-size', '6em')
+      .style('font-size', '5.5em')
       .style('font-weight', tsb.config.themes.current.introTextFontWegith);
 
     labelGroup
