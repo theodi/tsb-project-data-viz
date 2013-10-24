@@ -68,10 +68,6 @@ tsb.viz.collaborations = {
     var containerMargin = tsb.config.themes.current.containerMargin;
     var titleFontSize = tsb.config.themes.current.titleFontSize;
 
-    this.institutionTopCount = 12;
-    this.institutionNumColumns = 6;
-
-
     this.title.attr('x', leftMargin + containerMargin);
     this.title.attr('y', titleFontSize + containerMargin);
 
