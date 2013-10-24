@@ -11,6 +11,7 @@ tsb.viz.intro = {
     this.loadData();
     this.minimizeDelay = 3000;
     this.minimizeTime = 2000;
+    this.cropDelay = 240;
 
     svg
     .append('rect')
@@ -125,6 +126,7 @@ tsb.viz.intro = {
     if (alreadyOpened) {
       this.minimizeTime = 0;
       this.minimizeDelay = 0;
+      this.cropDelay = -50;
       this.showKeyFacts();
     }
 
@@ -141,7 +143,7 @@ tsb.viz.intro = {
     this.displayedNumProjects++;
     var projectCountText = this.numProjects + ' innovate projects';
 
-    var crop = Math.floor(Math.max(0, (this.displayedNumProjects - 240)/2));
+    var crop = Math.floor(Math.max(0, (this.displayedNumProjects - this.cropDelay)/2));
 
     titleText += projectCountText.substr(0, crop);
     projectCountText = projectCountText.substr(crop);
