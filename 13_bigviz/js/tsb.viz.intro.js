@@ -7,7 +7,7 @@ tsb.viz.intro = {
     this.h = h;
     this.staticMode = staticMode;
     this.year = (new Date().getFullYear());
-    this.duration = staticMode ? 0 : 60000;
+    this.duration = 60000;
     this.loadData();
 
     svg
@@ -18,13 +18,17 @@ tsb.viz.intro = {
   },
   loadData: function() {
     this.numProjects = 0;
+    this.totalNumProjects = 0;
     var svg = this.svg;
     var w = this.w;
     var h = this.h;
     tsb.state.dataSource.getProjectsForYear(this.year).then(function(projects) {
       this.createProjects(projects.rows);
       this.addLabels();
-      if (!this.staticMode) {
+      if (this.staticMode) {
+        this.projectCount.text(projects.rows.length + ' projects');
+      }
+      else {
         this.addKeyFacts();
         if (document.location.hash != '#introopened') {
           setTimeout(this.showKeyFacts.bind(this), 3000);
@@ -54,7 +58,8 @@ tsb.viz.intro = {
       .append('rect')
       .attr('class', className)
       .attr('x', x).attr('y', y+h)
-      .attr('width', w).attr('height', 0)
+      .attr('y', x).attr('y', this.staticMode ? y : 0)
+      .attr('width', w).attr('height', this.staticMode ? h : 0)
       .attr('fill', color)
       .style('opacity', tsb.config.themes.current.budgetAreaColorAlpha)
       .transition().delay(Math.random()*this.duration)
@@ -63,7 +68,9 @@ tsb.viz.intro = {
       .each('end', this.onProjectAnimComplete.bind(this))
   },
   onProjectAnimComplete: function() {
-    this.projectCount.text(++this.numProjects + ' projects');
+    if (!this.staticMode) {
+      this.projectCount.text(++this.numProjects + ' projects');
+    }
   },
   addLabels: function() {
     var labelGroup = this.labelGroup = this.svg.append('g');
