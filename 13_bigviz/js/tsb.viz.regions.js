@@ -280,7 +280,7 @@ tsb.viz.regions = {
             this.tooltip.style('display', 'none');
           }.bind(this))
 
-            this.tooltip.node().parentNode.appendChild(this.tooltip.node());
+          this.tooltip.node().parentNode.appendChild(this.tooltip.node());
         }.bind(this))
       }.bind(this));
 
