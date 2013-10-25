@@ -7,7 +7,7 @@ tsb.viz.collaborations = {
     this.w = w;
     this.h = h;
     this.institutionSize = 'medium';
-    this.institutionTopCount = 12;
+    this.institutionTopCount = 10;
     this.institutionsOnlyLocal = false;
     this.debug = false;
 
@@ -118,7 +118,8 @@ tsb.viz.collaborations = {
     var availableHeight = this.h - marginTop - marginBottom;
     var numRows = 2;
     var rowHeight = availableHeight / numRows;
-    var numColumns = Math.floor(this.maxWidth / rowHeight);
+    var cellWidth = rowHeight * 1.2;
+    var numColumns = Math.floor(this.maxWidth / cellWidth);
     var columnWidth = (this.maxWidth - 2*containerMargin)/numColumns;
 
     organizations = organizations.slice(0, numColumns * numRows);
@@ -179,7 +180,7 @@ tsb.viz.collaborations = {
         .attr('cx', x)
         .attr('cy', y)
         .attr('fill', areaColor)
-        .attr('r', collabolatorsInBudgetArea.rows.length/5)
+        .attr('r', Math.max(5, collabolatorsInBudgetArea.rows.length/3))
       }
     })
   },
