@@ -11,10 +11,10 @@ tsb.viz.intro = {
     this.loadData();
     this.minimizeDelay = 3000;
     this.minimizeTime = 2000;
-    this.cropDelay = 240;
     this.titleScale = 1;
     this.titleX = 0;
     this.titleY = 0;
+    this.eatenLetters = -1;
 
     this.bg = svg
     .append('rect')
@@ -129,7 +129,7 @@ tsb.viz.intro = {
     if (alreadyOpened) {
       this.minimizeTime = 0;
       this.minimizeDelay = 0;
-      this.cropDelay = -50;
+      this.eatenLetters = 50;
       this.showKeyFacts();
     }
 
@@ -143,13 +143,15 @@ tsb.viz.intro = {
   },
   updateLabels: function() {
     var titleText = 'In ' + this.year + ' we funded ';
-    this.displayedNumProjects++;
     var projectCountText = this.numProjects + ' innovate projects';
 
-    var crop = Math.floor(Math.max(0, (this.displayedNumProjects - this.cropDelay)/2));
+    if (this.eatenLetters >= 0) {
+      this.eatenLetters += 0.5;
+      var cut = Math.floor(this.eatenLetters);
+      titleText += projectCountText.substr(0, cut);
+      projectCountText = projectCountText.substr(cut);
+    }
 
-    titleText += projectCountText.substr(0, crop);
-    projectCountText = projectCountText.substr(crop);
     this.title.text(titleText);
     this.projectCount.text(projectCountText);
   },
@@ -232,6 +234,11 @@ tsb.viz.intro = {
       .delay(this.minimizeDelay)
       .duration(this.minimizeTime)
       .attr('transform', 'translate('+(leftMargin + containerMargin)+','+(titleFontSize + containerMargin)+') scale(0.5, 0.5)')
+      .each('start', function() {
+        if (this.eatenLetters == -1) {
+          this.eatenLetters = 0; //start eating
+        }
+      }.bind(this))
       .each('end', function() {
         this.titleX = leftMargin + containerMargin;
         this.titleY = titleFontSize + containerMargin;
