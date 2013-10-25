@@ -12,7 +12,7 @@ tsb.viz.regions = {
 
     this.maxGrant = 170000000;
 
-    svg
+    this.bg = svg
     .append('rect')
     .attr('class', 'bg')
     .attr('width', tsb.state.w).attr('height', tsb.state.h)
@@ -48,11 +48,14 @@ tsb.viz.regions = {
       this.tooltip.attr('transform', function(d) { return 'translate(' + (d3.event.x + 10) + ',' + (d3.event.y-20) + ')'; });
     }.bind(this))
 
-    this.backBtn = svg.append('g')
+    this.addBackBtn();
+    this.resize(this.w, this.h);
+    this.loadMap();
+  },
+  addBackBtn: function() {
+    this.backBtn = this.svg.append('g');
 
     this.backBtnHit = this.backBtn.append('rect')
-      .attr('x', '0.3em')
-      .attr('y', '2.3em')
       .attr('width', '2em')
       .attr('height', '2em')
       .style('fill', 'none')
@@ -60,8 +63,8 @@ tsb.viz.regions = {
       .attr('ry', '5px')
 
     this.backBtnArrow = this.backBtn.append('text')
-      .attr('x', this.w * 0.01)
-      .attr('y', '2em')
+      .attr('x', '0.3em')
+      .attr('y', '0.75em')
       .style('fill', '#AAA')
       .style('font-size', '200%')
       .style('font-weight', '300')
@@ -78,8 +81,20 @@ tsb.viz.regions = {
     this.backBtn.on('click', function() {
       document.location.href = "#introopened";
     }.bind(this));
+  },
+  resize: function(w, h) {
+    this.w = w;
+    this.h = h;
 
-    this.loadMap();
+    var maxWidth = this.maxWidth = tsb.common.getMaxWidth(this.w);
+    var leftMargin = this.leftMargin = (this.w - maxWidth)/2;
+    var containerMargin = tsb.config.themes.current.containerMargin;
+    var titleFontSize = tsb.config.themes.current.titleFontSize;
+
+    this.title.attr('x', leftMargin + containerMargin);
+    this.title.attr('y', titleFontSize + containerMargin);
+
+    this.backBtn.attr('transform', 'translate('+(leftMargin-titleFontSize*0.5)+','+titleFontSize*0.6+')');
   },
   loadMap: function() {
     d3.xml(tsb.config.ukMapSVG, 'image/svg+xml', function(xml) {

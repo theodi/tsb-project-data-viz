@@ -11,30 +11,11 @@ tsb.viz.collaborations = {
     this.institutionsOnlyLocal = false;
     this.debug = false;
 
-    svg
+    this.bg = svg
     .append('rect')
     .attr('class', 'bg')
     .attr('width', tsb.state.w).attr('height', tsb.state.h)
     .attr('fill', tsb.config.themes.current.collaborationsBgColor);
-
-    this.backBtn = svg.append('g')
-
-    this.backBtnHit = this.backBtn.append('rect')
-      .attr('x', '0.3em')
-      .attr('y', '2.3em')
-      .attr('width', '2em')
-      .attr('height', '2em')
-      .style('fill', 'none')
-      .attr('rx', '5px')
-      .attr('ry', '5px')
-
-    this.backBtnArrow = this.backBtn.append('text')
-      .attr('x', this.w * 0.01)
-      .attr('y', '2em')
-      .style('fill', '#AAA')
-      .style('font-size', '200%')
-      .style('font-weight', '300')
-      .text('«')
 
     this.title = svg
       .append('text')
@@ -42,6 +23,29 @@ tsb.viz.collaborations = {
       .style('font-size', tsb.config.themes.current.titleFontSize)
       .style('font-weight', tsb.config.themes.current.titleFontWeight)
       .text('University collaborations per TSB priority area')
+
+    this.addBackBtn();
+    this.resize(this.w, this.h);
+    this.initDebugLayout();
+    this.loadData();
+  },
+  addBackBtn: function() {
+    this.backBtn = this.svg.append('g');
+
+    this.backBtnHit = this.backBtn.append('rect')
+      .attr('width', '2em')
+      .attr('height', '2em')
+      .style('fill', 'none')
+      .attr('rx', '5px')
+      .attr('ry', '5px')
+
+    this.backBtnArrow = this.backBtn.append('text')
+      .attr('x', '0.3em')
+      .attr('y', '0.75em')
+      .style('fill', '#AAA')
+      .style('font-size', '200%')
+      .style('font-weight', '300')
+      .text('«')
 
     this.backBtn.on('mouseover', function() {
       this.backBtnArrow.style('fill', '#000');
@@ -54,10 +58,6 @@ tsb.viz.collaborations = {
     this.backBtn.on('click', function() {
       document.location.href = "#introopened";
     }.bind(this));
-
-    this.resize(this.w, this.h);
-    this.initDebugLayout();
-    this.loadData();
   },
   resize: function(w, h) {
     this.w = w;
@@ -70,6 +70,8 @@ tsb.viz.collaborations = {
 
     this.title.attr('x', leftMargin + containerMargin);
     this.title.attr('y', titleFontSize + containerMargin);
+
+    this.backBtn.attr('transform', 'translate('+(leftMargin-titleFontSize*0.5)+','+titleFontSize*0.6+')');
 
     this.updateDebugLayout();
   },
