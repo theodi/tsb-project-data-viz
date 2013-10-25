@@ -251,7 +251,7 @@ tsb.viz.priorityAreas = {
         byArea[budgetAreaId][grantArea.year-startYear].y = Number(grantArea.grantsSum);
         byArea[budgetAreaId][grantArea.year-startYear].grantsSum = grantArea.grantsSum;
         byArea[budgetAreaId][grantArea.year-startYear].numGrants = grantArea.numGrants;
-        if (grantArea.year < endYear)
+        if (grantArea.year == endYear - 1)
           byArea[budgetAreaId][grantArea.year-startYear+1].y = Number(grantArea.grantsSum);
       });
     });
