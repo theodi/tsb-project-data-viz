@@ -31,13 +31,15 @@ tsb.viz.priorityAreas = {
       .style('font-size', tsb.config.themes.current.titleFontSize)
       .style('font-weight', tsb.config.themes.current.subTitleFontWeight)
       .text('Space xploration')
-      .style('opacity', 0)
+      .style('opacity', 0);
 
-    this.backBtn = svg.append('g')
+    this.addBackBtn();
+    this.resize(this.w, this.h);
+  },
+  addBackBtn: function() {
+    this.backBtn = this.svg.append('g');
 
     this.backBtnHit = this.backBtn.append('rect')
-      .attr('x', '0.3em')
-      .attr('y', '2.3em')
       .attr('width', '2em')
       .attr('height', '2em')
       .style('fill', 'none')
@@ -45,8 +47,8 @@ tsb.viz.priorityAreas = {
       .attr('ry', '5px')
 
     this.backBtnArrow = this.backBtn.append('text')
-      .attr('x', this.w * 0.01)
-      .attr('y', '2em')
+      .attr('x', '0.3em')
+      .attr('y', '0.75em')
       .style('fill', '#AAA')
       .style('font-size', '200%')
       .style('font-weight', '300')
@@ -63,8 +65,6 @@ tsb.viz.priorityAreas = {
     this.backBtn.on('click', function() {
       document.location.href = "#introopened";
     }.bind(this));
-
-    this.resize(this.w, this.h);
   },
   resize: function(w, h) {
     this.w = w;
@@ -82,6 +82,8 @@ tsb.viz.priorityAreas = {
     this.title.attr('y', titleFontSize + containerMargin);
     this.subTitle.attr('x', leftMargin + containerMargin);
     this.subTitle.attr('y', titleFontSize + containerMargin);
+
+    this.backBtn.attr('transform', 'translate('+(leftMargin-titleFontSize*0.5)+','+titleFontSize*0.6+')');
   },
   loadData: function() {
     var results = [];
