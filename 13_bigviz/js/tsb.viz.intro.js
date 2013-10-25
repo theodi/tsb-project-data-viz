@@ -25,8 +25,6 @@ tsb.viz.intro = {
     .attr('class', 'bg')
     .attr('width', this.w).attr('height', this.h)
     .attr('fill', tsb.config.themes.current.introBgColor);
-
-    this.makeClipPaths();
   },
   close: function() {
     if (this.updateLabelsAnim) {
@@ -43,6 +41,7 @@ tsb.viz.intro = {
     tsb.state.dataSource.getProjectsForYear(this.year).then(function(projects) {
       this.createProjects(projects.rows);
       this.addLabels();
+      this.makeClipPaths();
       if (!this.staticMode) {
         this.addKeyFacts();
         if (document.location.hash != '#introopened') {
@@ -151,6 +150,7 @@ tsb.viz.intro = {
     this.updateLabelsAnim = setInterval(this.updateLabels.bind(this), 1/30);
 
     this.updateLabels();
+    this.addVizButtons();
     this.resize(this.w, this.h); //force layout update
   },
   updateLabels: function() {
@@ -200,6 +200,9 @@ tsb.viz.intro = {
         var x = leftMargin + d * spacing + d * this.subVizBtnSize + this.subVizBtnSize/2 + spacing;
         return 'translate('+x+','+marginTop+')';
       }.bind(this))
+  },
+  addVizButtons: function() {
+    this.makeClipPaths();
   },
   makeClipPaths: function() {
     var maxWidth = this.maxWidth = tsb.common.getMaxWidth(this.w);
