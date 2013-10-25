@@ -27,28 +27,8 @@ tsb.viz.regions = {
       .style('font-weight', '300')
       .text('TSB spending by region in ' + this.year)
 
-    this.tooltip = this.svg.append('g');
-    this.tooltip.style('display', 'none');
-
-    this.tooltipBg = this.tooltip.append('rect')
-      .attr('width', '240px')
-      .attr('height', '1.3em')
-      .style('fill', 'red')
-      .attr('rx', '5px')
-      .attr('ry', '5px')
-
-    this.tooltipText = this.tooltip.append('text')
-      .text('BLA BLA')
-      .attr('dx', '0.5em')
-      .attr('dy', '1.5em')
-      .style('fill', '#FFF')
-      .style('font-size', '12px')
-
-    this.svg.on('mousemove', function(e) {
-      this.tooltip.attr('transform', function(d) { return 'translate(' + (d3.event.x + 10) + ',' + (d3.event.y-20) + ')'; });
-    }.bind(this))
-
     this.addBackBtn();
+    this.addToolTip();
     this.resize(this.w, this.h);
     this.loadMap();
   },
@@ -81,6 +61,28 @@ tsb.viz.regions = {
     this.backBtn.on('click', function() {
       document.location.href = "#introopened";
     }.bind(this));
+  },
+  addToolTip: function() {
+    this.tooltip = this.svg.append('g');
+    this.tooltip.style('display', 'none');
+
+    this.tooltipBg = this.tooltip.append('rect')
+      .attr('width', '240px')
+      .attr('height', '1.3em')
+      .style('fill', 'red')
+      .attr('rx', '5px')
+      .attr('ry', '5px')
+
+    this.tooltipText = this.tooltip.append('text')
+      .text('BLA BLA')
+      .attr('dx', '0.5em')
+      .attr('dy', '1.5em')
+      .style('fill', '#FFF')
+      .style('font-size', '12px')
+
+    this.svg.on('mousemove', function(e) {
+      this.tooltip.attr('transform', function(d) { return 'translate(' + (d3.event.x + 10) + ',' + (d3.event.y-20) + ')'; });
+    }.bind(this))
   },
   resize: function(w, h) {
     this.w = w;
