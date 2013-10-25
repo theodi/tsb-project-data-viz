@@ -40,6 +40,8 @@ tsb.config.budgetAreaLabels = {
   'HLTHCR' : 'Healthcare'
 };
 
+tsb.config.introVizBtnLabels = ['PRIORITY AREAS', 'REGIONS', 'COLLABORATIONS'];
+
 tsb.config.themes = {
   odiDark: {
     defaultTextColor: '#222222',
@@ -50,6 +52,7 @@ tsb.config.themes = {
     introTextColor: '#FFFFFF',
     introTextFontWeight: 100,
     introBgColor: '#222222',
+    introVizBtnFontSize: 24,
     budgetAreaColorAlpha: 0.55,
     budgetAreaColor : {
       'TRANSPO'            : '#00B7FF',

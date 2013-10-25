@@ -17,7 +17,7 @@ tsb.viz.intro = {
     this.eatenLetters = -1;
 
     this.numClipPaths = 3;
-    this.subVizBtnSize = 240;
+    this.subVizBtnSize = 270;
     this.subVizBtnMargin = 160;
 
     this.bg = svg
@@ -234,11 +234,17 @@ tsb.viz.intro = {
         .attr('width', this.subVizBtnSize*1.2)
         .attr('height', this.subVizBtnSize*1.2)
         .attr('fill', function(d) { return 'rgba('+Math.floor((Math.random()*255))+','+Math.floor((Math.random()*255))+',0,1)'; });
+
+    subVizButtons
+      .append('text')
+      .attr('text-anchor', 'middle')
+      .attr('dy', tsb.config.themes.current.introVizBtnFontSize/2)
+      .style('font-size', tsb.config.themes.current.introVizBtnFontSize)
+      .text(function(d) { return tsb.config.introVizBtnLabels[d]; });
   },
   addKeyFacts: function() {
     return;
     var images = ['assets/priorityAreas.png', 'assets/regions.png', 'assets/collaborations.png'];
-    var labels = ['PRIORITY AREAS', 'REGIONS', 'COLLABORATIONS'];
     var colors = ['#2254F4', '#FF6700', '#EF3AAB'];
     var links = ['#priorityareas', '#regions', '#collaborations'];
 
