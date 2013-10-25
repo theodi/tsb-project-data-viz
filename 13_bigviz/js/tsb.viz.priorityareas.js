@@ -120,11 +120,6 @@ tsb.viz.priorityAreas = {
       .domain([0, d3.max(layers.concat(layers), function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); })])
       .range([this.h*0.77, this.h*0.15]);
 
-    var areaZero = d3.svg.area()
-      .x(function(d) { return x(d.x); })
-      .y0(function(d) { return y(d.y0); })
-      .y1(function(d) { return y(d.y0 + d.y*0); })
-
     var area = d3.svg.area()
       .x(function(d) { return x(d.x); })
       .y0(function(d) { return y(d.y0); })
@@ -134,8 +129,6 @@ tsb.viz.priorityAreas = {
     var layerPaths = this.svg.selectAll('path')
       .data(layers)
     .enter().append('path')
-      .attr('d', areaZero)
-      .transition().duration(1000)
       .attr('d', area)
       .style('fill', function(d) {
         return tsb.config.themes.current.budgetAreaColor[d[0].budgetArea];
