@@ -105,7 +105,6 @@ tsb.viz.priorityAreas = {
     var containerMargin = tsb.config.themes.current.containerMargin;
 
     var width = maxWidth;
-    var height = this.h * 0.8;
     var margin = leftMargin;
     var startYear = this.startYear;
     var endYear = this.endYear;
@@ -119,7 +118,7 @@ tsb.viz.priorityAreas = {
 
     var y = d3.scale.linear()
       .domain([0, d3.max(layers.concat(layers), function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); })])
-      .range([height, (this.h - height)/2]);
+      .range([this.h*0.77, this.h*0.15]);
 
     var area = d3.svg.area()
       .x(function(d) { return x(d.x); })
