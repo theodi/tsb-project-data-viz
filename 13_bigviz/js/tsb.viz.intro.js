@@ -233,13 +233,14 @@ tsb.viz.intro = {
         .attr('y', -this.subVizBtnSize*0.6)
         .attr('width', this.subVizBtnSize*1.2)
         .attr('height', this.subVizBtnSize*1.2)
-        .attr('fill', function(d) { return 'rgba('+Math.floor((Math.random()*255))+','+Math.floor((Math.random()*255))+',0,1)'; });
+        .attr('fill', function(d) { return tsb.config.themes.current.introVizBtnBgColor; });
 
     subVizButtons
       .append('text')
       .attr('text-anchor', 'middle')
       .attr('dy', tsb.config.themes.current.introVizBtnFontSize/2)
       .style('font-size', tsb.config.themes.current.introVizBtnFontSize)
+      .attr('fill', function(d) { return tsb.config.themes.current.introVizBtnLabelColors[d]; })
       .text(function(d) { return tsb.config.introVizBtnLabels[d]; });
   },
   addKeyFacts: function() {

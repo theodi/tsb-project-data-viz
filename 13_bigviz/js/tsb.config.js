@@ -53,6 +53,9 @@ tsb.config.themes = {
     introTextFontWeight: 100,
     introBgColor: '#222222',
     introVizBtnFontSize: 24,
+    introVizBtnBgColor: '#DDDDDD',
+    introVizBtnLabelColors3: ['#00bb4d', '#00b7fa', '#FFDD00'],
+    introVizBtnLabelColors: ['#0DBC37', '#00B7FF', '#F9BC26'],
     budgetAreaColorAlpha: 0.55,
     budgetAreaColor : {
       'TRANSPO'            : '#00B7FF',
