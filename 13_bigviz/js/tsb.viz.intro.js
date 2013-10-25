@@ -191,7 +191,7 @@ tsb.viz.intro = {
 
     this.subVizButtons
       .attr('transform', function(d) {
-        var x = leftMargin + d * spacing + d * this.subVizBtnSize + this.subVizBtnSize/2 + spacing;//this.subVizBtnSize/2 + margin + d * this.subVizBtnSize + d * spacing;
+        var x = leftMargin + d * spacing + d * this.subVizBtnSize + this.subVizBtnSize/2 + spacing;
         return 'translate('+x+','+marginTop+')';
       }.bind(this))
   },
