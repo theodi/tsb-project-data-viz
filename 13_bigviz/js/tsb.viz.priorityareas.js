@@ -5,8 +5,9 @@ tsb.viz.priorityAreas = {
     this.svg = svg;
     this.w = w;
     this.h = h;
-    this.endYear = (new Date().getFullYear());
-    this.startYear = this.endYear-11;
+    this.minColumnWidth = 120;
+    this.endYear = (new Date().getFullYear())+1;
+    this.startYear = this.endYear-Math.ceil(this.w/this.minColumnWidth);
     this.duration = 60000;
     this.loadData();
 
@@ -21,7 +22,7 @@ tsb.viz.priorityAreas = {
       .style('fill', '#333')
       .style('font-size', tsb.config.themes.current.titleFontSize)
       .style('font-weight', tsb.config.themes.current.titleFontWeight)
-      .text('TSB spending by priority area during ' + (this.startYear+1) + ' - ' + this.endYear)
+      .text('TSB spending by priority area during ' + (this.startYear+1) + ' - ' + (this.endYear-1))
 
     this.subTitle = svg
       .append('text')
@@ -99,9 +100,13 @@ tsb.viz.priorityAreas = {
     var stack = d3.layout.stack().offset('wiggle');
     var layers = stack(data);
 
-    var width = this.w;
+    var maxWidth = this.w;//this.maxWidth = tsb.common.getMaxWidth(this.w);
+    var leftMargin = 0;//this.leftMargin = (this.w - maxWidth)/2;
+    var containerMargin = tsb.config.themes.current.containerMargin;
+
+    var width = maxWidth;
     var height = this.h * 0.8;
-    var margin = 0;
+    var margin = leftMargin;
     var startYear = this.startYear;
     var endYear = this.endYear;
     var subTitle = this.subTitle;
@@ -110,7 +115,7 @@ tsb.viz.priorityAreas = {
 
     var x = d3.scale.linear()
       .domain([this.startYear, this.endYear])
-      .range([margin, width-margin]);
+      .range([margin, margin+width]);
 
     var y = d3.scale.linear()
       .domain([0, d3.max(layers.concat(layers), function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); })])
@@ -176,35 +181,34 @@ tsb.viz.priorityAreas = {
 
     //axis
     var yearLines = this.svg.selectAll('line.priorityAreas')
-      .data(d3.range(this.startYear, this.endYear+1))
-      .enter()
-        .append('line')
+      .data(d3.range(this.startYear, this.endYear+1)).enter()
+    yearLines.append('line')
         .attr('x1', x)
         .attr('y1', 0)
         .attr('x2', x)
         .attr('y2', this.h)
         .style('stroke', '#333')
-        .style('opacity', 0.1)
+        .style('opacity', 0.1);
 
     var yearLabels = this.svg.selectAll('text.priorityAreas')
-      .data(d3.range(this.startYear+1, this.endYear+1))
+      .data(d3.range(this.startYear+1, this.endYear))
       .enter()
         .append('text')
         .text(function(d) { return d; })
         .attr('text-anchor', 'middle')
-        .attr('dx', -width / (this.endYear - this.startYear) /2)
+        .attr('dx', 0*-width / (this.endYear - this.startYear) /2)
         .attr('x', x)
         .attr('y', this.h-20)
         .attr('fill', '#999')
         .attr('font-size', '80%')
 
     this.svg.selectAll('text.priorityAreasTotal')
-      .data(data[0])
+      .data(data[0].slice(1, data[0].length-1))
       .enter()
         .append('text')
         .text(function(d) { return d.grantsSum; })
         .attr('text-anchor', 'middle')
-        .attr('dx', -width / (this.endYear - this.startYear) /2)
+        .attr('dx', 0*-width / (this.endYear - this.startYear) /2)
         .attr('x', function(d) { return x(d.x); })
         .attr('y', this.h-70)
       .style('opacity', 0)
@@ -212,12 +216,12 @@ tsb.viz.priorityAreas = {
         .attr('class', 'priorityAreasTotal')
 
     this.svg.selectAll('text.priorityAreasGrants')
-      .data(data[0])
+      .data(data[0].slice(1, data[0].length-1))
       .enter()
         .append('text')
         .text(function(d) { return d.numGrants + ' grants'; })
         .attr('text-anchor', 'middle')
-        .attr('dx', -width / (this.endYear - this.startYear) /2)
+        .attr('dx', 0*-width / (this.endYear - this.startYear) /2)
         .attr('x', function(d) { return x(d.x); })
         .attr('y', this.h-50)
         .style('opacity', 0)
