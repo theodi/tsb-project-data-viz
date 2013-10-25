@@ -173,7 +173,7 @@ tsb.viz.priorityAreas = {
           .style('opacity', 0)
       })
       .on('click', function(d) {
-        var clickedYear = startYear + Math.floor((endYear - startYear + 1) * d3.event.clientX / width);
+        var clickedYear = startYear + Math.floor((endYear - startYear) * d3.event.clientX / width);
         var clickedArea = d[0].budgetArea;
         self.openLink(clickedYear, clickedArea)
       })
