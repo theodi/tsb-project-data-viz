@@ -42,6 +42,7 @@ tsb.config.budgetAreaLabels = {
 
 tsb.config.themes = {
   odiDark: {
+    defaultTextColor: '#222222',
     containerMargin: 15,
     titleFontSize: 42,
     titleFontWeight: 300,

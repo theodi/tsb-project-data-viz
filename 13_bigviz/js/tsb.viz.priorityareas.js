@@ -163,15 +163,35 @@ tsb.viz.priorityAreas = {
           .style('opacity', 1)
       })
       .on('mouseleave', function(d) {
+        svg.selectAll('text.priorityAreasTotal')
+          .data(d.slice(1, d.length-1))
+          .attr('fill', tsb.config.themes.current.defaultTextColor)
+          .text(function(d) {
+            var yearIndex = d.x - this.startYear;
+            var sum = data.reduce(function(sum, area) {
+              return sum + Number(area[yearIndex].grantsSum);
+            }.bind(this), 0)
+            return '£'+Math.floor(sum/1000000*10)/10 + 'm';
+          }.bind(this))
+          .transition()
+          .style('opacity', 1)
+        svg.selectAll('text.priorityAreasGrants')
+          .data(d.slice(1, d.length-1))
+          .attr('fill', tsb.config.themes.current.defaultTextColor)
+          .text(function(d) {
+            var yearIndex = d.x - this.startYear;
+            var sum = data.reduce(function(sum, area) {
+              return sum + Number(area[yearIndex].numGrants);
+            }.bind(this), 0);
+            return sum + ' GRANTS';
+          }.bind(this))
+          .transition()
+          .style('opacity', 1)
         layerPaths.transition()
           .style('opacity', 1)
         subTitle.transition()
           .style('opacity', 0)
-        svg.selectAll('text.priorityAreasTotal').transition()
-          .style('opacity', 0)
-        svg.selectAll('text.priorityAreasGrants').transition()
-          .style('opacity', 0)
-      })
+      }.bind(this))
       .on('click', function(d) {
         var clickedYear = startYear + Math.floor((endYear - startYear) * d3.event.clientX / width);
         var clickedArea = d[0].budgetArea;
@@ -223,6 +243,9 @@ tsb.viz.priorityAreas = {
         .attr('font-size', '70%')
         .attr('font-weight', '200')
         .attr('class', 'priorityAreasGrants')
+
+    //fire totals updates
+    this.svg.selectAll('path').on('mouseleave')(layers[0]);
   },
   openLink: function(year, area) {
     var areaLabel = tsb.config.budgetAreaLabels[area]
