@@ -25,6 +25,7 @@ tsb.viz.collaborations = {
       .text('SME collaborations in TSB priority areas')
 
     this.addBackBtn();
+    this.addToolTip();
     this.resize(this.w, this.h);
     this.initDebugLayout();
     this.loadData();
@@ -58,6 +59,28 @@ tsb.viz.collaborations = {
     this.backBtn.on('click', function() {
       document.location.href = "#introopened";
     }.bind(this));
+  },
+  addToolTip: function() {
+    this.tooltip = this.svg.append('g');
+    this.tooltip.style('display', 'none');
+
+    this.tooltipBg = this.tooltip.append('rect')
+      .attr('width', '240px')
+      .attr('height', '1.3em')
+      .style('fill', 'red')
+      .attr('rx', '5px')
+      .attr('ry', '5px')
+
+    this.tooltipText = this.tooltip.append('text')
+      .text('BLA BLA')
+      .attr('dx', '0.5em')
+      .attr('dy', '1.5em')
+      .style('fill', '#FFF')
+      .style('font-size', '12px')
+
+    this.svg.on('mousemove', function(e) {
+      this.tooltip.attr('transform', function(d) { return 'translate(' + (d3.event.x + 10) + ',' + (d3.event.y-20) + ')'; });
+    }.bind(this))
   },
   resize: function(w, h) {
     this.w = w;
@@ -176,13 +199,24 @@ tsb.viz.collaborations = {
       var areaColor = tsb.config.themes.current.budgetAreaColor[budgetAreaCode];
       var collabolatorsInBudgetArea = collaboratorsByBudgetArea[budgetAreaCode];
       if (collabolatorsInBudgetArea) {
-        organizationGroup.append('circle')
-        .attr('cx', x)
-        .attr('cy', y)
-        .attr('fill', areaColor)
-        .attr('r', Math.max(5, collabolatorsInBudgetArea.rows.length/3))
+        var areaCircle = organizationGroup.append('circle')
+          .attr('cx', x)
+          .attr('cy', y)
+          .attr('fill', areaColor)
+          .attr('r', Math.max(5, collabolatorsInBudgetArea.rows.length/3))
+        areaCircle.on('mouseover', function() {
+          this.tooltip.style('display', 'block')
+          var areaName = tsb.config.budgetAreaLabels[budgetAreaCode];
+          this.tooltipText.text(areaName + ' : ' + collabolatorsInBudgetArea.rows.length + ' collaborators');
+          this.tooltipBg.style('fill', areaColor)
+        }.bind(this))
+
+        areaCircle.on('mouseout', function() {
+          this.tooltip.style('display', 'none');
+        }.bind(this))
       }
-    })
+      this.tooltip.node().parentNode.appendChild(this.tooltip.node());
+    }.bind(this));
   },
   loadDataOld: function() {
     var margin = 80;
