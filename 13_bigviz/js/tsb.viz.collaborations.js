@@ -6,7 +6,7 @@ tsb.viz.collaborations = {
     this.svg = svg;
     this.w = w;
     this.h = h;
-    this.institutionSize = 'academic';
+    this.institutionSize = 'medium';
     this.institutionTopCount = 12;
     this.institutionsOnlyLocal = false;
     this.debug = false;
@@ -22,7 +22,7 @@ tsb.viz.collaborations = {
       .style('fill', '#333')
       .style('font-size', tsb.config.themes.current.titleFontSize)
       .style('font-weight', tsb.config.themes.current.titleFontWeight)
-      .text('University collaborations per TSB priority area')
+      .text('SME collaborations in TSB priority areas')
 
     this.addBackBtn();
     this.resize(this.w, this.h);
@@ -92,7 +92,7 @@ tsb.viz.collaborations = {
       .attr('height', this.h)
   },
   loadData: function() {
-   tsb.state.dataSource.getInstitutions(self.institutionSize).then(function(data) {
+   tsb.state.dataSource.getInstitutions(this.institutionSize).then(function(data) {
       data.rows.forEach(function(row) {
         row.numProjects = Number(row.numProjects);
         row.id = row.org.substr(row.org.lastIndexOf('/')+1)
@@ -148,6 +148,14 @@ tsb.viz.collaborations = {
         .attr('text-anchor', 'middle')
         .attr('font-size', '80%')
         .text(organization.orgLabel)
+        .attr('fill', 'black')
+
+      var organizationProjectCount = organizationGroup.append("text")
+        .attr("class", "pointLabel")
+        .attr('y', 4)
+        .attr('text-anchor', 'middle')
+        .attr('font-size', '80%')
+        .text(organization.numProjects)
         .attr('fill', 'black')
 
       tsb.state.dataSource.getOrganizationCollaborators(organization.org).then(function(data) {
