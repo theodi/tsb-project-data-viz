@@ -19,6 +19,10 @@ function init() {
   var currentViz = null;
 
   function checkScene() {
+    if (currentViz && currentViz.close) {
+      currentViz.close();
+    }
+
     svg.remove();
     svg = tsb.state.svg = d3.select('#home-viz').append('svg')
     .attr('width', tsb.state.w)

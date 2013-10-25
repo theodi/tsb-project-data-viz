@@ -28,6 +28,12 @@ tsb.viz.intro = {
 
     this.makeClipPaths();
   },
+  close: function() {
+    if (this.updateLabelsAnim) {
+      clearInterval(this.updateLabelsAnim);
+     this.updateLabelsAnim = null;
+    }
+  },
   loadData: function() {
     this.numProjects = 0;
     this.displayedNumProjects = 0;
