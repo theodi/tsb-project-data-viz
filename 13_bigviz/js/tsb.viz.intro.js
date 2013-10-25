@@ -16,11 +16,17 @@ tsb.viz.intro = {
     this.titleY = 0;
     this.eatenLetters = -1;
 
+    this.numClipPaths = 3;
+    this.subVizBtnSize = 240;
+    this.subVizBtnMargin = 160;
+
     this.bg = svg
     .append('rect')
     .attr('class', 'bg')
     .attr('width', this.w).attr('height', this.h)
     .attr('fill', tsb.config.themes.current.introBgColor);
+
+    this.makeClipPaths();
   },
   loadData: function() {
     this.numProjects = 0;
@@ -178,8 +184,50 @@ tsb.viz.intro = {
 
     this.labelGroup
       .attr('transform', 'translate('+(this.titleX)+','+(this.titleY)+') scale('+this.titleScale+','+this.titleScale+')');
+
+    var margin = this.subVizBtnMargin;
+    var spacing = (maxWidth - this.subVizBtnSize * this.numClipPaths) / (this.numClipPaths + 1);
+    var marginTop = this.h/2 + this.subVizBtnSize/10;
+
+    this.subVizButtons
+      .attr('transform', function(d) {
+        var x = leftMargin + d * spacing + d * this.subVizBtnSize + this.subVizBtnSize/2 + spacing;//this.subVizBtnSize/2 + margin + d * this.subVizBtnSize + d * spacing;
+        return 'translate('+x+','+marginTop+')';
+      }.bind(this))
+  },
+  makeClipPaths: function() {
+    var maxWidth = this.maxWidth = tsb.common.getMaxWidth(this.w);
+    var leftMargin = this.leftMargin = (this.w - maxWidth)/2;
+    var containerMargin = tsb.config.themes.current.containerMargin;
+    var titleFontSize = tsb.config.themes.current.titleFontSize;
+
+    var subVizButtons = this.subVizButtons = this.svg.selectAll('circle')
+      .data(d3.range(this.numClipPaths))
+      .enter()
+      .append('g')
+
+    subVizButtons
+      .append('clipPath')
+        .attr('id', function(d) { return 'clipPath_' + d; })
+      .append('circle')
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', this.subVizBtnSize/2)
+        .attr('fill', 'rgba(255,255,0,1)');
+
+    subVizButtons
+       .attr('clip-path', function(d) { return 'url(#clipPath_'+d+')'});
+
+    subVizButtons
+      .append('rect')
+        .attr('x', -this.subVizBtnSize*0.6)
+        .attr('y', -this.subVizBtnSize*0.6)
+        .attr('width', this.subVizBtnSize*1.2)
+        .attr('height', this.subVizBtnSize*1.2)
+        .attr('fill', function(d) { return 'rgba('+Math.floor((Math.random()*255))+','+Math.floor((Math.random()*255))+',0,1)'; });
   },
   addKeyFacts: function() {
+    return;
     var images = ['assets/priorityAreas.png', 'assets/regions.png', 'assets/collaborations.png'];
     var labels = ['PRIORITY AREAS', 'REGIONS', 'COLLABORATIONS'];
     var colors = ['#2254F4', '#FF6700', '#EF3AAB'];
