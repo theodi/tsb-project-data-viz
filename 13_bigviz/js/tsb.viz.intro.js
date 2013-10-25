@@ -242,6 +242,10 @@ tsb.viz.intro = {
       .style('font-size', tsb.config.themes.current.introVizBtnFontSize)
       .attr('fill', function(d) { return tsb.config.themes.current.introVizBtnLabelColors[d]; })
       .text(function(d) { return tsb.config.introVizBtnLabels[d]; });
+
+    subVizButtons.on('click', function(d) {
+      document.location.href = tsb.config.introVizBtnLinks[d];
+    })
   },
   showVizButtons: function() {
     var maxWidth = this.maxWidth = tsb.common.getMaxWidth(this.w);
