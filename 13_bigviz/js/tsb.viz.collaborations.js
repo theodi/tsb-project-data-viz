@@ -217,6 +217,11 @@ tsb.viz.collaborations = {
           this.tooltipBg.style('fill', areaColor);
           areaCircle.transition().attr('r', Math.max(5, collabolatorsInBudgetArea.rows.length/3));
         }.bind(this))
+
+        areaCircle.on('click', function() {
+          var areaName = tsb.config.budgetAreaLabels[budgetAreaCode];
+          this.openLink(organization.orgLabel, areaName)
+        }.bind(this));
       }
       this.tooltip.node().parentNode.appendChild(this.tooltip.node());
     }.bind(this));
@@ -396,5 +401,10 @@ tsb.viz.collaborations = {
         y: ysign * r * Math.pow(Math.sin(angle), 2/p)
       }
     })
-  }
+  },
+  openLink: function(orgLabel, areaLabel) {
+    var q = encodeURIComponent('"'+orgLabel+'"');
+    window.open(tsb.config.domain +
+      '/projects?utf8=✓&search_string='+q+'&budget_area_label%5B'+areaLabel+'%5D=true');
+  },
 };
