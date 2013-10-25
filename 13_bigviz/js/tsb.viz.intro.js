@@ -40,13 +40,19 @@ tsb.viz.intro = {
     var h = this.h;
     tsb.state.dataSource.getProjectsForYear(this.year).then(function(projects) {
       this.createProjects(projects.rows);
-      this.addLabels();
-      this.makeClipPaths();
+      var alreadyOpened = document.location.hash == '#introopened';
+      this.addLabels(alreadyOpened);
       if (!this.staticMode) {
-        this.addKeyFacts();
+        this.addVizButtons();
         if (document.location.hash != '#introopened') {
-          this.showKeyFacts();
+          this.showVizButtons();
         }
+      }
+      if (alreadyOpened) {
+        this.minimizeTime = 0;
+        this.minimizeDelay = 0;
+        this.eatenLetters = 50;
+        this.showVizButtons();
       }
     }.bind(this));
   },
@@ -109,7 +115,7 @@ tsb.viz.intro = {
       //this.updateLabels();
     }
   },
-  addLabels: function() {
+  addLabels: function(alreadyOpened) {
     var labelGroup = this.labelGroup = this.svg.append('g');
 
     this.title = labelGroup.append('text')
@@ -126,8 +132,6 @@ tsb.viz.intro = {
       .style('font-size', tsb.config.themes.current.titleFontSize * 2)
       .style('font-weight', tsb.config.themes.current.introTextFontWeight);
 
-    var alreadyOpened = document.location.hash == '#introopened';
-
     labelGroup
       .style('opacity', (this.staticMode || alreadyOpened) ? 1 : 0)
 
@@ -137,20 +141,12 @@ tsb.viz.intro = {
         .style('opacity', 1);
     }
 
-    if (alreadyOpened) {
-      this.minimizeTime = 0;
-      this.minimizeDelay = 0;
-      this.eatenLetters = 50;
-      this.showKeyFacts();
-    }
-
     if (this.updateLabelsAnim) {
       clearInterval(this.updateLabelsAnim);
     }
     this.updateLabelsAnim = setInterval(this.updateLabels.bind(this), 1/30);
 
     this.updateLabels();
-    this.addVizButtons();
     this.resize(this.w, this.h); //force layout update
   },
   updateLabels: function() {
@@ -195,14 +191,17 @@ tsb.viz.intro = {
     var spacing = (maxWidth - this.subVizBtnSize * this.numClipPaths) / (this.numClipPaths + 1);
     var marginTop = this.h/2 + this.subVizBtnSize/10;
 
-    this.subVizButtons
-      .attr('transform', function(d) {
-        var x = leftMargin + d * spacing + d * this.subVizBtnSize + this.subVizBtnSize/2 + spacing;
-        return 'translate('+x+','+marginTop+')';
-      }.bind(this))
+    if (this.subVizButtons) {
+      this.subVizButtons
+        .attr('transform', function(d) {
+          var x = leftMargin + d * spacing + d * this.subVizBtnSize + this.subVizBtnSize/2 + spacing;
+          return 'translate('+x+','+marginTop+')';
+        }.bind(this))
+    }
   },
   addVizButtons: function() {
     this.makeClipPaths();
+    this.resize(this.w, this.h);
   },
   makeClipPaths: function() {
     var maxWidth = this.maxWidth = tsb.common.getMaxWidth(this.w);
@@ -219,9 +218,10 @@ tsb.viz.intro = {
       .append('clipPath')
         .attr('id', function(d) { return 'clipPath_' + d; })
       .append('circle')
+        .attr('class', 'cookieCutter')
         .attr('cx', 0)
         .attr('cy', 0)
-        .attr('r', this.subVizBtnSize/2)
+        .attr('r', 0)
         .attr('fill', 'rgba(255,255,0,1)');
 
     subVizButtons
@@ -243,10 +243,7 @@ tsb.viz.intro = {
       .attr('fill', function(d) { return tsb.config.themes.current.introVizBtnLabelColors[d]; })
       .text(function(d) { return tsb.config.introVizBtnLabels[d]; });
   },
-  addKeyFacts: function() {
-    console.log('ADD BUTTONS HERE');
-  },
-  showKeyFacts: function() {
+  showVizButtons: function() {
     var maxWidth = this.maxWidth = tsb.common.getMaxWidth(this.w);
     var leftMargin = this.leftMargin = (this.w - maxWidth)/2;
     var containerMargin = tsb.config.themes.current.containerMargin;
@@ -267,6 +264,12 @@ tsb.viz.intro = {
         this.titleY = titleFontSize + containerMargin;
         this.titleScale = 0.5;
       }.bind(this));
+
+    this.subVizButtons.selectAll('.cookieCutter')
+      .transition()
+      .delay(function(d) { return this.minimizeDelay + this.minimizeTime*0.5 + d * this.minimizeTime*0.1}.bind(this))
+      .duration(this.minimizeTime)
+      .attr('r', this.subVizBtnSize/2)
 
     //TODO: show buttons here
   }
