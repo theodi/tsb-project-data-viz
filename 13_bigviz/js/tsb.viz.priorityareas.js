@@ -114,7 +114,7 @@ tsb.viz.priorityAreas = {
 
     var x = d3.scale.linear()
       .domain([this.startYear, this.endYear])
-      .range([margin, margin+width]);
+      .range([leftMargin, margin+width]);
 
     var y = d3.scale.linear()
       .domain([0, d3.max(layers.concat(layers), function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); })])
@@ -144,7 +144,7 @@ tsb.viz.priorityAreas = {
         subTitle.transition()
           .style('opacity', 1)
         svg.selectAll('text.priorityAreasTotal')
-          .data(d)
+          .data(d.slice(1, d.length-1))
           .attr('fill', function(d) {
             return tsb.config.themes.current.budgetAreaColor[d.budgetArea];
           })
@@ -154,7 +154,7 @@ tsb.viz.priorityAreas = {
           .transition()
           .style('opacity', 1)
         svg.selectAll('text.priorityAreasGrants')
-          .data(d)
+          .data(d.slice(1, d.length-1))
           .attr('fill', function(d) {
             return tsb.config.themes.current.budgetAreaColor[d.budgetArea];
           })
@@ -195,8 +195,8 @@ tsb.viz.priorityAreas = {
         .append('text')
         .text(function(d) { return d; })
         .attr('text-anchor', 'middle')
-        .attr('dx', 0*-width / (this.endYear - this.startYear) /2)
-        .attr('x', x)
+        .attr('dx', 0)
+        .attr('x', function(d) { return x(d); })
         .attr('y', this.h-20)
         .attr('fill', '#999')
         .attr('font-size', '80%')
@@ -205,9 +205,7 @@ tsb.viz.priorityAreas = {
       .data(data[0].slice(1, data[0].length-1))
       .enter()
         .append('text')
-        .text(function(d) { return d.grantsSum; })
         .attr('text-anchor', 'middle')
-        .attr('dx', 0*-width / (this.endYear - this.startYear) /2)
         .attr('x', function(d) { return x(d.x); })
         .attr('y', this.h-70)
       .style('opacity', 0)
@@ -218,9 +216,7 @@ tsb.viz.priorityAreas = {
       .data(data[0].slice(1, data[0].length-1))
       .enter()
         .append('text')
-        .text(function(d) { return d.numGrants + ' grants'; })
         .attr('text-anchor', 'middle')
-        .attr('dx', 0*-width / (this.endYear - this.startYear) /2)
         .attr('x', function(d) { return x(d.x); })
         .attr('y', this.h-50)
         .style('opacity', 0)
@@ -245,7 +241,7 @@ tsb.viz.priorityAreas = {
       byArea[areaId] = areaStats;
       areas.push(areaStats);
       for(var year=this.startYear; year<=this.endYear; year++) {
-        areaStats[year-startYear] = { x: year, y: 0, grantsSum:0, numGrants:0, budgetArea: areaId };
+        areaStats[year-startYear] = { x: Number(year), y: 0, grantsSum:0, numGrants:0, budgetArea: areaId };
       }
     }.bind(this));
     data.forEach(function(year) {
