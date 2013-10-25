@@ -208,11 +208,14 @@ tsb.viz.collaborations = {
           this.tooltip.style('display', 'block')
           var areaName = tsb.config.budgetAreaLabels[budgetAreaCode];
           this.tooltipText.text(areaName + ' : ' + collabolatorsInBudgetArea.rows.length + ' collaborators');
-          this.tooltipBg.style('fill', areaColor)
+          this.tooltipBg.style('fill', areaColor);
+          areaCircle.transition().attr('r', Math.max(5, collabolatorsInBudgetArea.rows.length/3+4));
         }.bind(this))
 
         areaCircle.on('mouseout', function() {
           this.tooltip.style('display', 'none');
+          this.tooltipBg.style('fill', areaColor);
+          areaCircle.transition().attr('r', Math.max(5, collabolatorsInBudgetArea.rows.length/3));
         }.bind(this))
       }
       this.tooltip.node().parentNode.appendChild(this.tooltip.node());
