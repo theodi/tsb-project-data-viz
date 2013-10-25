@@ -404,7 +404,8 @@ tsb.viz.collaborations = {
   },
   openLink: function(orgLabel, areaLabel) {
     var q = encodeURIComponent('"'+orgLabel+'"');
-    window.open(tsb.config.domain +
-      '/projects?utf8=✓&search_string='+q+'&budget_area_label%5B'+areaLabel+'%5D=true');
+    var url = tsb.config.domain +
+      '/projects?utf8=✓&search_string='+q+'&budget_area_label%5B'+areaLabel+'%5D=true'
+    window.open(url);
   },
 };
