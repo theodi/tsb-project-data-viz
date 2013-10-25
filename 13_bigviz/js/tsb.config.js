@@ -41,6 +41,7 @@ tsb.config.budgetAreaLabels = {
 };
 
 tsb.config.introVizBtnLabels = ['PRIORITY AREAS', 'REGIONS', 'COLLABORATIONS'];
+tsb.config.introVizBtnLinks = ['#priorityareas', '#regions', '#collaborations'];
 
 tsb.config.themes = {
   odiDark: {

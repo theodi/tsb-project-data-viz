@@ -244,48 +244,7 @@ tsb.viz.intro = {
       .text(function(d) { return tsb.config.introVizBtnLabels[d]; });
   },
   addKeyFacts: function() {
-    return;
-    var images = ['assets/priorityAreas.png', 'assets/regions.png', 'assets/collaborations.png'];
-    var colors = ['#2254F4', '#FF6700', '#EF3AAB'];
-    var links = ['#priorityareas', '#regions', '#collaborations'];
-
-    var imageSize = 240;
-    var margin = 160;
-    var spacing = (1160 - 2 * margin - images.length * imageSize) / (images.length - 1);
-    margin += (this.w - 1160) / 2
-    images.forEach(function(image, imageIndex) {
-      var keyFactBtn = this.svg.append('g');
-
-      keyFactBtn
-        .attr('class', 'keyFactBtn');
-
-      if (document.location.hash != '#introopened') {
-        keyFactBtn
-          .style('opacity', 0);
-      }
-
-      keyFactBtn.on('click', function() {
-        document.location.href = links[imageIndex];
-      })
-
-      keyFactBtn.append('image')
-        .attr('x', margin + (spacing + imageSize) * imageIndex)
-        .attr('y', this.h/2 - imageSize/2 + 30)
-        .attr('width', imageSize)
-        .attr('height', imageSize)
-        .attr('xlink:href', image);
-
-      keyFactBtn.append('text')
-        .attr('x', margin + (spacing + imageSize) * imageIndex + imageSize/2)
-        .attr('y', this.h/2 + 40)
-        .style('fill', colors[imageIndex])
-        .style('fill', '#333')
-        .style('font-size', '120%')
-        .style('font-weight', '200')
-        .attr('text-anchor', 'middle')
-        .text(labels[imageIndex])
-
-    }.bind(this))
+    console.log('ADD BUTTONS HERE');
   },
   showKeyFacts: function() {
     var maxWidth = this.maxWidth = tsb.common.getMaxWidth(this.w);
@@ -309,10 +268,6 @@ tsb.viz.intro = {
         this.titleScale = 0.5;
       }.bind(this));
 
-    this.svg.selectAll('.keyFactBtn')
-      .transition()
-      .delay(this.minimizeDelay + this.minimizeTime*1.5)
-      .duration(this.minimizeTime)
-      .style('opacity', 1)
+    //TODO: show buttons here
   }
 }
