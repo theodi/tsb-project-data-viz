@@ -40,6 +40,9 @@ function init() {
     else if (document.location.hash == '#regions') {
       currentViz = tsb.viz.regions;
     }
+    else if (document.location.hash == '#network') {
+      currentViz = tsb.viz.network;
+    }
     else {
       currentViz = tsb.viz.intro;
     }
