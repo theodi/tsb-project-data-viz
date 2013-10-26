@@ -6,15 +6,17 @@ tsb.viz.network = {
     this.w = w;
     this.h = h;
     this.institutionSize = 'small';
-    this.institutionTopCount = 5;
+    this.institutionTopCount = 6;
 
     this.force = d3.layout.force()
-      .charge(-70)
+      .charge(-50)
       .linkDistance(25)
       .size([w, h]);
 
     this.loadData();
     this.resize(this.w, this.h);
+
+    this.path = this.svg.append('g').selectAll('path.network');
   },
   organizationsByName: {},
   organizations: [],
@@ -101,6 +103,18 @@ tsb.viz.network = {
       .style('stroke', 'rgba(128, 90, 18, 0.1)')
       .style('stroke-width', 1);
 
+    var path = this.path;
+
+    var updateMesh = function() {
+      vertices = organizationsNodes.map(function(o) { return [o.x, o.y] });
+      path = path.data(d3.geom.delaunay(vertices).map(function(d) { return "M" + d.join("L") + "Z"; }), String);
+      path.exit().remove();
+      path.enter().append("path")
+        .style('fill', function(d, i) { return '#FFFFFF'; })
+        .style('stroke', function(d, i) { return 'rgba(255,0,0,0.2)'; })
+        .attr("d", String);
+    }
+
     this.force.on('tick', function() {
       organizationsConnections
         .attr('x1', function(d) { return d.source.x; })
@@ -111,6 +125,8 @@ tsb.viz.network = {
       organizationSites
         .attr('cx', function(d) { return d.x; })
         .attr('cy', function(d) { return d.y; });
+
+      updateMesh();
     });
   },
   resize: function(w, h) {
