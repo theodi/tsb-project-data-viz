@@ -155,7 +155,8 @@ tsb.SPARQLDataSource = (function() {
     PREFIX esize: <http://tsb-projects.labs.theodi.org/def/concept/enterprise-size/> \
     PREFIX rdf: <http://www.w3.org/2000/01/rdf-schema#> \
     PREFIX w3: <http://www.w3.org/ns/org#> \
-    SELECT ?org (count(?org) as ?numProjects) ?orgLabel ?orgRegion \
+    PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> \
+    SELECT ?org (count(?org) as ?numProjects) ?orgLabel ?orgRegion ?orgLat ?orgLng \
     WHERE { \
       ?org a tsb:Organization . \
       ?org rdf:label ?orgLabel . \
@@ -164,9 +165,11 @@ tsb.SPARQLDataSource = (function() {
       ?project rdf:label ?projectLabel . \
       ?org w3:hasSite ?orgSite . \
       ?orgSite tsb:region ?orgRegion . \
+      ?orgSite geo:lat ?orgLat . \
+      ?orgSite geo:long ?orgLng . \
       ?org tsb:enterpriseSize esize:"+size+" . \
     } \
-    GROUP BY ?org ?orgLabel ?orgRegion \
+    GROUP BY ?org ?orgLabel ?orgRegion ?orgLat ?orgLng\
     ";
     return this.query(q);
   }
@@ -182,7 +185,8 @@ tsb.SPARQLDataSource = (function() {
     PREFIX esize: <http://tsb-projects.labs.theodi.org/def/concept/enterprise-size/> \
     PREFIX rdf: <http://www.w3.org/2000/01/rdf-schema#> \
     PREFIX w3: <http://www.w3.org/ns/org#> \
-    select ?collaborator ?collaboratorLabel ?collaboratorSizeLabel ?budgetArea ?collaboratorRegion \
+    PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> \
+    select ?collaborator ?collaboratorLabel ?collaboratorSizeLabel ?budgetArea ?collaboratorRegion ?collaboratorLat ?collaboratorLng \
     where { \
          <" + orgId + "> tsb:participatesIn ?project . \
          ?org tsb:participatesIn ?project . \
@@ -194,9 +198,11 @@ tsb.SPARQLDataSource = (function() {
          ?collaborator tsb:enterpriseSize ?collaboratorSize . \
          ?collaborator w3:hasSite ?collaboratorSite . \
          ?collaboratorSite tsb:region ?collaboratorRegion . \
+         ?collaboratorSite geo:lat ?collaboratorLat . \
+         ?collaboratorSite geo:long ?collaboratorLng . \
          ?collaboratorSize rdf:label ?collaboratorSizeLabel . \
     } \
-    group by ?collaborator ?collaboratorLabel ?collaboratorSizeLabel ?budgetArea ?collaboratorRegion \
+    group by ?collaborator ?collaboratorLabel ?collaboratorSizeLabel ?budgetArea ?collaboratorRegion ?collaboratorLat ?collaboratorLng \
     ";
     return this.query(q);
   }
