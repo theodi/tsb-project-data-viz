@@ -6,11 +6,11 @@ tsb.viz.network = {
     this.w = w;
     this.h = h;
     this.institutionSize = 'small';
-    this.institutionTopCount = 12;
+    this.institutionTopCount = 5;
 
     this.force = d3.layout.force()
-      .charge(-20)
-      .linkDistance(5)
+      .charge(-70)
+      .linkDistance(25)
       .size([w, h]);
 
     this.loadData();
@@ -51,7 +51,8 @@ tsb.viz.network = {
   },
   buildViz: function(organizations) {
     var organizationsNodes = [];
-    var organizationsLinks = [];
+    var organizationsNodesLinks = [];
+    var organizationsNodesLinksMap = {};
     var organizationsByName = {};
 
 
@@ -60,24 +61,29 @@ tsb.viz.network = {
       organizationsByName[organization.orgLabel] = organization;
       organizationsNodes.push(organization);
       organization.collaborators.forEach(function(collaborator) {
-        console.log(collaborator.collaboratorLabel);
         if (organizationsByName[collaborator.collaboratorLabel]) {
-          collaborator = organizationsByName[collaborator.label];
+          collaborator = organizationsByName[collaborator.collaboratorLabel];
+          if (collaborator == organization) return;
         }
         else {
           collaborator.index = organizationsNodes.length;
           organizationsByName[collaborator.collaboratorLabel] = collaborator;
           organizationsNodes.push(collaborator);
         }
+        var linkHash = organization.index + '-' + collaborator.index;
+        if (!organizationsNodesLinksMap[linkHash]) {
+          organizationsNodesLinksMap[linkHash] = true;
+          organizationsNodesLinks.push({source:organization.index, target:collaborator.index});
+        }
       });
     });
 
     this.force
       .nodes(organizationsNodes)
-      .links(organizationsLinks)
+      .links(organizationsNodesLinks)
       .start();
 
-    var organizationSite = this.svg.selectAll('circle.organization')
+    var organizationSites = this.svg.selectAll('circle.organization')
       .data(organizationsNodes)
         .enter()
         .append('circle')
@@ -86,15 +92,24 @@ tsb.viz.network = {
         .attr('cy', function(d) { return d.y; })
         .attr('r', 3)
         .style('stroke', '#44FF00')
-        .style('fill', 'none');
+        .style('fill', 'none')
+
+    var organizationsConnections = this.svg.selectAll('.link')
+      .data(organizationsNodesLinks)
+      .enter().append('line')
+      .attr('class', 'link')
+      .style('stroke', 'rgba(128, 90, 18, 0.1)')
+      .style('stroke-width', 1);
 
     this.force.on('tick', function() {
-      // link.attr('x1', function(d) { return d.source.x; })
-      //   .attr('y1', function(d) { return d.source.y; })
-      //   .attr('x2', function(d) { return d.target.x; })
-      //   .attr('y2', function(d) { return d.target.y; });
+      organizationsConnections
+        .attr('x1', function(d) { return d.source.x; })
+        .attr('y1', function(d) { return d.source.y; })
+        .attr('x2', function(d) { return d.target.x; })
+        .attr('y2', function(d) { return d.target.y; });
 
-      organizationSite.attr('cx', function(d) { return d.x; })
+      organizationSites
+        .attr('cx', function(d) { return d.x; })
         .attr('cy', function(d) { return d.y; });
     });
   },
