@@ -69,12 +69,12 @@ tsb.viz.network = {
     collaboratorsDataSet.rows.forEach(function(collaboratorInfo) {
       collaboratorInfo.lat = Number(collaboratorInfo.lat);
       collaboratorInfo.lng = Number(collaboratorInfo.lng);
-      collaboratorInfo.x = this.lngX(collaboratorInfo.lng);
-      collaboratorInfo.y = this.latY(collaboratorInfo.lat);
+      collaboratorInfo.x = Math.random()*this.w;//this.lngX(collaboratorInfo.lng) + 15 * Math.random();
+      collaboratorInfo.y = Math.random()*this.h;//this.latY(collaboratorInfo.lat) + 15 * Math.random();
       collaboratorInfo.budgetAreaCode = tsb.common.extractBudgetAreaCode(collaboratorInfo.budgetArea);
-      this.organizationList.push([collaboratorInfo.x+Math.random(), collaboratorInfo.y+Math.random()]);
       if (!this.uniqueDots[collaboratorInfo.collaboratorLabel]) {
         this.uniqueDots[collaboratorInfo.collaboratorLabel] = true;
+        this.organizationList.push([collaboratorInfo.x, collaboratorInfo.y]);
         this.uniqueDotsCount++;
       }
       else {
@@ -85,11 +85,11 @@ tsb.viz.network = {
         .attr('cx', collaboratorInfo.x)
         .attr('cy', collaboratorInfo.y)
         .attr('r', function() {
-          if (collaboratorInfo.collaboratorSizeLabel == 'academic') return 2;
-          if (collaboratorInfo.collaboratorSizeLabel == 'large') return 3;
-          if (collaboratorInfo.collaboratorSizeLabel == 'medium') return 2;
-          if (collaboratorInfo.collaboratorSizeLabel == 'small') return 2;
-          if (collaboratorInfo.collaboratorSizeLabel == 'micro') return 1;
+          if (collaboratorInfo.collaboratorSizeLabel == 'academic') return 10;
+          if (collaboratorInfo.collaboratorSizeLabel == 'large') return 8;
+          if (collaboratorInfo.collaboratorSizeLabel == 'medium') return 6;
+          if (collaboratorInfo.collaboratorSizeLabel == 'small') return 5;
+          if (collaboratorInfo.collaboratorSizeLabel == 'micro') return 4;
           return '#666666'
         })
         .style('stroke', 'none')
@@ -111,16 +111,15 @@ tsb.viz.network = {
     var dlat = 56.291349-49.95122;
     this.lngX = d3.scale.linear()
       //.domain([-10.458984, 2.856445])
-      .domain([-5.458984, 2.856445])
-      .range([(w-h)/2, h*dlat/dlng+(w-h)/2]);
+      .domain([-5.458984, 1.3])
+      //.range([(w-h)/2, h*dlat/dlng+(w-h)/2]);
+      .range([0, w]);
     this.latY = d3.scale.linear()
       //.domain([61.291349, 49.95122])
-      .domain([56.291349, 49.95122])
+      .domain([57.291349, 49.95122])
       .range([0, h]);
   },
   updateMesh: function() {
-    console.log(this.organizationList.length);
-    return;
     this.path = this.path.data(d3.geom.delaunay(this.organizationList).map(function(d) { return "M" + d.join("L") + "Z"; }), String);
     this.path.exit().remove();
     this.path.enter().append("path")
