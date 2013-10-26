@@ -5,8 +5,8 @@ tsb.viz.network = {
     this.svg = svg;
     this.w = w;
     this.h = h;
-    this.institutionSize = 'academic';
-    this.institutionTopCount = 5;
+    this.institutionSize = 'small';
+    this.institutionTopCount = 12;
     this.loadData();
 
     this.resize(w, h);
@@ -54,7 +54,8 @@ tsb.viz.network = {
         .attr('cx', organization.x)
         .attr('cy', organization.y)
         .attr('r', 5)
-        .style('fill', 'red')
+        .style('stroke', '#44FF00')
+        .style('fill', 'none')
 
       tsb.state.dataSource.getOrganizationCollaborators(organization.org).then(function(data) {
         this.addCollaborators(organization, organizationGroup, 50, data);
@@ -83,8 +84,23 @@ tsb.viz.network = {
       var collaboratorSite = this.svg.append('circle')
         .attr('cx', collaboratorInfo.x)
         .attr('cy', collaboratorInfo.y)
-        .attr('r', 1)
-        .style('fill', 'blue')
+        .attr('r', function() {
+          if (collaboratorInfo.collaboratorSizeLabel == 'academic') return 2;
+          if (collaboratorInfo.collaboratorSizeLabel == 'large') return 3;
+          if (collaboratorInfo.collaboratorSizeLabel == 'medium') return 2;
+          if (collaboratorInfo.collaboratorSizeLabel == 'small') return 2;
+          if (collaboratorInfo.collaboratorSizeLabel == 'micro') return 1;
+          return '#666666'
+        })
+        .style('stroke', 'none')
+        .style('fill', function() {
+          if (collaboratorInfo.collaboratorSizeLabel == 'academic') return '#0DBC37';
+          if (collaboratorInfo.collaboratorSizeLabel == 'large') return '#00B7FF';
+          if (collaboratorInfo.collaboratorSizeLabel == 'medium') return '#1DD3A7';
+          if (collaboratorInfo.collaboratorSizeLabel == 'small') return '#F9BC26';
+          if (collaboratorInfo.collaboratorSizeLabel == 'micro') return '#FF6700';
+          return '#666666'
+        })
     }.bind(this));
     this.updateMesh();
   },
@@ -103,14 +119,14 @@ tsb.viz.network = {
       .range([0, h]);
   },
   updateMesh: function() {
-    this.path.selectAll('path').remove();
-    this.path = this.path.data(this.voronoi(this.organizationList), this.polygon);
+    console.log(this.organizationList.length);
+    return;
+    this.path = this.path.data(d3.geom.delaunay(this.organizationList).map(function(d) { return "M" + d.join("L") + "Z"; }), String);
     this.path.exit().remove();
-    this.path.enter().append('path')
+    this.path.enter().append("path")
       .style('fill', function(d, i) { return '#FFFFFF'; })
       .style('stroke', function(d, i) { return 'rgba(255,0,0,0.2)'; })
-      .attr('d', this.polygon);
-    this.path.order();
+      .attr("d", String);
   },
   polygon: function(d) {
     return 'M' + d.join('L') + 'Z';
