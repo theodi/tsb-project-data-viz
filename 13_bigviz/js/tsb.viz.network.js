@@ -6,11 +6,18 @@ tsb.viz.network = {
     this.w = w;
     this.h = h;
     this.institutionSize = 'academic';
-    this.institutionTopCount = 12;
+    this.institutionTopCount = 5;
     this.loadData();
 
     this.resize(w, h);
+
+    this.voronoi = d3.geom.voronoi()
+      .clipExtent([[0, 0], [this.w, this.h]])
+      //.x(function(d) { return d.x; })
+      //.y(function(d) { return d.y; })
+    this.path = this.svg.append('g').selectAll('path');
   },
+  organizationList: [],
   loadData: function() {
     tsb.state.dataSource.getInstitutions(this.institutionSize).then(function(data) {
       data.rows.forEach(function(row) {
@@ -33,6 +40,8 @@ tsb.viz.network = {
     organizations.forEach(function(organization, organizationIndex) {
       organization.x = this.lngX(organization.lng);
       organization.y = this.latY(organization.lat);
+
+      this.organizationList.push([organization.x, organization.y]);
 
       var x = this.w / 2;
       var y = this.h / 2;
@@ -62,6 +71,7 @@ tsb.viz.network = {
       collaboratorInfo.x = this.lngX(collaboratorInfo.lng);
       collaboratorInfo.y = this.latY(collaboratorInfo.lat);
       collaboratorInfo.budgetAreaCode = tsb.common.extractBudgetAreaCode(collaboratorInfo.budgetArea);
+      this.organizationList.push([collaboratorInfo.x+Math.random(), collaboratorInfo.y+Math.random()]);
       if (!this.uniqueDots[collaboratorInfo.collaboratorLabel]) {
         this.uniqueDots[collaboratorInfo.collaboratorLabel] = true;
         this.uniqueDotsCount++;
@@ -76,6 +86,7 @@ tsb.viz.network = {
         .attr('r', 1)
         .style('fill', 'blue')
     }.bind(this));
+    this.updateMesh();
   },
   resize: function(w, h) {
     this.w = w;
@@ -90,6 +101,19 @@ tsb.viz.network = {
       //.domain([61.291349, 49.95122])
       .domain([56.291349, 49.95122])
       .range([0, h]);
+  },
+  updateMesh: function() {
+    this.path.selectAll('path').remove();
+    this.path = this.path.data(this.voronoi(this.organizationList), this.polygon);
+    this.path.exit().remove();
+    this.path.enter().append('path')
+      .style('fill', function(d, i) { return '#FFFFFF'; })
+      .style('stroke', function(d, i) { return 'rgba(255,0,0,0.2)'; })
+      .attr('d', this.polygon);
+    this.path.order();
+  },
+  polygon: function(d) {
+    return 'M' + d.join('L') + 'Z';
   },
   close: function() {
 
