@@ -75,15 +75,15 @@ tsb.viz.network = {
         var linkHash = organization.index + '-' + collaborator.index;
         if (!organizationsNodesLinksMap[linkHash]) {
           organizationsNodesLinksMap[linkHash] = true;
-          organizationsNodesLinks.push({source:organization.index, target:collaborator.index});
+          organizationsNodesLinks.push({source:organization, target:collaborator});
         }
       });
     });
 
-    this.force
-      .nodes(organizationsNodes)
-      .links(organizationsNodesLinks)
-      .start();
+    //this.force
+    //  .nodes(organizationsNodes)
+    //  .links(organizationsNodesLinks)
+    //  .start();
 
     var organizationSites = this.svg.selectAll('circle.organization')
       .data(organizationsNodes)
@@ -100,8 +100,14 @@ tsb.viz.network = {
       .data(organizationsNodesLinks)
       .enter().append('line')
       .attr('class', 'link')
-      .style('stroke', 'rgba(128, 90, 18, 0.1)')
-      .style('stroke-width', 1);
+      .style('stroke', 'rgba(128, 90, 18, 0.5)')
+      .style('stroke-width', 1)
+      .attr('x1', function(d) { return d.source.x; })
+      .attr('y1', function(d) { return d.source.y; })
+      .attr('x2', function(d) { return d.target.x; })
+      .attr('y2', function(d) { return d.target.y; });
+
+      console.log(organizationsNodesLinks[0].source, organizationsNodesLinks[0].target)
 
     var path = this.path;
 
@@ -126,7 +132,7 @@ tsb.viz.network = {
         .attr('cx', function(d) { return d.x; })
         .attr('cy', function(d) { return d.y; });
 
-      updateMesh();
+      //updateMesh();
     });
   },
   resize: function(w, h) {
