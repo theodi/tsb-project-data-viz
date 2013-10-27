@@ -11,13 +11,13 @@ tsb.viz.network = {
     this.loadData();
     this.resize(this.w, this.h);
 
-    this.path = this.svg.append('g').selectAll('path.network');
-
     this.bg = svg
     .append('rect')
     .attr('class', 'bg')
     .attr('width', tsb.state.w).attr('height', tsb.state.h)
     .attr('fill', '#FFFFFF');
+
+    this.path = this.svg.append('g').selectAll('path.network');
   },
   organizationsByName: {},
   organizations: [],
@@ -50,7 +50,7 @@ tsb.viz.network = {
               projectsMap[collaborator.project].participantCount++;
             }
             var angle = Math.PI*2*projectsMap[collaborator.project].index/90;
-            var r = 50 + 160 * projectsMap[collaborator.project].participantCount / 10;
+            var r = 50 + 120 * projectsMap[collaborator.project].participantCount / 10;
             collaborator.x = organization.x + r * Math.cos(angle);
             collaborator.y = organization.y + r * Math.sin(angle);
           })
@@ -192,8 +192,34 @@ tsb.viz.network = {
     });
 
     var path = this.path;
+    var self = this;
+
+    var polygon = function(d) {
+      return 'M' + d.join('L') + 'Z';
+    }
 
     var updateMesh = function(parentOrg) {
+      path.selectAll('path.bla').remove();
+      var polygons = self.voronoi(organizationsNodes);
+      polygons2 = polygons.filter(function(polys) {
+        var reject = false;
+        polys.forEach(function(poly) {
+          if (isNaN(poly[0]) || isNaN(poly[1])) {
+            reject = true;
+          }
+        })
+        return !reject;
+      });
+      console.log('polygons', polygons.length);
+      path = path.data(polygons, polygon);
+      path.exit().remove();
+      path.enter().append('path')
+        .style('fill', function(d, i) { return 'none'; })
+        .style('stroke', function(d, i) { return 'rgba(0,0,0,0.22)'; })
+        .attr('d', polygon);
+      path.order();
+    }
+      /*
       var links = self.voronoi.links(organizationsNodes.filter(function(o) {
         return !parentOrg || o == parentOrg || o.parentOrg == parentOrg;
       }));
@@ -209,10 +235,11 @@ tsb.viz.network = {
         .attr('y1', function(d) { return d.source.y; })
         .attr('x2', function(d) { return d.target.x; })
         .attr('y2', function(d) { return d.target.y; });
-    }
+      */
+    //}
 
-    setInterval(updateMesh, 1000/30)
-    //updateMesh();
+    //setInterval(updateMesh, 1000)
+    updateMesh();
 
 
     this.force.on('tick', function() {
