@@ -6,7 +6,11 @@ tsb.viz.network = {
     this.w = w;
     this.h = h;
     this.institutionSize = 'academic';
-    this.institutionTopCount = 5;
+    this.institutionTopCount = 3;
+    this.maxNumProjects = 120;
+    this.minR = 50;
+    this.maxR = 160;
+    this.dotScale = 20;
 
     this.loadData();
     this.resize(this.w, this.h);
@@ -45,21 +49,23 @@ tsb.viz.network = {
             if (!projectsMap[collaborator.project]) {
               projectsMap[collaborator.project] = {
                 index: ++numProjects,
-                participantCount: 1
+                participantCount: 1,
+                participants: []
               }
             }
             else {
               projectsMap[collaborator.project].participantCount++;
             }
             collaborator.projectInfo = projectsMap[collaborator.project];
-            var angle = Math.PI*2*projectsMap[collaborator.project].index/120;
-            var r = 50 + 60 * projectsMap[collaborator.project].participantCount / 10;
+            collaborator.projectInfo.participants.push(collaborator);
+            var angle = Math.PI*2*projectsMap[collaborator.project].index/this.maxNumProjects;
+            var r = this.minR + this.maxR * projectsMap[collaborator.project].participantCount / 10;
             collaborator.x = organization.x + r * Math.cos(angle);
             collaborator.y = organization.y + r * Math.sin(angle);
             if (collaborator.project == 'http://tsb-projects.labs.theodi.org/id/project/100184') {
               console.log('dot', collaborator);
             }
-          })
+          }.bind(this))
           organization.collaborators = data.rows;
           if (++loadedCollabolators == organizationList.length) {
             this.buildViz(organizationList);
@@ -102,7 +108,7 @@ tsb.viz.network = {
       organizationsByName[organization.orgLabel] = organization;
       organizationsNodes.push(organization);
       organization.collaborators.forEach(function(collaborator) {
-        if (organizationsByName[collaborator.collaboratorLabel]) {
+        if (false && organizationsByName[collaborator.collaboratorLabel]) {
           collaborator = organizationsByName[collaborator.collaboratorLabel];
           if (collaborator == organization) return;
         }
@@ -153,16 +159,14 @@ tsb.viz.network = {
         .attr('cx', function(d) { return d.x; }.bind(this))
         .attr('cy', function(d) { return d.y; }.bind(this))
         .attr('r', function(d) {
-
           if (d.org) return 20;
-          return 0;
-          if (d.sizeLabel == 'academic') return 10/5;
-          if (d.sizeLabel == 'large') return 8/5;
-          if (d.sizeLabel == 'medium') return 6/5;
-          if (d.sizeLabel == 'small') return 5/5;
-          if (d.sizeLabel == 'micro') return 4/5;
+          if (d.sizeLabel == 'academic') return 10/this.dotScale;
+          if (d.sizeLabel == 'large') return 8/this.dotScale;
+          if (d.sizeLabel == 'medium') return 6/this.dotScale;
+          if (d.sizeLabel == 'small') return 5/this.dotScale;
+          if (d.sizeLabel == 'micro') return 4/this.dotScale;
           return '0'
-        })
+        }.bind(this))
         .style('stroke', 'none')
         .style('fill', function(d) {
           return 'white';
@@ -175,6 +179,7 @@ tsb.viz.network = {
           return '#666666'
         })
         .style('opacity', 1)
+        .attr('test', function(d) { d.node = this;})
     organizationSites.each(function(d) {
       d.node = this;
     })
@@ -185,6 +190,15 @@ tsb.viz.network = {
       this.tooltipText.text(d.collaboratorLabel + ' / ' + d.projectInfo.participantCount);
       console.log(d.project);
       this.tooltipBg.style('fill', 'black')
+
+      console.log(d.projectInfo.participants);
+      //this.svg.selectAll('circle.debug').data(d.projectInfo.participants)
+      //  .enter().append('circle')
+      //  .attr('cx', function(d) { return d.x })
+      //  .attr('cy', function(d) { return d.y })
+      //  .attr('r', 10)
+      //  .attr('stroke', 'blue')
+      //  .attr('fill', 'blue')
     }.bind(this))
 
     organizationSites.on('mouseout', function() {
