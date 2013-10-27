@@ -6,7 +6,7 @@ tsb.viz.network = {
     this.w = w;
     this.h = h;
     this.institutionSize = 'academic';
-    this.institutionTopCount = 6;
+    this.institutionTopCount = 12;
 
     this.loadData();
     this.resize(this.w, this.h);
@@ -45,6 +45,13 @@ tsb.viz.network = {
       row.ox = row.x;
       row.oy = row.y;
       row.sizeLabel = row.orgSizeLabel || row.collaboratorSizeLabel;
+      if (row.budgetArea) {
+        row.budgetAreaCode = tsb.common.extractBudgetAreaCode(row.budgetArea);
+        row.budgetAreaColor = tsb.config.themes.current.budgetAreaColor[row.budgetAreaCode];
+      }
+      else {
+        row.budgetAreaColor = '#444444';
+      }
       if (row.numProjects) row.numProjects = Number(row.numProjects);
       if (row.org) row.id = row.org.substr(row.org.lastIndexOf('/')+1)
     }.bind(this));
@@ -102,15 +109,17 @@ tsb.viz.network = {
         .attr('cx', function(d) { return d.x; })
         .attr('cy', function(d) { return d.y; })
         .attr('r', function(d) {
-          if (d.sizeLabel == 'academic') return 10;
-          if (d.sizeLabel == 'large') return 8;
-          if (d.sizeLabel == 'medium') return 6;
-          if (d.sizeLabel == 'small') return 5;
-          if (d.sizeLabel == 'micro') return 4;
+          if (d.org) return 20;
+          if (d.sizeLabel == 'academic') return 10/2;
+          if (d.sizeLabel == 'large') return 8/2;
+          if (d.sizeLabel == 'medium') return 6/2;
+          if (d.sizeLabel == 'small') return 5/2;
+          if (d.sizeLabel == 'micro') return 4/2;
           return '0'
         })
         .style('stroke', 'none')
         .style('fill', function(d) {
+          return d.budgetAreaColor;
           if (d.sizeLabel == 'academic') return '#0DBC37';
           if (d.sizeLabel == 'large') return '#00B7FF';
           if (d.sizeLabel == 'medium') return '#1DD3A7';
@@ -118,6 +127,11 @@ tsb.viz.network = {
           if (d.sizeLabel == 'micro') return '#FF6700';
           return '#666666'
         })
+        .transition()
+        .delay(100)
+        .duration(2000)
+        .attr('cx', function(d) { return d.x = Math.random()*this.w; }.bind(this))
+        .attr('cy', function(d) { return d.y = Math.random()*this.h; }.bind(this))
 
     var organizationsConnections = this.svg.selectAll('.link')
       .data(organizationsNodesLinks)
@@ -125,8 +139,6 @@ tsb.viz.network = {
       .attr('class', 'link')
       //.style('stroke', 'rgba(128, 90, 18, 0.5)')
       .style('stroke-width', 1)
-
-      console.log(organizationsNodesLinks[0].source, organizationsNodesLinks[0].target)
 
     var path = this.path;
 
@@ -139,6 +151,8 @@ tsb.viz.network = {
         .style('stroke', function(d, i) { return 'rgba(255,0,0,0.2)'; })
         .attr("d", String);
     }
+
+    updateMesh()
 
     this.force.on('tick', function() {
       organizationsConnections
