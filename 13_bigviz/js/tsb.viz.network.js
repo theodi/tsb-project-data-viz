@@ -5,7 +5,7 @@ tsb.viz.network = {
     this.svg = svg;
     this.w = w;
     this.h = h;
-    this.institutionSize = 'small';
+    this.institutionSize = 'academic';
     this.institutionTopCount = 6;
 
     this.loadData();
@@ -34,8 +34,12 @@ tsb.viz.network = {
       organizationList.forEach(function(organization, organizationIndex) {
         tsb.state.dataSource.getOrganizationCollaborators(organization.org).then(function(data) {
           this.processRows(data.rows);
-          data.rows.forEach(function(collaborator) {
+          data.rows.forEach(function(collaborator, i) {
             collaborator.parentOrg = organization;
+            var angle = 2*Math.PI * i/data.rows.length
+            var r = 40 + 80 * Math.random();
+            collaborator.x = organization.x + r * Math.cos(angle);
+            collaborator.y = organization.y + r * Math.sin(angle);
           })
           organization.collaborators = data.rows;
           if (++loadedCollabolators == organizationList.length) {
@@ -51,8 +55,10 @@ tsb.viz.network = {
       row.lng = Number(row.lng);
       row.x = this.lngX(row.lng);
       row.y = this.latY(row.lat);
-      row.x = Math.random()*this.w;
-      row.y = Math.random()*this.h;
+      row.x = 100+Math.random()*(this.w-200);
+      row.y = 50+Math.random()*(this.h-100);
+      row.x = this.w/2;
+      row.y = this.h/2;
       row.sizeLabel = row.orgSizeLabel || row.collaboratorSizeLabel;
       if (row.budgetArea) {
         row.budgetAreaCode = tsb.common.extractBudgetAreaCode(row.budgetArea);
@@ -146,17 +152,17 @@ tsb.viz.network = {
           if (d.sizeLabel == 'micro') return '#FF6700';
           return '#666666'
         })
-        .style('opacity', 0)
+        .style('opacity', 1)
     organizationSites.each(function(d) {
       d.node = this;
     })
-    organizationSites.transition()
-        .delay(function(d) {
-          if (d.org) return 0;
-          else return Math.random() * 10000;
-        })
-        .duration(1000)
-        .style('opacity', 1)
+    //organizationSites.transition()
+    //    .delay(function(d) {
+    //      if (d.org) return 0;
+    //      else return Math.random() * 10000;
+    //    })
+    //    .duration(1000)
+    //    .style('opacity', 1)
 
     organizationSites.on('mouseenter', function(parentOrg) {
       if (parentOrg.org) {
@@ -176,12 +182,12 @@ tsb.viz.network = {
 
     var updateMesh = function(parentOrg) {
       var links = self.voronoi.links(organizationsNodes.filter(function(o) {
-        return o == parentOrg || o.parentOrg == parentOrg;
+        return !parentOrg || o == parentOrg || o.parentOrg == parentOrg;
       }));
       lines = lines.data(links);
       lines.exit().remove();
       lines.enter().append('line')
-        .style('stroke', 'rgba(255, 255, 255, 0.5)')
+        .style('stroke', 'rgba(255, 255, 255, 0.75)')
         .style('stroke-width', 1)
         .attr('class', 'link')
       lines
@@ -193,7 +199,7 @@ tsb.viz.network = {
     }
 
     //setInterval(updateMesh, 1000/30)
-    //updateMesh();
+    updateMesh();
 
 
     this.force.on('tick', function() {
