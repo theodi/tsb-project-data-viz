@@ -201,20 +201,22 @@ tsb.viz.network = {
     var updateMesh = function(parentOrg) {
       path.selectAll('path.bla').remove();
       var polygons = self.voronoi(organizationsNodes);
-      polygons = polygons.filter(function(polys) {
-        var reject = false;
-        polys.forEach(function(poly) {
-          if (isNaN(poly[0]) || isNaN(poly[1])) {
-            reject = true;
-          }
-        })
-        return !reject && polys.length != 0;
-      });
+      //polygons = polygons.filter(function(polys) {
+      //  var reject = false;
+      //  polys.forEach(function(poly) {
+      //    if (isNaN(poly[0]) || isNaN(poly[1])) {
+      //      reject = true;
+      //    }
+      //  })
+      //  return !reject && polys.length != 0;
+      //});
       console.log('polygons', polygons.length);
       path = path.data(polygons, polygon);
       path.exit().remove();
       path.enter().append('path')
-        .style('fill', function(d, i) { return '#44DD00'; })
+        .style('fill', function(d, i) {
+          return d3.rgb(organizationsNodes[i].budgetAreaColor).darker(0.5 * Math.random());
+         })
         .style('stroke', function(d, i) { return 'rgba(255,255,0,0.22)'; })
         .attr('d', polygon);
       path.order();
