@@ -48,8 +48,8 @@ tsb.viz.network = {
       row.lng = Number(row.lng);
       row.x = this.lngX(row.lng);
       row.y = this.latY(row.lat);
-      row.ox = Math.random()*this.w;
-      row.oy = Math.random()*this.h;
+      row.x = Math.random()*this.w;
+      row.y = Math.random()*this.h;
       row.sizeLabel = row.orgSizeLabel || row.collaboratorSizeLabel;
       if (row.budgetArea) {
         row.budgetAreaCode = tsb.common.extractBudgetAreaCode(row.budgetArea);
@@ -129,8 +129,8 @@ tsb.viz.network = {
         .attr('class', 'node')
         //.attr('cx', function(d) { return d.x; })
         //.attr('cy', function(d) { return d.y; })
-        .attr('cx', function(d) { return d.ox; }.bind(this))
-        .attr('cy', function(d) { return d.oy; }.bind(this))
+        .attr('cx', function(d) { return d.x; }.bind(this))
+        .attr('cy', function(d) { return d.y; }.bind(this))
         .attr('r', function(d) {
           if (d.org) return 20;
           if (d.sizeLabel == 'academic') return 10/2;
