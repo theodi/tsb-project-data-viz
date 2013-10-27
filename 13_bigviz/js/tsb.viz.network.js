@@ -6,7 +6,7 @@ tsb.viz.network = {
     this.w = w;
     this.h = h;
     this.institutionSize = 'academic';
-    this.institutionTopCount = 6;
+    this.institutionTopCount = 1;
 
     this.loadData();
     this.resize(this.w, this.h);
@@ -31,13 +31,24 @@ tsb.viz.network = {
 
       var organizationList = tsb.common.inital(data.rows, this.institutionTopCount);
       var loadedCollabolators = 0;
+      var projectsMap = {};
+      var numProjects = 0;
       organizationList.forEach(function(organization, organizationIndex) {
         tsb.state.dataSource.getOrganizationCollaborators(organization.org).then(function(data) {
           this.processRows(data.rows);
           data.rows.forEach(function(collaborator, i) {
             collaborator.parentOrg = organization;
-            var angle = 2*Math.PI * i/data.rows.length
-            var r = 140 + 160 * Math.random();
+            if (!projectsMap[collaborator.project]) {
+              projectsMap[collaborator.project] = {
+                index: ++numProjects,
+                participantCount: 1
+              }
+            }
+            else {
+              projectsMap[collaborator.project].participantCount++;
+            }
+            var angle = Math.PI*2*projectsMap[collaborator.project].index/90;
+            var r = 70 + 160 * projectsMap[collaborator.project].participantCount / 10;
             collaborator.x = organization.x + r * Math.cos(angle);
             collaborator.y = organization.y + r * Math.sin(angle);
           })
@@ -57,8 +68,8 @@ tsb.viz.network = {
       row.y = this.latY(row.lat);
       row.x = 100+Math.random()*(this.w-200);
       row.y = 50+Math.random()*(this.h-100);
-      //row.x = this.w/2;
-      //row.y = this.h/2;
+      row.x = this.w/2;
+      row.y = this.h/2;
       row.sizeLabel = row.orgSizeLabel || row.collaboratorSizeLabel;
       if (row.budgetArea) {
         row.budgetAreaCode = tsb.common.extractBudgetAreaCode(row.budgetArea);

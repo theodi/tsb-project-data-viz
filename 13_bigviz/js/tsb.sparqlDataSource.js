@@ -186,7 +186,7 @@ tsb.SPARQLDataSource = (function() {
     PREFIX rdf: <http://www.w3.org/2000/01/rdf-schema#> \
     PREFIX w3: <http://www.w3.org/ns/org#> \
     PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> \
-    select ?collaborator ?collaboratorLabel ?collaboratorSizeLabel ?budgetArea ?collaboratorRegion (?collaboratorLat as ?lat) (?collaboratorLng as ?lng) \
+    select ?collaborator ?collaboratorLabel ?collaboratorSizeLabel ?budgetArea ?collaboratorRegion (?collaboratorLat as ?lat) (?collaboratorLng as ?lng) ?project \
     where { \
          <" + orgId + "> tsb:participatesIn ?project . \
          ?org tsb:participatesIn ?project . \
@@ -202,7 +202,7 @@ tsb.SPARQLDataSource = (function() {
          ?collaboratorSite geo:long ?collaboratorLng . \
          ?collaboratorSize rdf:label ?collaboratorSizeLabel . \
     } \
-    group by ?collaborator ?collaboratorLabel ?collaboratorSizeLabel ?budgetArea ?collaboratorRegion ?collaboratorLat ?collaboratorLng \
+    group by ?collaborator ?collaboratorLabel ?collaboratorSizeLabel ?budgetArea ?collaboratorRegion ?collaboratorLat ?collaboratorLng ?project \
     ";
     return this.query(q);
   }
