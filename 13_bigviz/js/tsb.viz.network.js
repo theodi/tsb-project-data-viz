@@ -5,7 +5,7 @@ tsb.viz.network = {
     this.svg = svg;
     this.w = w;
     this.h = h;
-    this.institutionSize = 'small';
+    this.institutionSize = 'academic';
     this.institutionTopCount = 6;
 
     this.loadData();
@@ -44,6 +44,7 @@ tsb.viz.network = {
       row.y = this.latY(row.lat);
       row.ox = row.x;
       row.oy = row.y;
+      row.sizeLabel = row.orgSizeLabel || row.collaboratorSizeLabel;
       if (row.numProjects) row.numProjects = Number(row.numProjects);
       if (row.org) row.id = row.org.substr(row.org.lastIndexOf('/')+1)
     }.bind(this));
@@ -88,9 +89,9 @@ tsb.viz.network = {
       })
       .size([this.w, this.h]);
 
-    this.force
-      .nodes(organizationsNodes)
-      .links(organizationsNodesLinks)
+    //this.force
+      //.nodes(organizationsNodes)
+      //.links(organizationsNodesLinks)
       //.start();
 
     var organizationSites = this.svg.selectAll('circle.organization')
@@ -100,9 +101,23 @@ tsb.viz.network = {
         .attr('class', 'node')
         .attr('cx', function(d) { return d.x; })
         .attr('cy', function(d) { return d.y; })
-        .attr('r', 3)
-        .style('stroke', '#44FF00')
-        .style('fill', 'none')
+        .attr('r', function(d) {
+          if (d.sizeLabel == 'academic') return 10;
+          if (d.sizeLabel == 'large') return 8;
+          if (d.sizeLabel == 'medium') return 6;
+          if (d.sizeLabel == 'small') return 5;
+          if (d.sizeLabel == 'micro') return 4;
+          return '0'
+        })
+        .style('stroke', 'none')
+        .style('fill', function(d) {
+          if (d.sizeLabel == 'academic') return '#0DBC37';
+          if (d.sizeLabel == 'large') return '#00B7FF';
+          if (d.sizeLabel == 'medium') return '#1DD3A7';
+          if (d.sizeLabel == 'small') return '#F9BC26';
+          if (d.sizeLabel == 'micro') return '#FF6700';
+          return '#666666'
+        })
 
     var organizationsConnections = this.svg.selectAll('.link')
       .data(organizationsNodesLinks)
