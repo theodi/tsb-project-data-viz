@@ -5,7 +5,7 @@ tsb.viz.network = {
     this.svg = svg;
     this.w = w;
     this.h = h;
-    this.institutionSize = 'academic';
+    this.institutionSize = 'small';
     this.institutionTopCount = 6;
 
     this.loadData();
@@ -116,14 +116,7 @@ tsb.viz.network = {
       .y(function(d) { return d.y; })
 
     var self = this;
-    var links = self.voronoi.links(organizationsNodes);
-    var lines = self.svg.selectAll('line.link')
-        .data(links);
-    lines.exit().remove();
-      lines.enter().append('line')
-        .style('stroke', 'rgba(255, 255, 255, 0.5)')
-        .style('stroke-width', 1)
-        .attr('class', 'link')
+    var lines = self.svg.append('g').selectAll('line.link');
 
     var organizationSites = this.svg.selectAll('circle.organization')
       .data(organizationsNodes)
@@ -167,6 +160,8 @@ tsb.viz.network = {
 
     organizationSites.on('mouseenter', function(parentOrg) {
       if (parentOrg.org) {
+        updateMesh(parentOrg);
+        return;
         organizationSites.transition()
           .style('opacity', function(d) {
             return (d == parentOrg || d.parentOrg == parentOrg) ? 1 : 0.2;
@@ -179,16 +174,25 @@ tsb.viz.network = {
 
     var path = this.path;
 
-    var updateMesh = function() {
+    var updateMesh = function(parentOrg) {
+      var links = self.voronoi.links(organizationsNodes.filter(function(o) {
+        return o == parentOrg || o.parentOrg == parentOrg;
+      }));
+      lines = lines.data(links);
+      lines.exit().remove();
+      lines.enter().append('line')
+        .style('stroke', 'rgba(255, 255, 255, 0.5)')
+        .style('stroke-width', 1)
+        .attr('class', 'link')
       lines
-        .style('opacity', function(d) { return Math.min(d.source.node.style.opacity, d.target.node.style.opacity) })
+        .style('opacity', function(d) { return 1; return Math.min(d.source.node.style.opacity, d.target.node.style.opacity) })
         .attr('x1', function(d) { return d.source.x; })
         .attr('y1', function(d) { return d.source.y; })
         .attr('x2', function(d) { return d.target.x; })
         .attr('y2', function(d) { return d.target.y; });
     }
 
-    setInterval(updateMesh, 1000/30)
+    //setInterval(updateMesh, 1000/30)
     //updateMesh();
 
 
