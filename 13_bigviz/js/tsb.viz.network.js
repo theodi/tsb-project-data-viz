@@ -6,7 +6,7 @@ tsb.viz.network = {
     this.w = w;
     this.h = h;
     this.institutionSize = 'academic';
-    this.institutionTopCount = 3;
+    this.institutionTopCount = 2;
 
     this.loadData();
     this.resize(this.w, this.h);
@@ -32,7 +32,7 @@ tsb.viz.network = {
       var organizationList = tsb.common.inital(data.rows, this.institutionTopCount);
       var loadedCollabolators = 0;
       organizationList.forEach(function(organization, organizationIndex) {
-        organization.x = this.w/4 + organizationIndex * this.w/4;
+        organization.x = this.w/(this.institutionTopCount+1) + organizationIndex * this.w/(this.institutionTopCount+1);
 
         var projectsMap = {};
         var numProjects = 0;
@@ -49,8 +49,8 @@ tsb.viz.network = {
             else {
               projectsMap[collaborator.project].participantCount++;
             }
-            var angle = Math.PI*2*projectsMap[collaborator.project].index/90;
-            var r = 50 + 120 * projectsMap[collaborator.project].participantCount / 10;
+            var angle = Math.PI*2*projectsMap[collaborator.project].index/110;
+            var r = 50 + 260 * projectsMap[collaborator.project].participantCount / 10;
             collaborator.x = organization.x + r * Math.cos(angle);
             collaborator.y = organization.y + r * Math.sin(angle);
           })
@@ -201,21 +201,21 @@ tsb.viz.network = {
     var updateMesh = function(parentOrg) {
       path.selectAll('path.bla').remove();
       var polygons = self.voronoi(organizationsNodes);
-      polygons2 = polygons.filter(function(polys) {
+      polygons = polygons.filter(function(polys) {
         var reject = false;
         polys.forEach(function(poly) {
           if (isNaN(poly[0]) || isNaN(poly[1])) {
             reject = true;
           }
         })
-        return !reject;
+        return !reject && polys.length != 0;
       });
       console.log('polygons', polygons.length);
       path = path.data(polygons, polygon);
       path.exit().remove();
       path.enter().append('path')
-        .style('fill', function(d, i) { return 'none'; })
-        .style('stroke', function(d, i) { return 'rgba(0,0,0,0.22)'; })
+        .style('fill', function(d, i) { return '#44DD00'; })
+        .style('stroke', function(d, i) { return 'rgba(255,255,0,0.22)'; })
         .attr('d', polygon);
       path.order();
     }
