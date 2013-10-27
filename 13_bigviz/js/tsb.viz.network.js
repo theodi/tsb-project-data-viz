@@ -37,7 +37,7 @@ tsb.viz.network = {
           data.rows.forEach(function(collaborator, i) {
             collaborator.parentOrg = organization;
             var angle = 2*Math.PI * i/data.rows.length
-            var r = 40 + 80 * Math.random();
+            var r = 140 + 160 * Math.random();
             collaborator.x = organization.x + r * Math.cos(angle);
             collaborator.y = organization.y + r * Math.sin(angle);
           })
@@ -57,8 +57,8 @@ tsb.viz.network = {
       row.y = this.latY(row.lat);
       row.x = 100+Math.random()*(this.w-200);
       row.y = 50+Math.random()*(this.h-100);
-      row.x = this.w/2;
-      row.y = this.h/2;
+      //row.x = this.w/2;
+      //row.y = this.h/2;
       row.sizeLabel = row.orgSizeLabel || row.collaboratorSizeLabel;
       if (row.budgetArea) {
         row.budgetAreaCode = tsb.common.extractBudgetAreaCode(row.budgetArea);
@@ -198,8 +198,8 @@ tsb.viz.network = {
         .attr('y2', function(d) { return d.target.y; });
     }
 
-    //setInterval(updateMesh, 1000/30)
-    updateMesh();
+    setInterval(updateMesh, 1000/30)
+    //updateMesh();
 
 
     this.force.on('tick', function() {
