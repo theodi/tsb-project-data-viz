@@ -6,7 +6,7 @@ tsb.viz.network = {
     this.w = w;
     this.h = h;
     this.institutionSize = 'academic';
-    this.institutionTopCount = 1;
+    this.institutionTopCount = 3;
 
     this.loadData();
     this.resize(this.w, this.h);
@@ -17,7 +17,7 @@ tsb.viz.network = {
     .append('rect')
     .attr('class', 'bg')
     .attr('width', tsb.state.w).attr('height', tsb.state.h)
-    .attr('fill', '#08DEF9');
+    .attr('fill', '#FFFFFF');
   },
   organizationsByName: {},
   organizations: [],
@@ -31,9 +31,11 @@ tsb.viz.network = {
 
       var organizationList = tsb.common.inital(data.rows, this.institutionTopCount);
       var loadedCollabolators = 0;
-      var projectsMap = {};
-      var numProjects = 0;
       organizationList.forEach(function(organization, organizationIndex) {
+        organization.x = this.w/4 + organizationIndex * this.w/4;
+
+        var projectsMap = {};
+        var numProjects = 0;
         tsb.state.dataSource.getOrganizationCollaborators(organization.org).then(function(data) {
           this.processRows(data.rows);
           data.rows.forEach(function(collaborator, i) {
@@ -48,7 +50,7 @@ tsb.viz.network = {
               projectsMap[collaborator.project].participantCount++;
             }
             var angle = Math.PI*2*projectsMap[collaborator.project].index/90;
-            var r = 70 + 160 * projectsMap[collaborator.project].participantCount / 10;
+            var r = 50 + 160 * projectsMap[collaborator.project].participantCount / 10;
             collaborator.x = organization.x + r * Math.cos(angle);
             collaborator.y = organization.y + r * Math.sin(angle);
           })
@@ -198,7 +200,7 @@ tsb.viz.network = {
       lines = lines.data(links);
       lines.exit().remove();
       lines.enter().append('line')
-        .style('stroke', 'rgba(255, 255, 255, 0.75)')
+        .style('stroke', 'rgba(0, 0, 0, 0.15)')
         .style('stroke-width', 1)
         .attr('class', 'link')
       lines
