@@ -6,7 +6,7 @@ tsb.viz.network = {
     this.w = w;
     this.h = h;
     this.institutionSize = 'academic';
-    this.institutionTopCount = 2;
+    this.institutionTopCount = 5;
 
     this.loadData();
     this.resize(this.w, this.h);
@@ -18,6 +18,8 @@ tsb.viz.network = {
     .attr('fill', '#FFFFFF');
 
     this.path = this.svg.append('g').selectAll('path.network');
+
+    this.addToolTip();
   },
   organizationsByName: {},
   organizations: [],
@@ -34,10 +36,10 @@ tsb.viz.network = {
       organizationList.forEach(function(organization, organizationIndex) {
         organization.x = this.w/(this.institutionTopCount+1) + organizationIndex * this.w/(this.institutionTopCount+1);
 
-        var projectsMap = {};
-        var numProjects = 0;
         tsb.state.dataSource.getOrganizationCollaborators(organization.org).then(function(data) {
           this.processRows(data.rows);
+          var projectsMap = {};
+          var numProjects = 0;
           data.rows.forEach(function(collaborator, i) {
             collaborator.parentOrg = organization;
             if (!projectsMap[collaborator.project]) {
@@ -49,10 +51,14 @@ tsb.viz.network = {
             else {
               projectsMap[collaborator.project].participantCount++;
             }
-            var angle = Math.PI*2*projectsMap[collaborator.project].index/110;
-            var r = 50 + 260 * projectsMap[collaborator.project].participantCount / 10;
+            collaborator.projectInfo = projectsMap[collaborator.project];
+            var angle = Math.PI*2*projectsMap[collaborator.project].index/120;
+            var r = 50 + 60 * projectsMap[collaborator.project].participantCount / 10;
             collaborator.x = organization.x + r * Math.cos(angle);
             collaborator.y = organization.y + r * Math.sin(angle);
+            if (collaborator.project == 'http://tsb-projects.labs.theodi.org/id/project/100184') {
+              console.log('dot', collaborator);
+            }
           })
           organization.collaborators = data.rows;
           if (++loadedCollabolators == organizationList.length) {
@@ -147,16 +153,19 @@ tsb.viz.network = {
         .attr('cx', function(d) { return d.x; }.bind(this))
         .attr('cy', function(d) { return d.y; }.bind(this))
         .attr('r', function(d) {
+
           if (d.org) return 20;
-          if (d.sizeLabel == 'academic') return 10/2;
-          if (d.sizeLabel == 'large') return 8/2;
-          if (d.sizeLabel == 'medium') return 6/2;
-          if (d.sizeLabel == 'small') return 5/2;
-          if (d.sizeLabel == 'micro') return 4/2;
+          return 0;
+          if (d.sizeLabel == 'academic') return 10/5;
+          if (d.sizeLabel == 'large') return 8/5;
+          if (d.sizeLabel == 'medium') return 6/5;
+          if (d.sizeLabel == 'small') return 5/5;
+          if (d.sizeLabel == 'micro') return 4/5;
           return '0'
         })
         .style('stroke', 'none')
         .style('fill', function(d) {
+          return 'white';
           return d.budgetAreaColor;
           if (d.sizeLabel == 'academic') return '#0DBC37';
           if (d.sizeLabel == 'large') return '#00B7FF';
@@ -169,27 +178,18 @@ tsb.viz.network = {
     organizationSites.each(function(d) {
       d.node = this;
     })
-    //organizationSites.transition()
-    //    .delay(function(d) {
-    //      if (d.org) return 0;
-    //      else return Math.random() * 10000;
-    //    })
-    //    .duration(1000)
-    //    .style('opacity', 1)
 
-    organizationSites.on('mouseenter', function(parentOrg) {
-      if (parentOrg.org) {
-        updateMesh(parentOrg);
-        return;
-        organizationSites.transition()
-          .style('opacity', function(d) {
-            return (d == parentOrg || d.parentOrg == parentOrg) ? 1 : 0.2;
-          })
-      }
-    })
-    organizationSites.on('mouseleave', function(d) {
-      organizationSites.transition().style('opacity', 1)
-    });
+    organizationSites.on('mouseover', function(d) {
+      this.tooltip.style('display', 'block')
+      //this.tooltipText.text(d.project + ' ' + d.projectInfo.participantCount);
+      this.tooltipText.text(d.collaboratorLabel + ' / ' + d.projectInfo.participantCount);
+      console.log(d.project);
+      this.tooltipBg.style('fill', 'black')
+    }.bind(this))
+
+    organizationSites.on('mouseout', function() {
+      this.tooltip.style('display', 'none');
+    }.bind(this))
 
     var path = this.path;
     var self = this;
@@ -267,6 +267,28 @@ tsb.viz.network = {
       .domain([57.291349, 49.95122])
       .range([0, h]);
   },
+  addToolTip: function() {
+    this.tooltip = this.svg.append('g');
+    this.tooltip.style('display', 'none');
+
+    this.tooltipBg = this.tooltip.append('rect')
+      .attr('width', '240px')
+      .attr('height', '1.3em')
+      .style('fill', 'red')
+      .attr('rx', '5px')
+      .attr('ry', '5px')
+
+    this.tooltipText = this.tooltip.append('text')
+      .text('BLA BLA')
+      .attr('dx', '0.5em')
+      .attr('dy', '1.5em')
+      .style('fill', '#FFF')
+      .style('font-size', '12px')
+
+    this.svg.on('mousemove', function(e) {
+      this.tooltip.attr('transform', function(d) { return 'translate(' + (d3.event.x + 10) + ',' + (d3.event.y-20) + ')'; });
+    }.bind(this))
+  }
 }
 
 /*
