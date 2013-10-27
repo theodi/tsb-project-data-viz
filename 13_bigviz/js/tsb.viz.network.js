@@ -5,7 +5,7 @@ tsb.viz.network = {
     this.svg = svg;
     this.w = w;
     this.h = h;
-    this.institutionSize = 'small';
+    this.institutionSize = 'academic';
     this.institutionTopCount = 6;
 
     this.loadData();
@@ -34,6 +34,9 @@ tsb.viz.network = {
       organizationList.forEach(function(organization, organizationIndex) {
         tsb.state.dataSource.getOrganizationCollaborators(organization.org).then(function(data) {
           this.processRows(data.rows);
+          data.rows.forEach(function(collaborator) {
+            collaborator.parentOrg = organization;
+          })
           organization.collaborators = data.rows;
           if (++loadedCollabolators == organizationList.length) {
             this.buildViz(organizationList);
@@ -118,7 +121,7 @@ tsb.viz.network = {
         .data(links);
     lines.exit().remove();
       lines.enter().append('line')
-        .style('stroke', 'rgba(255, 255, 255, 0.75)')
+        .style('stroke', 'rgba(255, 255, 255, 0.5)')
         .style('stroke-width', 1)
         .attr('class', 'link')
 
@@ -161,6 +164,18 @@ tsb.viz.network = {
         })
         .duration(1000)
         .style('opacity', 1)
+
+    organizationSites.on('mouseenter', function(parentOrg) {
+      if (parentOrg.org) {
+        organizationSites.transition()
+          .style('opacity', function(d) {
+            return (d == parentOrg || d.parentOrg == parentOrg) ? 1 : 0.2;
+          })
+      }
+    })
+    organizationSites.on('mouseleave', function(d) {
+      organizationSites.transition().style('opacity', 1)
+    });
 
     var path = this.path;
 
