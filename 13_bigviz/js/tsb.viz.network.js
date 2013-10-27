@@ -5,13 +5,19 @@ tsb.viz.network = {
     this.svg = svg;
     this.w = w;
     this.h = h;
-    this.institutionSize = 'academic';
-    this.institutionTopCount = 12;
+    this.institutionSize = 'small';
+    this.institutionTopCount = 6;
 
     this.loadData();
     this.resize(this.w, this.h);
 
     this.path = this.svg.append('g').selectAll('path.network');
+
+    this.bg = svg
+    .append('rect')
+    .attr('class', 'bg')
+    .attr('width', tsb.state.w).attr('height', tsb.state.h)
+    .attr('fill', '#08DEF9');
   },
   organizationsByName: {},
   organizations: [],
@@ -42,8 +48,8 @@ tsb.viz.network = {
       row.lng = Number(row.lng);
       row.x = this.lngX(row.lng);
       row.y = this.latY(row.lat);
-      row.ox = row.x;
-      row.oy = row.y;
+      row.ox = Math.random()*this.w;
+      row.oy = Math.random()*this.h;
       row.sizeLabel = row.orgSizeLabel || row.collaboratorSizeLabel;
       if (row.budgetArea) {
         row.budgetAreaCode = tsb.common.extractBudgetAreaCode(row.budgetArea);
@@ -101,13 +107,30 @@ tsb.viz.network = {
       //.links(organizationsNodesLinks)
       //.start();
 
+    this.voronoi = d3.geom.voronoi()
+      .clipExtent([[0, 0], [this.w, this.h]])
+      .x(function(d) { return d.x; })
+      .y(function(d) { return d.y; })
+
+    var self = this;
+    var links = self.voronoi.links(organizationsNodes);
+    var lines = self.svg.selectAll('line.link')
+        .data(links);
+    lines.exit().remove();
+      lines.enter().append('line')
+        .style('stroke', 'rgba(255, 255, 255, 0.75)')
+        .style('stroke-width', 1)
+        .attr('class', 'link')
+
     var organizationSites = this.svg.selectAll('circle.organization')
       .data(organizationsNodes)
         .enter()
         .append('circle')
         .attr('class', 'node')
-        .attr('cx', function(d) { return d.x; })
-        .attr('cy', function(d) { return d.y; })
+        //.attr('cx', function(d) { return d.x; })
+        //.attr('cy', function(d) { return d.y; })
+        .attr('cx', function(d) { return d.ox; }.bind(this))
+        .attr('cy', function(d) { return d.oy; }.bind(this))
         .attr('r', function(d) {
           if (d.org) return 20;
           if (d.sizeLabel == 'academic') return 10/2;
@@ -127,40 +150,34 @@ tsb.viz.network = {
           if (d.sizeLabel == 'micro') return '#FF6700';
           return '#666666'
         })
-        .transition()
-        .delay(100)
-        .duration(2000)
-        .attr('cx', function(d) { return d.x = Math.random()*this.w; }.bind(this))
-        .attr('cy', function(d) { return d.y = Math.random()*this.h; }.bind(this))
-
-    var organizationsConnections = this.svg.selectAll('.link')
-      .data(organizationsNodesLinks)
-      .enter().append('line')
-      .attr('class', 'link')
-      //.style('stroke', 'rgba(128, 90, 18, 0.5)')
-      .style('stroke-width', 1)
+        .style('opacity', 0)
+    organizationSites.each(function(d) {
+      d.node = this;
+    })
+    organizationSites.transition()
+        .delay(function(d) {
+          if (d.org) return 0;
+          else return Math.random() * 10000;
+        })
+        .duration(1000)
+        .style('opacity', 1)
 
     var path = this.path;
 
     var updateMesh = function() {
-      vertices = organizationsNodes.map(function(o) { return [o.x, o.y] });
-      path = path.data(d3.geom.delaunay(vertices).map(function(d) { return "M" + d.join("L") + "Z"; }), String);
-      path.exit().remove();
-      path.enter().append("path")
-        .style('fill', function(d, i) { return '#FFFFFF'; })
-        .style('stroke', function(d, i) { return 'rgba(255,0,0,0.2)'; })
-        .attr("d", String);
-    }
-
-    updateMesh()
-
-    this.force.on('tick', function() {
-      organizationsConnections
+      lines
+        .style('opacity', function(d) { return Math.min(d.source.node.style.opacity, d.target.node.style.opacity) })
         .attr('x1', function(d) { return d.source.x; })
         .attr('y1', function(d) { return d.source.y; })
         .attr('x2', function(d) { return d.target.x; })
         .attr('y2', function(d) { return d.target.y; });
+    }
 
+    setInterval(updateMesh, 1000/30)
+    //updateMesh();
+
+
+    this.force.on('tick', function() {
       organizationSites
         .attr('cx', function(d) { return d.x; })
         .attr('cy', function(d) { return d.y; });
