@@ -100,7 +100,7 @@ tsb.viz.network = {
         .attr('cx', 0)
         .attr('cy', 0)
         .attr('r', participantRadius)
-        .style('fill', '#999');
+        .style('fill', '#333');
 
     participantNodes.selectAll('circle.project')
       .data(function(d) {
@@ -110,6 +110,7 @@ tsb.viz.network = {
         .attr('cx', function(d, i) { return 2 * participantRadius * Math.cos(d.angle); })
         .attr('cy', function(d, i) { return 2 * participantRadius * Math.sin(d.angle); })
         .attr('r', 3)
+        .style('fill', function(d) { return tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode];})
 
   },
   resize: function(w, h) {
