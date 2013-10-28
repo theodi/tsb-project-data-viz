@@ -1,6 +1,6 @@
 var tsb = tsb || { viz : {} };
 
-tsb.viz.collabGrid = {
+tsb.viz.collabTree = {
   init: function(svg, w, h) {
     this.svg = svg;
     this.w = w;
