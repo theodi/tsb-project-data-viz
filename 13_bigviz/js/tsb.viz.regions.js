@@ -145,12 +145,14 @@ tsb.viz.regions = {
       var regionBbox = region.node().getBoundingClientRect();
       var regionWidth = regionBbox.right - regionBbox.left;
       //regionX = margin + offsetLeft - regionBbox.left + regionIndex * spacing;
-      regionX = margin + (spacing + colWidth) * regionIndex - regionBbox.left;
+      regionX = margin + (spacing + colWidth) * regionIndex - regionBbox.left + colWidth/2 - regionWidth*0.8;
       var regionY = -regionBbox.top + this.offsetFromTop;
       //offsetLeft += regionWidth;
 
-      if (regionIndex == regionCodeList.length-1) {
-        regionY -= this.h*0.1;
+      if (regionCode == 'S92000003') {
+        //scotland
+        regionY -= this.h*0.05;
+        regionX += 20;
       }
 
       var cx = margin + (spacing + colWidth) * regionIndex;
