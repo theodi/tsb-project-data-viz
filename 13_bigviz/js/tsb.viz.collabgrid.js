@@ -42,6 +42,7 @@ tsb.viz.collabGrid = {
           participant = {
             id: row.participant,
             label: row.participantLabel,
+            size: row.participantSizeLabel,
             projects: []
           }
           participantsMap[row.participant] = participant;
@@ -92,7 +93,7 @@ tsb.viz.collabGrid = {
 
     function exploreOrganization(org) {
       org.x = w/2;
-      org.y = h*0.8;
+      org.y = h*0.9;
 
       var rootNode = nodeGroup.selectAll('.root').data([org]);
       rootNode.exit().remove()
@@ -104,10 +105,9 @@ tsb.viz.collabGrid = {
         .style('fill', 'white')
         .style('stroke', '#333')
         .transition()
-        .attr('r', 20)
+        .attr('r', participantSizeToRadius)
 
       rootNode.on('mouseover', function(d) {
-        console.log(d);
         tooltip.style('display', 'block')
         tooltipText.text(d.label);
       })
@@ -118,32 +118,33 @@ tsb.viz.collabGrid = {
 
       org.projects.forEach(function(project, projectIndex) {
         project.x = w/2 + (projectIndex - org.projects.length/2) * 40;
-        project.y = h*0.5;
+        project.y = h*0.7;
       })
+
+      function participantSizeToRadius(d) {
+        if (d.size == 'micro') return 5;
+        if (d.size == 'small') return 5;
+        if (d.size == 'medium') return 5;
+        if (d.size == 'large') return 10;
+        if (d.size == 'academic') return 10;
+      }
 
       var projectNodes = nodeGroup.selectAll('.project').data(org.projects);
       projectNodes.exit().remove()
       projectNodes.enter().append('rect')
         .attr('class', 'project')
-        .attr('x', function(d) { return d.x - 3; })
+        .attr('x', function(d) { return d.x - 7; })
         .attr('y', function(d) { return d.y; })
-        .attr('width', function(d) { return 6; })
-        .attr('height', function(d) { return 14; })
+        .attr('width', function(d) { return 14; })
+        .attr('height', function(d) { return 6; })
         .attr('r', 0)
         .style('fill', function(d) { return tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode]; })
         .style('stroke', 'none')
-        .transition()
-        .delay(function(d,i) {
-          return i * 30;
-        })
-        .attr('r', 5);
 
       var collaborators = _.filter(_.uniq(_.flatten(_.pluck(org.projects, 'participants'))), function(p) { return p != org; });
       collaborators.forEach(function(collaborator, collaboratorIndex) {
-        //collaborator.x = w/2 + collaboratorDistance * Math.cos(Math.PI*2*collaboratorIndex/(collaborators.length-1));
-        //collaborator.y = h/2 + collaboratorDistance * Math.sin(Math.PI*2*collaboratorIndex/(collaborators.length-1));
         collaborator.x = w/2 + (collaboratorIndex - collaborators.length/2) * 40;
-        collaborator.y = h * 0.2;
+        collaborator.y = h * 0.4;
       });
 
       var collaboratorNodes = nodeGroup.selectAll('.collaborator').data(collaborators);
@@ -153,16 +154,15 @@ tsb.viz.collabGrid = {
         .attr('cx', function(d) { return d.x; })
         .attr('cy', function(d) { return d.y; })
         .attr('r', 0)
-        .style('stroke', 'none')
-        .style('fill', '#333')
+        .style('stroke', '#333')
+        .style('fill', '#FFF')
         .transition()
         .delay(function(d,i) {
           return i * 30;
         })
-        .attr('r', 5);
+        .attr('r', participantSizeToRadius);
 
       collaboratorNodes.on('mouseover', function(d) {
-        console.log(d);
         tooltip.style('display', 'block')
         tooltipText.text(d.label);
       })
@@ -171,10 +171,7 @@ tsb.viz.collabGrid = {
         tooltip.style('display', 'none');
       })
 
-
-      //do, are we displaying ourselves?
-
-      var diagonal = d3.svg.diagonal().projection(function(d) { return [d.x, d.y]; });
+     var diagonal = d3.svg.diagonal().projection(function(d) { return [d.x, d.y]; });
 
       var links = [];
       org.projects.forEach(function(project) {
@@ -192,7 +189,6 @@ tsb.viz.collabGrid = {
         .attr('class', 'link')
         .style('fill', 'none')
         .style('stroke', function(d) {
-          console.log(d);
           return tsb.config.themes.current.budgetAreaColor[d.project.budgetAreaCode];
         })
         .attr('d', diagonal);

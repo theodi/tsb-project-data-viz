@@ -233,7 +233,7 @@ tsb.SPARQLDataSource = (function() {
     PREFIX ptime: <http://purl.org/NET/c4dm/timeline.owl#> \
     PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \
     PREFIX rdf: <http://www.w3.org/2000/01/rdf-schema#> \
-    select ?project ?budgetArea ?participant ?participantLabel \
+    select ?project ?budgetArea ?participant ?participantLabel ?participantSizeLabel \
     where { \
         ?project a tsb:Project . \
         ?project tsb:projectDuration ?projectDuration . \
@@ -241,6 +241,8 @@ tsb.SPARQLDataSource = (function() {
         ?project tsb:competition ?competition . \
         ?project tsb:hasParticipant ?participant . \
         ?participant rdf:label ?participantLabel . \
+        ?participant tsb:enterpriseSize ?participantSize . \
+        ?participantSize rdf:label ?participantSizeLabel . \
         ?competition tsb:budgetArea ?budgetArea . \
         FILTER(?projectStartDate >= \""+year+"-01-01\"^^xsd:date) . \
         FILTER(?projectStartDate <= \""+year+"-12-31\"^^xsd:date) . \
