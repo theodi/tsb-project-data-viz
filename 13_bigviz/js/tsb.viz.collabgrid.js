@@ -88,11 +88,12 @@ tsb.viz.collabGrid = {
     var nodeGroup = svg.append('g');
 
     function exploreOrganization(org) {
+      //ROOT
       org.x = w/2;
       org.y = h*0.9;
 
       var rootNode = nodeGroup.selectAll('.root').data([org])
-      rootNode.exit().remove()
+
       rootNode.enter().append('circle')
         .attr('class', 'root')
         .attr('cx', function(d) { return d.x; })
@@ -100,11 +101,8 @@ tsb.viz.collabGrid = {
         .attr('r', 0)
         .style('fill', 'white')
         .style('stroke', '#333')
-        .transition()
-        .attr('r', participantSizeToRadius)
 
       rootNode
-        .data([org])
         .transition()
         .attr('r', participantSizeToRadius)
 
@@ -116,6 +114,10 @@ tsb.viz.collabGrid = {
       rootNode.on('mouseout', function() {
         tooltip.style('display', 'none');
       })
+
+      rootNode.exit().remove()
+
+      //PROJECTS
 
       org.projects.forEach(function(project, projectIndex) {
         project.x = w/2 + (projectIndex - org.projects.length/2) * 40;
@@ -131,7 +133,6 @@ tsb.viz.collabGrid = {
       }
 
       var projectNodes = nodeGroup.selectAll('.project').data(org.projects);
-      projectNodes.exit().remove()
       projectNodes.enter().append('rect')
         .attr('class', 'project')
         .attr('x', function(d) { return d.x - 7; })
@@ -140,7 +141,16 @@ tsb.viz.collabGrid = {
         .attr('height', function(d) { return 6; })
         .attr('r', 0)
         .style('fill', function(d) { return tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode]; })
-        .style('stroke', 'none')
+        .style('stroke', 'none');
+
+      projectNodes
+        .transition().duration(1000)
+        .attr('x', function(d) { return d.x - 7; })
+        .style('fill', function(d) { return tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode]; })
+
+      projectNodes.exit().transition().duration(1000).style('opacity', 0).remove()
+
+      //COLLABORATORS
 
       var collaborators = _.filter(_.uniq(_.flatten(_.pluck(org.projects, 'participants'))), function(p) { return p != org; });
       collaborators.forEach(function(collaborator, collaboratorIndex) {
@@ -149,12 +159,19 @@ tsb.viz.collabGrid = {
       });
 
       var collaboratorNodes = nodeGroup.selectAll('.collaborator').data(collaborators);
-      collaboratorNodes.exit().remove()
-      var collaboratorGroup = collaboratorNodes.enter().append('g');
+      collaboratorNodes.enter().append('g')
+        .attr('class', 'collaborator')
+        .attr('transform', function(d) { return 'translate(' + (d.x) + ',' + (d.y) + ')'; })
+        .append('circle')
 
-      collaboratorGroup.attr('transform', function(d) { return 'translate(' + (d.x) + ',' + (d.y) + ')'; });
-      var collaboratorCircle = collaboratorGroup.append('circle')
-      .attr('class', 'collaborator')
+      collaboratorNodes.exit().remove()
+
+      collaboratorNodes
+        .attr('transform', function(d) { return 'translate(' + (d.x) + ',' + (d.y) + ')'; });
+
+      var collaboratorCircle = collaboratorNodes.select('circle');
+      collaboratorCircle
+        .attr('class', 'collaboratorCircle')
         .attr('cx', 0)
         .attr('cy', 0)
         .attr('r', 0)
@@ -166,13 +183,13 @@ tsb.viz.collabGrid = {
         })
         .attr('r', participantSizeToRadius);
 
-      var collabolatorProjects = collaboratorGroup.selectAll('.project')
+      var collabolatorProjects = collaboratorNodes.selectAll('.collaboratorProject')
         .data(function(d) {
           return d.projects;
         })
-      collabolatorProjects.exit().remove()
+      collabolatorProjects.exit().transition().duration(1000).style('opacity', 0).remove()
       collabolatorProjects.enter().append('rect')
-        .attr('class', 'project')
+        .attr('class', 'collaboratorProject')
         .attr('x', function(d, i) { return -7; })
         .attr('y', function(d, i) { return -25 -i * 8 + 6; })
         .attr('width', function(d) { return 14; })
@@ -200,7 +217,9 @@ tsb.viz.collabGrid = {
         exploreOrganization(d);
       })
 
-     var diagonal = d3.svg.diagonal().projection(function(d) { return [d.x, d.y]; });
+      //LINKS
+
+      var diagonal = d3.svg.diagonal().projection(function(d) { return [d.x, d.y]; });
 
       var links = [];
       org.projects.forEach(function(project) {
@@ -213,14 +232,22 @@ tsb.viz.collabGrid = {
       })
 
       var linkNodes = linkGroup.selectAll('.link').data(links);
-      linkNodes.exit().remove();
+
       linkNodes.enter().append('path')
         .attr('class', 'link')
         .style('fill', 'none')
         .style('stroke', function(d) {
           return tsb.config.themes.current.budgetAreaColor[d.project.budgetAreaCode];
         })
+
+      linkNodes
+        .transition().duration(1000)
+        .style('stroke', function(d) {
+          return tsb.config.themes.current.budgetAreaColor[d.project.budgetAreaCode];
+        })
         .attr('d', diagonal);
+
+      linkNodes.exit().remove();
 
       tooltip.node().parentNode.appendChild(tooltip.node());
     }
