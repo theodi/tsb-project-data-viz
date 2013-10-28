@@ -52,7 +52,6 @@ tsb.viz.network = {
       console.log('projectList', projectList.length);
       console.log('projects', projects.length, projects);
 
-
       participantList.forEach(function(participantInfo) {
         participantInfo.rows.forEach(function(participantProject) {
           var participant = participantMap[participantProject.participant];
@@ -73,7 +72,45 @@ tsb.viz.network = {
           }
         })
       })
+
+      this.buildViz(participants, projects);
     }.bind(this));
+  },
+  buildViz: function(participants, projects) {
+    var w = this.w;
+    var h = this.h;
+
+    var participantRadius = 5;
+
+    participants.forEach(function(pariticipant) {
+      var numProjects = pariticipant.projects.length;
+      pariticipant.projects.forEach(function(project, projectIndex) {
+        project.angle = Math.PI * 2 * projectIndex / numProjects;
+      })
+    })
+
+    var participantNodes = this.svg.selectAll('g.participant')
+      .data(participants)
+      .enter()
+      .append('g')
+        .attr('transform', function(d) { return 'translate('+Math.random() * w + ',' + Math.random() * h+')'; })
+
+    participantNodes
+        .append('circle')
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', participantRadius)
+        .style('fill', '#999');
+
+    participantNodes.selectAll('circle.project')
+      .data(function(d) {
+        return d.projects;
+      })
+      .enter().append('circle')
+        .attr('cx', function(d, i) { return 2 * participantRadius * Math.cos(d.angle); })
+        .attr('cy', function(d, i) { return 2 * participantRadius * Math.sin(d.angle); })
+        .attr('r', 3)
+
   },
   resize: function(w, h) {
     this.w = w;
