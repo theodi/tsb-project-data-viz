@@ -43,6 +43,9 @@ function init() {
     else if (document.location.hash == '#network') {
       currentViz = tsb.viz.network;
     }
+    else if (document.location.hash == '#collabgrid') {
+      currentViz = tsb.viz.collabGrid;
+    }
     else {
       currentViz = tsb.viz.intro;
     }
