@@ -169,16 +169,22 @@ tsb.viz.collabGrid = {
       collabolatorProjects.enter().append('rect')
         .attr('class', 'project')
         .attr('x', function(d, i) { return -7; })
-        .attr('y', function(d, i) { return -20 -i * 8; })
+        .attr('y', function(d, i) { return -25 -i * 8 + 6; })
         .attr('width', function(d) { return 14; })
-        .attr('height', function(d) { return 6; })
+        .attr('height', function(d) { return 0; })
         .attr('r', 0)
         .style('fill', function(d) { return tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode]; })
         .style('stroke', 'none')
+        .transition()
+        .delay(function(d, i) { return 500 + i * 50})
+        .attr('y', function(d, i) { return -25 - i * 8; })
+        .attr('height', function(d) { return 6; })
 
       collaboratorNodes.on('mouseover', function(d) {
-        tooltip.style('display', 'block')
-        tooltipText.text(d.label);
+        if (d3.event.target.nodeName == 'circle') {
+          tooltip.style('display', 'block')
+          tooltipText.text(d.label);
+        }
       })
 
       collaboratorNodes.on('mouseout', function() {
