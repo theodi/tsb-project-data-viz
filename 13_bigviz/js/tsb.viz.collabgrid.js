@@ -87,11 +87,14 @@ tsb.viz.collabGrid = {
     var tooltip = this.tooltip;
     var tooltipText = this.tooltipText;
 
+    var linkGroup = svg.append('g');
+    var nodeGroup = svg.append('g');
+
     function exploreOrganization(org) {
       org.x = w/2;
       org.y = h*0.8;
 
-      var rootNode = svg.selectAll('.root').data([org]);
+      var rootNode = nodeGroup.selectAll('.root').data([org]);
       rootNode.exit().remove()
       rootNode.enter().append('circle')
         .attr('class', 'root')
@@ -114,11 +117,11 @@ tsb.viz.collabGrid = {
       })
 
       org.projects.forEach(function(project, projectIndex) {
-        project.x = w/2 + (projectIndex - org.projects.length/2) * 50;
+        project.x = w/2 + (projectIndex - org.projects.length/2) * 40;
         project.y = h*0.5;
       })
 
-      var projectNodes = svg.selectAll('.project').data(org.projects);
+      var projectNodes = nodeGroup.selectAll('.project').data(org.projects);
       projectNodes.exit().remove()
       projectNodes.enter().append('circle')
         .attr('class', 'project')
@@ -141,7 +144,7 @@ tsb.viz.collabGrid = {
         collaborator.y = h * 0.2;
       });
 
-      var collaboratorNodes = svg.selectAll('.collaborator').data(collaborators);
+      var collaboratorNodes = nodeGroup.selectAll('.collaborator').data(collaborators);
       collaboratorNodes.exit().remove()
       collaboratorNodes.enter().append('circle')
       .attr('class', 'collaborator')
@@ -181,7 +184,7 @@ tsb.viz.collabGrid = {
         })
       })
 
-      var linkNodes = svg.selectAll('.link').data(links);
+      var linkNodes = linkGroup.selectAll('.link').data(links);
       linkNodes.exit().remove();
       linkNodes.enter().append('path')
         .attr('class', 'link')
