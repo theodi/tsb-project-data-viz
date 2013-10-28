@@ -105,7 +105,7 @@ tsb.viz.network = {
           if (!participantLinksMap[linkABHash] && !participantLinksMap[linkBAHash]) {
             participantLinksMap[linkABHash] = true;
             participantLinksMap[linkBAHash] = true;
-            participantLinks.push([participantA.index, participantB.index]);
+            participantLinks.push({source:participantA.index, target:participantB.index});
           }
         }
       }
@@ -146,18 +146,37 @@ tsb.viz.network = {
 
     console.log('participantLinks', participantLinks.length);
 
-    function participantProjectoionColor() {
-
-    }
-
     var participantLinkLines = this.svg.selectAll('line.link')
       .data(participantLinks)
       .enter().append('line')
-      .attr('x1', function(d) { return participants[d[0]].x; })
-      .attr('y1', function(d) { return participants[d[0]].y; })
-      .attr('x2', function(d) { return participants[d[1]].x; })
-      .attr('y2', function(d) { return participants[d[1]].y; })
+      .attr('x1', function(d) { return participants[d.source].x; })
+      .attr('y1', function(d) { return participants[d.source].y; })
+      .attr('x2', function(d) { return participants[d.target].x; })
+      .attr('y2', function(d) { return participants[d.target].y; })
       .style('stroke', 'rgba(0,0,0,0.1)');
+
+    this.force = d3.layout.force()
+      .charge(-50)
+      .linkDistance(225)
+      .size([this.w, this.h]);
+
+    this.force
+      .nodes(participants)
+      .links(participantLinks)
+      .start();
+
+    this.force.on('tick', function() {
+      participantNodes
+        .attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; })
+
+      participantLinkLines
+        .attr('x1', function(d) { return d.source.x; })
+        .attr('y1', function(d) { return d.source.y; })
+        .attr('x2', function(d) { return d.target.x; })
+        .attr('y2', function(d) { return d.target.y; })
+
+      //updateMesh();
+    });
   },
   resize: function(w, h) {
     this.w = w;
