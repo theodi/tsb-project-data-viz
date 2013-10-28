@@ -54,76 +54,50 @@ tsb.viz.collabGrid = {
         }
       })
 
-      //buildObjectListForKey(data.rows, 'participant', participants, participantMap);
-      //buildObjectListForKey(data.rows, 'project', projects, projectMap);
+      console.log('projects', projects.length, 'participants', participants.length);
 
-      /*
-      console.log('data loaded', data.rows.length);
-      var participantList = data.groupBy('participant').values;
-      var projectList = data.groupBy('project').values;
+      function prop(name) {
+        return function(o) {
+          return o[name];
+        }
+      }
 
-      console.log('participantList', participantList.length);
-      participantList = participantList.filter(function(participantDataSet) {
-        return participantDataSet.rows.length > 1
-      })
-      console.log('participantList', participantList.length);
+      var projectsByBudgetAreaCode = _.groupBy(projects, prop('budgetAreaCode'));
+      var budgetAreaCodes = _.keys(projectsByBudgetAreaCode);
+      var participantsByBudgetAreaCode = {};
 
-      var participants = [];
-      var participantMap = {};
-      var projects = [];
-      var projectMap = {};
+      console.log('projectsByBudgetAreaCode', projectsByBudgetAreaCode)
 
-      console.log('projectList', projectList.length);
-      projectList = projectList.filter(function(projectDataSet) {
-        return projectDataSet.rows.length > 1
-      })
-      projectList.forEach(function(projectInfo) {
-        projectInfo.rows.forEach(function(projectParticipant) {
-          var project = projectMap[projectParticipant.project];
-          if (!project) {
-            project = {
-              label : '',
-              participants : [],
-              id : projectParticipant.project,
-              budgetArea : projectParticipant.budgetArea,
-              budgetAreaCode: tsb.common.extractBudgetAreaCode(projectParticipant.budgetArea)
-            };
-            projects.push(project);
-            projectMap[projectParticipant.project] = project;
-          }
-        });
-      })
-      console.log('projectList', projectList.length);
-      console.log('projects', projects.length);
-
-      participantList.forEach(function(participantInfo) {
-        participantInfo.rows.forEach(function(participantProject) {
-          var participant = participantMap[participantProject.participant];
-          if (!participant) {
-            participant = { label : participantProject.participantLabel, projects : [] };
-            participants.push(participant);
-            participantMap[participantProject.participant] = participant;
-          }
-          var project = projectMap[participantProject.project];
-          if (project) {
-            project.participants.push(participant);
-            //if project is worthy
-            participant.projects.push({
-              id: participantProject.project,
-              budgetArea: participantProject.budgetArea,
-              budgetAreaCode: tsb.common.extractBudgetAreaCode(participantProject.budgetArea)
-            })
-          }
-        })
+      budgetAreaCodes.forEach(function(budgetAreaCode) {
+        var projects = projectsByBudgetAreaCode[budgetAreaCode];
+        var participants = _.uniq(_.flatten(_.pluck(projects, 'participants')));
+        participantsByBudgetAreaCode[budgetAreaCode] = participants;
       })
 
-      this.buildViz(participants, projects);
-      */
+      this.buildViz(participants, projects, participantsByBudgetAreaCode, projectsByBudgetAreaCode);
     }.bind(this));
-
   },
-  buildViz: function(participants, projects) {
-    console.log(participants, projects);
+  buildViz: function(participants, projects, participantsByBudgetAreaCode, projectsByBudgetAreaCode) {
+    var svg = this.svg;
+    var w = this.w;
+    var h = this.h;
+
+    function exploreOrganization(org) {
+      var root = svg.selectAll('circle.root')
+        .data([org])
+
+      root.exit().remove()
+      root.enter().append('circle')
+        .attr('cx', w/2)
+        .attr('cy', h/2)
+        .attr('r', 0)
+        .style('fill', '#333')
+        .transition()
+        .attr('r', 20)
+    }
+
+    var startOrg = _.shuffle(participants)[0];
+    exploreOrganization(startOrg);
   },
   resize: function(w, h) {
     this.w = w;
