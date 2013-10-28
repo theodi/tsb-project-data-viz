@@ -120,7 +120,7 @@ tsb.viz.regions = {
     }.bind(this));
   },
   explodeMap: function() {
-    var speedup = 10;
+    var speedup = 1;
     var mapAnimDelay = 1000/speedup;
     var mapAnimTime = 2000/speedup;
     var labelAnimTime = 1000/speedup;
