@@ -82,7 +82,7 @@ tsb.viz.collabGrid = {
     var w = this.w;
     var h = this.h;
     var projectDistance = 50;
-    var collabolatorDistance = 150;
+    var collaboratorDistance = 150;
 
     function exploreOrganization(org) {
       var rootNode = svg.selectAll('circle.root').data([org]);
@@ -117,16 +117,16 @@ tsb.viz.collabGrid = {
         })
         .attr('r', 5);
 
-      var collabolators = _.uniq(_.flatten(_.pluck(org.projects, 'participants')));
-      collabolators.forEach(function(collabolator, collabolatorIndex) {
-        collabolator.x = w/2 + collabolatorDistance * Math.cos(Math.PI*2*collabolatorIndex/collabolators.length);
-        collabolator.y = h/2 + collabolatorDistance * Math.sin(Math.PI*2*collabolatorIndex/collabolators.length);
+      var collaborators = _.uniq(_.flatten(_.pluck(org.projects, 'participants')));
+      collaborators.forEach(function(collaborator, collaboratorIndex) {
+        collaborator.x = w/2 + collaboratorDistance * Math.cos(Math.PI*2*collaboratorIndex/collaborators.length);
+        collaborator.y = h/2 + collaboratorDistance * Math.sin(Math.PI*2*collaboratorIndex/collaborators.length);
       });
 
-      var collabolatorNodes = svg.selectAll('circle.collabolator').data(collabolators);
-      collabolatorNodes.exit().remove()
-      collabolatorNodes.enter().append('circle')
-      .attr('class', 'collabolator')
+      var collaboratorNodes = svg.selectAll('circle.collaborator').data(collaborators);
+      collaboratorNodes.exit().remove()
+      collaboratorNodes.enter().append('circle')
+      .attr('class', 'collaborator')
         .attr('cx', function(d) { return d.x; })
         .attr('cy', function(d) { return d.y; })
         .attr('r', 0)
