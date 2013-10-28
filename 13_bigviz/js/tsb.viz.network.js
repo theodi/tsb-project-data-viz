@@ -86,12 +86,14 @@ tsb.viz.network = {
     var w = this.w;
     var h = this.h;
 
-    var participantRadius = 5;
+    var participantRadius = 2;
 
     participants.forEach(function(participant, participantIndex) {
       participant.index = participantIndex;
       participant.x = Math.random() * w;
       participant.y = Math.random() * h;
+      participant.cx = w/2;
+      participant.cy = h/2;
       var numProjects = participant.projects.length;
       participant.projects.forEach(function(project, projectIndex) {
         project.participant = participant;
@@ -111,8 +113,11 @@ tsb.viz.network = {
           if (!participantLinksMap[linkABHash] && !participantLinksMap[linkBAHash]) {
             participantLinksMap[linkABHash] = true;
             participantLinksMap[linkBAHash] = true;
-            if (project.budgetAreaCode == 'TECH')
+            if (project.budgetAreaCode == 'ENRG') {
+              participantA.used = true;
+              participantB.used = true;
               participantLinks.push({source:participantA.index, target:participantB.index, project:project});
+            }
           }
         }
       }
@@ -123,35 +128,12 @@ tsb.viz.network = {
       })
     })
 
-    var participantNodes = this.svg.selectAll('g.participant')
-      .data(participants)
-      .enter()
-      .append('g')
-        .attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; })
+    this.force = d3.layout.force()
+      .charge(-50)
+      .gravity(0.01)
+      .linkDistance(50)
+      .size([this.w, this.h]);
 
-    participantNodes
-        .append('circle')
-        .attr('cx', 0)
-        .attr('cy', 0)
-        .attr('r', function(d) {
-          return d.projects.length;
-        })
-        .style('stroke', '#333')
-        .style('fill', 'none');
-
-    participantNodes.selectAll('circle.projects')
-      .data(function(d) {
-        return d.projects;
-      })
-      .enter().append('circle')
-        .attr('cx', function(d, i) { return (d.participant.projects.length + participantRadius) * Math.cos(d.angle); })
-        .attr('cy', function(d, i) { return (d.participant.projects.length + participantRadius) * Math.sin(d.angle); })
-        .attr('r', function(d){
-          return 4;
-        })
-        .style('fill', function(d) { return tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode];})
-
-    console.log('participantLinks', participantLinks.length);
 
     var participantLinkLines = this.svg.selectAll('line.link')
       .data(participantLinks)
@@ -164,17 +146,56 @@ tsb.viz.network = {
         return tsb.config.themes.current.budgetAreaColor[d.project.budgetAreaCode];
       })
 
-    this.force = d3.layout.force()
-      .charge(-50)
-      .linkDistance(225)
-      .size([this.w, this.h]);
+    var participantNodes = this.svg.selectAll('g.participant')
+      .data(participants)
+      .enter()
+      .append('g')
+        .attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; })
+
+
+
+    participantNodes
+        .append('circle')
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', function(d) {
+          return 2 + d.projects.length;
+        })
+        .style('stroke', '#333')
+        .style('fill', 'white')
+        .call(this.force.drag);
+
+    participantNodes.selectAll('circle.projects')
+      .data(function(d) {
+        return d.projects;
+      })
+      .enter().append('circle')
+        .attr('cx', function(d, i) { return (d.participant.projects.length + participantRadius) * Math.cos(d.angle); })
+        .attr('cy', function(d, i) { return (d.participant.projects.length + participantRadius) * Math.sin(d.angle); })
+        .attr('r', function(d){
+          return 2;
+        })
+        .style('fill', function(d) { return tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode];})
+
+    
 
     this.force
       .nodes(participants)
       .links(participantLinks)
       .start();
 
-    this.force.on('tick', function() {
+    function gravity(alpha) {
+      return function(d) {
+        if (!d.used) return;
+        d.y += (d.cy - d.y) * alpha;
+        d.x += (d.cx - d.x) * alpha;
+      };
+    }
+
+    this.force.on('tick', function(e) {
+      participantNodes
+        .each(gravity(.1 * e.alpha))
+
       participantNodes
         .attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; })
 
