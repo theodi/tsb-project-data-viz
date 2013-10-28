@@ -123,13 +123,15 @@ tsb.viz.collabGrid = {
 
       var projectNodes = nodeGroup.selectAll('.project').data(org.projects);
       projectNodes.exit().remove()
-      projectNodes.enter().append('circle')
+      projectNodes.enter().append('rect')
         .attr('class', 'project')
-        .attr('cx', function(d, i) { return d.x; })
-        .attr('cy', function(d) { return d.y; })
+        .attr('x', function(d) { return d.x - 3; })
+        .attr('y', function(d) { return d.y; })
+        .attr('width', function(d) { return 6; })
+        .attr('height', function(d) { return 14; })
         .attr('r', 0)
-        .style('stroke', function(d) { return tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode]; })
-        .style('fill', 'none')
+        .style('fill', function(d) { return tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode]; })
+        .style('stroke', 'none')
         .transition()
         .delay(function(d,i) {
           return i * 30;
