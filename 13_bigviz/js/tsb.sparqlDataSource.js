@@ -227,6 +227,28 @@ tsb.SPARQLDataSource = (function() {
     return this.query(q);
   }
 
+  SPARQLDataSource.prototype.getProjectsAndParticipantsForYear = function(year) {
+    var q =" \
+    PREFIX tsb: <http://tsb-projects.labs.theodi.org/def/> \
+    PREFIX ptime: <http://purl.org/NET/c4dm/timeline.owl#> \
+    PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \
+    PREFIX rdf: <http://www.w3.org/2000/01/rdf-schema#> \
+    select ?project ?budgetArea ?participant ?participantLabel \
+    where { \
+        ?project a tsb:Project . \
+        ?project tsb:projectDuration ?projectDuration . \
+        ?projectDuration ptime:start ?projectStartDate . \
+        ?project tsb:competition ?competition . \
+        ?project tsb:hasParticipant ?participant . \
+        ?participant rdf:label ?participantLabel . \
+        ?competition tsb:budgetArea ?budgetArea . \
+        FILTER(?projectStartDate >= \""+year+"-01-01\"^^xsd:date) . \
+        FILTER(?projectStartDate <= \""+year+"-12-31\"^^xsd:date) . \
+    } \
+    ";
+    return this.query(q);
+  }
+
   SPARQLDataSource.prototype.getAreaSummaryForYear = function(year) {
     var q =" \
       PREFIX tsb: <http://tsb-projects.labs.theodi.org/def/> \
