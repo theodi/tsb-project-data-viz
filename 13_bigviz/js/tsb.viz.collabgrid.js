@@ -88,12 +88,15 @@ tsb.viz.collabGrid = {
     var tooltipText = this.tooltipText;
 
     function exploreOrganization(org) {
+      org.x = w/2;
+      org.y = h*0.8;
+
       var rootNode = svg.selectAll('.root').data([org]);
       rootNode.exit().remove()
       rootNode.enter().append('circle')
         .attr('class', 'root')
-        .attr('cx', w/2)
-        .attr('cy', h/2)
+        .attr('cx', function(d) { return d.x; })
+        .attr('cy', function(d) { return d.y; })
         .attr('r', 0)
         .style('fill', 'white')
         .style('stroke', '#333')
@@ -110,17 +113,16 @@ tsb.viz.collabGrid = {
         tooltip.style('display', 'none');
       })
 
-
       org.projects.forEach(function(project, projectIndex) {
-        project.x = w/2 + projectDistance * Math.cos(Math.PI*2*projectIndex/org.projects.length);
-        project.y = h/2 + projectDistance * Math.sin(Math.PI*2*projectIndex/org.projects.length);
+        project.x = w/2 + (projectIndex - org.projects.length/2) * 50;
+        project.y = h*0.5;
       })
 
       var projectNodes = svg.selectAll('.project').data(org.projects);
       projectNodes.exit().remove()
       projectNodes.enter().append('circle')
         .attr('class', 'project')
-        .attr('cx', function(d) { return d.x; })
+        .attr('cx', function(d, i) { return d.x; })
         .attr('cy', function(d) { return d.y; })
         .attr('r', 0)
         .style('stroke', function(d) { return tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode]; })
@@ -133,8 +135,10 @@ tsb.viz.collabGrid = {
 
       var collaborators = _.filter(_.uniq(_.flatten(_.pluck(org.projects, 'participants'))), function(p) { return p != org; });
       collaborators.forEach(function(collaborator, collaboratorIndex) {
-        collaborator.x = w/2 + collaboratorDistance * Math.cos(Math.PI*2*collaboratorIndex/(collaborators.length-1));
-        collaborator.y = h/2 + collaboratorDistance * Math.sin(Math.PI*2*collaboratorIndex/(collaborators.length-1));
+        //collaborator.x = w/2 + collaboratorDistance * Math.cos(Math.PI*2*collaboratorIndex/(collaborators.length-1));
+        //collaborator.y = h/2 + collaboratorDistance * Math.sin(Math.PI*2*collaboratorIndex/(collaborators.length-1));
+        collaborator.x = w/2 + (collaboratorIndex - collaborators.length/2) * 40;
+        collaborator.y = h * 0.2;
       });
 
       var collaboratorNodes = svg.selectAll('.collaborator').data(collaborators);
@@ -169,9 +173,10 @@ tsb.viz.collabGrid = {
 
       var links = [];
       org.projects.forEach(function(project) {
+        links.push({ source:project, target:org, project: project});
         project.participants.forEach(function(participant) {
           if (participant != org) {
-            links.push({source:project, target:participant});
+            links.push({source:project, target:participant, project: project});
           }
         })
       })
@@ -181,7 +186,10 @@ tsb.viz.collabGrid = {
       linkNodes.enter().append('path')
         .attr('class', 'link')
         .style('fill', 'none')
-        .style('stroke', 'rgba(0,0,0,0.2)')
+        .style('stroke', function(d) {
+          console.log(d);
+          return tsb.config.themes.current.budgetAreaColor[d.project.budgetAreaCode];
+        })
         .attr('d', diagonal);
 
       tooltip.node().parentNode.appendChild(tooltip.node());
