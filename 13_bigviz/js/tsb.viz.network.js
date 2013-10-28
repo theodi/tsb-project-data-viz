@@ -6,11 +6,11 @@ tsb.viz.network = {
     this.w = w;
     this.h = h;
     this.institutionSize = 'academic';
-    this.institutionTopCount = 3;
+    this.institutionTopCount = 1;
     this.maxNumProjects = 120;
     this.minR = 50;
-    this.maxR = 160;
-    this.dotScale = 20;
+    this.maxR = 360;
+    this.dotScale = 2;
 
     this.loadData();
     this.resize(this.w, this.h);
@@ -160,16 +160,16 @@ tsb.viz.network = {
         .attr('cy', function(d) { return d.y; }.bind(this))
         .attr('r', function(d) {
           if (d.org) return 20;
-          if (d.sizeLabel == 'academic') return 10/this.dotScale;
-          if (d.sizeLabel == 'large') return 8/this.dotScale;
-          if (d.sizeLabel == 'medium') return 6/this.dotScale;
+          if (d.sizeLabel == 'academic') return 20/this.dotScale;
+          if (d.sizeLabel == 'large') return 10/this.dotScale;
+          if (d.sizeLabel == 'medium') return 5/this.dotScale;
           if (d.sizeLabel == 'small') return 5/this.dotScale;
-          if (d.sizeLabel == 'micro') return 4/this.dotScale;
+          if (d.sizeLabel == 'micro') return 2/this.dotScale;
           return '0'
         }.bind(this))
-        .style('stroke', 'none')
+        .style('stroke', 'white')
         .style('fill', function(d) {
-          return 'white';
+          return 'none';
           return d.budgetAreaColor;
           if (d.sizeLabel == 'academic') return '#0DBC37';
           if (d.sizeLabel == 'large') return '#00B7FF';
