@@ -88,6 +88,7 @@ tsb.viz.network = {
       participant.y = Math.random() * h;
       var numProjects = participant.projects.length;
       participant.projects.forEach(function(project, projectIndex) {
+        project.participant = participant;
         project.angle = Math.PI * 2 * projectIndex / numProjects;
       })
     })
@@ -125,20 +126,29 @@ tsb.viz.network = {
         .append('circle')
         .attr('cx', 0)
         .attr('cy', 0)
-        .attr('r', participantRadius)
-        .style('fill', '#333');
+        .attr('r', function(d) {
+          return d.projects.length;
+        })
+        .style('stroke', '#333')
+        .style('fill', 'none');
 
     participantNodes.selectAll('circle.projects')
       .data(function(d) {
         return d.projects;
       })
       .enter().append('circle')
-        .attr('cx', function(d, i) { return 2 * participantRadius * Math.cos(d.angle); })
-        .attr('cy', function(d, i) { return 2 * participantRadius * Math.sin(d.angle); })
-        .attr('r', 3)
+        .attr('cx', function(d, i) { return (d.participant.projects.length + participantRadius) * Math.cos(d.angle); })
+        .attr('cy', function(d, i) { return (d.participant.projects.length + participantRadius) * Math.sin(d.angle); })
+        .attr('r', function(d){
+          return 4;
+        })
         .style('fill', function(d) { return tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode];})
 
     console.log('participantLinks', participantLinks.length);
+
+    function participantProjectoionColor() {
+
+    }
 
     var participantLinkLines = this.svg.selectAll('line.link')
       .data(participantLinks)
