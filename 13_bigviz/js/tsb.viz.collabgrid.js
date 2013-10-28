@@ -91,7 +91,7 @@ tsb.viz.collabGrid = {
       org.x = w/2;
       org.y = h*0.9;
 
-      var rootNode = nodeGroup.selectAll('.root').data([org]);
+      var rootNode = nodeGroup.selectAll('.root').data([org])
       rootNode.exit().remove()
       rootNode.enter().append('circle')
         .attr('class', 'root')
@@ -100,6 +100,11 @@ tsb.viz.collabGrid = {
         .attr('r', 0)
         .style('fill', 'white')
         .style('stroke', '#333')
+        .transition()
+        .attr('r', participantSizeToRadius)
+
+      rootNode
+        .data([org])
         .transition()
         .attr('r', participantSizeToRadius)
 
@@ -189,6 +194,10 @@ tsb.viz.collabGrid = {
 
       collaboratorNodes.on('mouseout', function() {
         tooltip.style('display', 'none');
+      })
+
+      collaboratorNodes.on('click', function(d) {
+        exploreOrganization(d);
       })
 
      var diagonal = d3.svg.diagonal().projection(function(d) { return [d.x, d.y]; });
