@@ -159,19 +159,19 @@ tsb.viz.collabGrid = {
       });
 
       var collaboratorNodes = nodeGroup.selectAll('.collaborator').data(collaborators);
-      collaboratorNodes.enter().append('g')
+      var g = collaboratorNodes.enter().append('g')
         .attr('class', 'collaborator')
         .attr('transform', function(d) { return 'translate(' + (d.x) + ',' + (d.y) + ')'; })
-        .append('circle')
+      g.append('circle').attr('class', 'collaboratorCircle')
+      g.append('circle').attr('class', 'collaboratorCircleUni')
 
       collaboratorNodes.exit().remove()
 
       collaboratorNodes
         .attr('transform', function(d) { return 'translate(' + (d.x) + ',' + (d.y) + ')'; });
 
-      var collaboratorCircle = collaboratorNodes.select('circle');
+      var collaboratorCircle = collaboratorNodes.select('circle.collaboratorCircle');
       collaboratorCircle
-        .attr('class', 'collaboratorCircle')
         .attr('cx', 0)
         .attr('cy', 0)
         .attr('r', 0)
@@ -182,6 +182,22 @@ tsb.viz.collabGrid = {
           return i * 30;
         })
         .attr('r', participantSizeToRadius);
+
+      var collaboratorCircleUni = collaboratorNodes.select('circle.collaboratorCircleUni');
+      collaboratorCircleUni
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', 0)
+        .style('stroke', 'rgba(30, 30, 30, 0.4)')
+        .style('fill', 'transparent')
+        .transition()
+        .delay(function(d,i) {
+          return i * 30;
+        })
+        .attr('r', function(d) {
+          if (d.size != 'academic') return 0;
+          return 3 + participantSizeToRadius(d);
+        });
 
       var collabolatorProjects = collaboratorNodes.selectAll('.collaboratorProject')
         .data(function(d) {
@@ -288,7 +304,7 @@ tsb.viz.collabGrid = {
     this.tooltipBg = this.tooltip.append('rect')
       .attr('width', '240px')
       .attr('height', '1.3em')
-      .style('fill', 'red')
+      .style('fill', '#000')
       .attr('rx', '5px')
       .attr('ry', '5px')
 
