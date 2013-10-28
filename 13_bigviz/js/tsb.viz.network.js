@@ -50,7 +50,7 @@ tsb.viz.network = {
         });
       })
       console.log('projectList', projectList.length);
-      console.log('projects', projects.length, projects);
+      console.log('projects', projects.length);
 
       participantList.forEach(function(participantInfo) {
         participantInfo.rows.forEach(function(participantProject) {
@@ -82,10 +82,36 @@ tsb.viz.network = {
 
     var participantRadius = 5;
 
-    participants.forEach(function(pariticipant) {
-      var numProjects = pariticipant.projects.length;
-      pariticipant.projects.forEach(function(project, projectIndex) {
+    participants.forEach(function(participant, participantIndex) {
+      participant.index = participantIndex;
+      participant.x = Math.random() * w;
+      participant.y = Math.random() * h;
+      var numProjects = participant.projects.length;
+      participant.projects.forEach(function(project, projectIndex) {
         project.angle = Math.PI * 2 * projectIndex / numProjects;
+      })
+    })
+
+    var participantLinks = [];
+    var participantLinksMap = {};
+    projects.forEach(function(project) {
+      for(var i=0; i<project.participants.length; i++) {
+        var participantA = project.participants[i];
+        for(var j=i+1; j<project.participants.length; j++) {
+          var participantB = project.participants[j];
+          var linkABHash = participantA.index + '-' + participantB.index;
+          var linkBAHash = participantB.index + '-' + participantA.index;
+          if (!participantLinksMap[linkABHash] && !participantLinksMap[linkBAHash]) {
+            participantLinksMap[linkABHash] = true;
+            participantLinksMap[linkBAHash] = true;
+            participantLinks.push([participantA.index, participantB.index]);
+          }
+        }
+      }
+      project.participants.forEach(function() {
+        project.participants.forEach(function(participantB) {
+          if (participantA == participantB) return;
+        })
       })
     })
 
@@ -93,7 +119,7 @@ tsb.viz.network = {
       .data(participants)
       .enter()
       .append('g')
-        .attr('transform', function(d) { return 'translate('+Math.random() * w + ',' + Math.random() * h+')'; })
+        .attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; })
 
     participantNodes
         .append('circle')
@@ -102,7 +128,7 @@ tsb.viz.network = {
         .attr('r', participantRadius)
         .style('fill', '#333');
 
-    participantNodes.selectAll('circle.project')
+    participantNodes.selectAll('circle.projects')
       .data(function(d) {
         return d.projects;
       })
@@ -112,6 +138,16 @@ tsb.viz.network = {
         .attr('r', 3)
         .style('fill', function(d) { return tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode];})
 
+    console.log('participantLinks', participantLinks.length);
+
+    var participantLinkLines = this.svg.selectAll('line.link')
+      .data(participantLinks)
+      .enter().append('line')
+      .attr('x1', function(d) { return participants[d[0]].x; })
+      .attr('y1', function(d) { return participants[d[0]].y; })
+      .attr('x2', function(d) { return participants[d[1]].x; })
+      .attr('y2', function(d) { return participants[d[1]].y; })
+      .style('stroke', 'rgba(0,0,0,0.1)');
   },
   resize: function(w, h) {
     this.w = w;
