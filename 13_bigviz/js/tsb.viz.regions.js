@@ -5,7 +5,7 @@ tsb.viz.regions = {
     this.svg = svg;
     this.w = w;
     this.h = h;
-    this.mapScale = 0.25;
+    this.mapScale = 0.18;
     this.offsetFromTop = 350;
     this.unusedShapes = ['Ireland', 'IsleOfMan', 'ChannelIslands', 'Border1', 'Border2', 'Border3'];
     this.year = (new Date()).getFullYear();
@@ -120,7 +120,7 @@ tsb.viz.regions = {
     }.bind(this));
   },
   explodeMap: function() {
-    var speedup = 1;
+    var speedup = 10;
     var mapAnimDelay = 1000/speedup;
     var mapAnimTime = 2000/speedup;
     var labelAnimTime = 1000/speedup;
@@ -136,22 +136,24 @@ tsb.viz.regions = {
       totalWidth += regionWidth;
     }.bind(this));
 
-    var spacing = (this.w - totalWidth - 2 * margin)/(regionCodeList.length-1);
+    var colWidth = 100;
+    var spacing = (this.w - 2 * margin - regionCodeList.length * colWidth)/(regionCodeList.length-1);
 
     regionCodeList.forEach(function(regionCode, regionIndex) {
       var regionInfo = tsb.config.regionsMap[regionCode];
       var region = this.svg.select('.' + regionInfo.id);
       var regionBbox = region.node().getBoundingClientRect();
       var regionWidth = regionBbox.right - regionBbox.left;
-      regionX = margin + offsetLeft - regionBbox.left + regionIndex * spacing;
+      //regionX = margin + offsetLeft - regionBbox.left + regionIndex * spacing;
+      regionX = margin + (spacing + colWidth) * regionIndex - regionBbox.left;
       var regionY = -regionBbox.top + this.offsetFromTop;
-      offsetLeft += regionWidth;
+      //offsetLeft += regionWidth;
 
       if (regionIndex == regionCodeList.length-1) {
         regionY -= this.h*0.1;
       }
 
-      var cx = regionBbox.left + regionX + regionWidth/2;
+      var cx = margin + (spacing + colWidth) * regionIndex;
 
       //this.svg.append('rect')
       //  .attr('x', regionBbox.left + regionX)
@@ -183,10 +185,10 @@ tsb.viz.regions = {
         .delay(mapAnimDelay + mapAnimTime/2)
         .duration(labelAnimTime)
         .style('opacity', 1)
-        .attr('text-anchor', 'middle')
+        //.attr('text-anchor', 'middle')
 
       var nameLabelBBox = nameLabel.node().getBoundingClientRect();
-      var dx = -(nameLabelBBox.right - nameLabelBBox.left)/2;
+      var dx = 0;//-(nameLabelBBox.right - nameLabelBBox.left)/2;
 
       var statsTop = 180;
 
