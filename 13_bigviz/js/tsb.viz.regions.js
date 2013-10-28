@@ -276,6 +276,10 @@ tsb.viz.regions = {
             this.tooltipBg.style('fill', tsb.config.themes.current.budgetAreaColor[budgetAreaCode])
           }.bind(this))
 
+          areaBar.on('click', function(d) {
+            this.openLink(this.year, budgetAreaCode, regionInfo.name);
+          }.bind(this))
+
           areaBar.on('mouseout', function() {
             this.tooltip.style('display', 'none');
           }.bind(this))
@@ -285,6 +289,15 @@ tsb.viz.regions = {
       }.bind(this));
 
     }.bind(this));
+  },
+  openLink: function(year, area, region) {
+    var areaLabel = tsb.config.budgetAreaLabels[area];
+    var start = year + '-01-01';
+    var end = year + '-12-31';
+    var region
+    var url = tsb.config.domain +
+      '/projects?utf8=✓&search_string=&date_from='+start+'&date_to='+end+'&budget_area_label%5B'+areaLabel+'%5D&region_labels%5B'+region+'%5D=true';
+    window.open(url);
   },
   loadData:function(){
     this.explodeMap();

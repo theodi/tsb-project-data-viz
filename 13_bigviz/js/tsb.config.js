@@ -27,6 +27,19 @@ tsb.config.regionsMap = {
   'S92000003' : { name: 'Scotland', id: 'Scotland'} ,
 };
 
+//South East
+//West Midlands
+//East of England
+//South West
+//London
+//East Midlands
+//Yorkshire and The Humber
+//North West
+//North East
+//Scotland
+//Wales
+//Northern Ireland
+
 tsb.config.budgetAreas = [ 'SPAC', 'TRANSPO', 'TECH', 'MANF', 'ENV_SUS', 'tsb-programmes', 'DIGS', 'ENRG', 'HLTHCR' ];
 tsb.config.budgetAreaLabels = {
   'SPAC' : 'Space',
