@@ -30,11 +30,49 @@ tsb.viz.network = {
       })
       console.log('participantList', participantList.length);
 
+      var participants = [];
+      var participantMap = {};
+      var projects = [];
+      var projectMap = {};
+
       console.log('projectList', projectList.length);
       projectList = projectList.filter(function(projectDataSet) {
         return projectDataSet.rows.length > 2
       })
+      projectList.forEach(function(projectInfo) {
+        projectInfo.rows.forEach(function(projectParticipant) {
+          var project = projectMap[projectParticipant.project];
+          if (!project) {
+            project = { label : '', participants : [] };
+            projects.push(project);
+            projectMap[projectParticipant.project] = project;
+          }
+        });
+      })
       console.log('projectList', projectList.length);
+      console.log('projects', projects.length, projects);
+
+
+      participantList.forEach(function(participantInfo) {
+        participantInfo.rows.forEach(function(participantProject) {
+          var participant = participantMap[participantProject.participant];
+          if (!participant) {
+            participant = { label : participantProject.participantLabel, projects : [] };
+            participants.push(participant);
+            participantMap[participantProject.participant] = participant;
+          }
+          var project = projectMap[participantProject.project];
+          if (project) {
+            project.participants.push(participant);
+            //if project is worthy
+            participant.projects.push({
+              id: participantProject.project,
+              budgetArea: participantProject.budgetArea,
+              budgetAreaCode: tsb.common.extractBudgetAreaCode(participantProject.budgetArea)
+            })
+          }
+        })
+      })
     }.bind(this));
   },
   resize: function(w, h) {
