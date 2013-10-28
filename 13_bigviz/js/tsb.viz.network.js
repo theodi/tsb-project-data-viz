@@ -26,7 +26,7 @@ tsb.viz.network = {
 
       console.log('participantList', participantList.length);
       participantList = participantList.filter(function(participantDataSet) {
-        return participantDataSet.rows.length > 2
+        return participantDataSet.rows.length > 1
       })
       console.log('participantList', participantList.length);
 
@@ -37,13 +37,19 @@ tsb.viz.network = {
 
       console.log('projectList', projectList.length);
       projectList = projectList.filter(function(projectDataSet) {
-        return projectDataSet.rows.length > 2
+        return projectDataSet.rows.length > 1
       })
       projectList.forEach(function(projectInfo) {
         projectInfo.rows.forEach(function(projectParticipant) {
           var project = projectMap[projectParticipant.project];
           if (!project) {
-            project = { label : '', participants : [] };
+            project = {
+              label : '',
+              participants : [],
+              id : projectParticipant.project,
+              budgetArea : projectParticipant.budgetArea,
+              budgetAreaCode: tsb.common.extractBudgetAreaCode(projectParticipant.budgetArea)
+            };
             projects.push(project);
             projectMap[projectParticipant.project] = project;
           }
@@ -105,7 +111,8 @@ tsb.viz.network = {
           if (!participantLinksMap[linkABHash] && !participantLinksMap[linkBAHash]) {
             participantLinksMap[linkABHash] = true;
             participantLinksMap[linkBAHash] = true;
-            participantLinks.push({source:participantA.index, target:participantB.index});
+            if (project.budgetAreaCode == 'TECH')
+              participantLinks.push({source:participantA.index, target:participantB.index, project:project});
           }
         }
       }
@@ -153,7 +160,9 @@ tsb.viz.network = {
       .attr('y1', function(d) { return participants[d.source].y; })
       .attr('x2', function(d) { return participants[d.target].x; })
       .attr('y2', function(d) { return participants[d.target].y; })
-      .style('stroke', 'rgba(0,0,0,0.1)');
+      .style('stroke', function(d) {
+        return tsb.config.themes.current.budgetAreaColor[d.project.budgetAreaCode];
+      })
 
     this.force = d3.layout.force()
       .charge(-50)
