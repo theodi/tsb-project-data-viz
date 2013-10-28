@@ -82,13 +82,13 @@ tsb.viz.collabGrid = {
     var w = this.w;
     var h = this.h;
     var projectDistance = 50;
+    var collabolatorDistance = 150;
 
     function exploreOrganization(org) {
-      var rootNode = svg.selectAll('circle.root')
-        .data([org])
-
+      var rootNode = svg.selectAll('circle.root').data([org]);
       rootNode.exit().remove()
       rootNode.enter().append('circle')
+        .attr('class', 'root')
         .attr('cx', w/2)
         .attr('cy', h/2)
         .attr('r', 0)
@@ -97,15 +97,17 @@ tsb.viz.collabGrid = {
         .transition()
         .attr('r', 20)
 
-      console.log(org);
+      org.projects.forEach(function(project, projectIndex) {
+        project.x = w/2 + projectDistance * Math.cos(Math.PI*2*projectIndex/org.projects.length);
+        project.y = h/2 + projectDistance * Math.sin(Math.PI*2*projectIndex/org.projects.length);
+      })
 
-      var projectNodes = svg.selectAll('circle.project')
-        .data(org.projects);
-
+      var projectNodes = svg.selectAll('circle.project').data(org.projects);
       projectNodes.exit().remove()
       projectNodes.enter().append('circle')
-        .attr('cx', function(d, i) { return w/2 + projectDistance * Math.cos(Math.PI*2*i/org.projects.length); })
-        .attr('cy', function(d, i) { return h/2 + projectDistance * Math.sin(Math.PI*2*i/org.projects.length); })
+        .attr('class', 'project')
+        .attr('cx', function(d) { return d.x; })
+        .attr('cy', function(d) { return d.y; })
         .attr('r', 0)
         .style('stroke', function(d) { return tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode]; })
         .style('fill', 'none')
@@ -114,6 +116,28 @@ tsb.viz.collabGrid = {
           return i * 30;
         })
         .attr('r', 5);
+
+      var collabolators = _.uniq(_.flatten(_.pluck(org.projects, 'participants')));
+      collabolators.forEach(function(collabolator, collabolatorIndex) {
+        collabolator.x = w/2 + collabolatorDistance * Math.cos(Math.PI*2*collabolatorIndex/collabolators.length);
+        collabolator.y = h/2 + collabolatorDistance * Math.sin(Math.PI*2*collabolatorIndex/collabolators.length);
+      });
+
+      var collabolatorNodes = svg.selectAll('circle.collabolator').data(collabolators);
+      collabolatorNodes.exit().remove()
+      collabolatorNodes.enter().append('circle')
+      .attr('class', 'collabolator')
+        .attr('cx', function(d) { return d.x; })
+        .attr('cy', function(d) { return d.y; })
+        .attr('r', 0)
+        .style('stroke', 'none')
+        .style('fill', '#333')
+        .transition()
+        .delay(function(d,i) {
+          return i * 30;
+        })
+        .attr('r', 5);
+
     }
 
     var startOrg = participants[0];
