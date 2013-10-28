@@ -38,11 +38,13 @@ tsb.DataSet = (function() {
 
   DataSet.prototype.groupBy = function(fieldName) {
     var groups = {};
-    groups.uniqueValues = [];
+    groups.keys = [];
+    groups.values = [];
     this.rows.forEach(function(item) {
       if (!groups[item[fieldName]]) {
         groups[item[fieldName]] = new DataSet();
-        groups.uniqueValues.push(item[fieldName]);
+        groups.keys.push(item[fieldName]);
+        groups.values.push(groups[item[fieldName]])
       }
       groups[item[fieldName]].rows.push(item);
     })

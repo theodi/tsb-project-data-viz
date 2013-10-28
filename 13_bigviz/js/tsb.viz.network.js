@@ -21,10 +21,20 @@ tsb.viz.network = {
   loadData: function() {
     tsb.state.dataSource.getProjectsAndParticipantsForYear(this.year).then(function(data) {
       console.log('data loaded', data.rows.length);
-      console.log(data.groupBy('participant').uniqueValues.length);
-      console.log(data.groupBy('project').uniqueValues.length);
+      var participantList = data.groupBy('participant').values;
+      var projectList = data.groupBy('project').values;
 
-      return;
+      console.log('participantList', participantList.length);
+      participantList = participantList.filter(function(participantDataSet) {
+        return participantDataSet.rows.length > 2
+      })
+      console.log('participantList', participantList.length);
+
+      console.log('projectList', projectList.length);
+      projectList = projectList.filter(function(projectDataSet) {
+        return projectDataSet.rows.length > 2
+      })
+      console.log('projectList', projectList.length);
     }.bind(this));
   },
   resize: function(w, h) {
