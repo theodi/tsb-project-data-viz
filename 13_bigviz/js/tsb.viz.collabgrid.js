@@ -84,10 +84,10 @@ tsb.viz.collabGrid = {
     var tooltip = this.tooltip;
     var tooltipText = this.tooltipText;
 
-    var linkGroup = svg.append('g');
-    var nodeGroup = svg.append('g');
-
     function exploreOrganization(org) {
+      var rootGroup = svg.append('g');
+      var linkGroup = rootGroup.append('g');
+      var nodeGroup = rootGroup.append('g');
       //ROOT
       org.x = w/2;
       org.y = h*0.9;
@@ -214,7 +214,22 @@ tsb.viz.collabGrid = {
       })
 
       collaboratorNodes.on('click', function(d) {
-        exploreOrganization(d);
+        //console.log(d.x);
+        var targetX = w/2;
+        var targetY = h*0.9;
+        var dx = targetX - d.x;
+        var dy = targetY - d.y;
+        rootGroup
+          .transition()
+          .duration(1000)
+          .attr('transform', function(d) { return 'translate(' + (dx) + ',' + (dy) + ')'; })
+          .each('end', function() {
+            exploreOrganization(d);
+            rootGroup
+              .transition()
+              .duration(1000)
+              .style('opacity', 0).remove();
+          })
       })
 
       //LINKS
