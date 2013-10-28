@@ -41,6 +41,7 @@ tsb.viz.collabGrid = {
         if (!participant) {
           participant = {
             id: row.participant,
+            label: row.participantLabel,
             projects: []
           }
           participantsMap[row.participant] = participant;
@@ -83,6 +84,8 @@ tsb.viz.collabGrid = {
     var h = this.h;
     var projectDistance = 50;
     var collaboratorDistance = 150;
+    var tooltip = this.tooltip;
+    var tooltipText = this.tooltipText;
 
     function exploreOrganization(org) {
       var rootNode = svg.selectAll('.root').data([org]);
@@ -92,10 +95,21 @@ tsb.viz.collabGrid = {
         .attr('cx', w/2)
         .attr('cy', h/2)
         .attr('r', 0)
-        .style('fill', 'none')
+        .style('fill', 'white')
         .style('stroke', '#333')
         .transition()
         .attr('r', 20)
+
+      rootNode.on('mouseover', function(d) {
+        console.log(d);
+        tooltip.style('display', 'block')
+        tooltipText.text(d.label);
+      })
+
+      rootNode.on('mouseout', function() {
+        tooltip.style('display', 'none');
+      })
+
 
       org.projects.forEach(function(project, projectIndex) {
         project.x = w/2 + projectDistance * Math.cos(Math.PI*2*projectIndex/org.projects.length);
@@ -138,6 +152,17 @@ tsb.viz.collabGrid = {
         })
         .attr('r', 5);
 
+      collaboratorNodes.on('mouseover', function(d) {
+        console.log(d);
+        tooltip.style('display', 'block')
+        tooltipText.text(d.label);
+      })
+
+      collaboratorNodes.on('mouseout', function() {
+        tooltip.style('display', 'none');
+      })
+
+
       //do, are we displaying ourselves?
 
       var diagonal = d3.svg.diagonal().projection(function(d) { return [d.x, d.y]; });
@@ -157,6 +182,7 @@ tsb.viz.collabGrid = {
         .style('stroke', 'rgba(0,0,0,0.2)')
         .attr('d', diagonal);
 
+      tooltip.node().parentNode.appendChild(tooltip.node());
     }
 
     var startOrg = participants[0];
