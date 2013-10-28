@@ -85,7 +85,7 @@ tsb.viz.collabGrid = {
     var collaboratorDistance = 150;
 
     function exploreOrganization(org) {
-      var rootNode = svg.selectAll('circle.root').data([org]);
+      var rootNode = svg.selectAll('.root').data([org]);
       rootNode.exit().remove()
       rootNode.enter().append('circle')
         .attr('class', 'root')
@@ -102,7 +102,7 @@ tsb.viz.collabGrid = {
         project.y = h/2 + projectDistance * Math.sin(Math.PI*2*projectIndex/org.projects.length);
       })
 
-      var projectNodes = svg.selectAll('circle.project').data(org.projects);
+      var projectNodes = svg.selectAll('.project').data(org.projects);
       projectNodes.exit().remove()
       projectNodes.enter().append('circle')
         .attr('class', 'project')
@@ -123,7 +123,7 @@ tsb.viz.collabGrid = {
         collaborator.y = h/2 + collaboratorDistance * Math.sin(Math.PI*2*collaboratorIndex/collaborators.length);
       });
 
-      var collaboratorNodes = svg.selectAll('circle.collaborator').data(collaborators);
+      var collaboratorNodes = svg.selectAll('.collaborator').data(collaborators);
       collaboratorNodes.exit().remove()
       collaboratorNodes.enter().append('circle')
       .attr('class', 'collaborator')
@@ -137,6 +137,25 @@ tsb.viz.collabGrid = {
           return i * 30;
         })
         .attr('r', 5);
+
+      //do, are we displaying ourselves?
+
+      var diagonal = d3.svg.diagonal().projection(function(d) { return [d.x, d.y]; });
+
+      var links = [];
+      org.projects.forEach(function(project) {
+        project.participants.forEach(function(participant) {
+          links.push({source:project, target:participant});
+        })
+      })
+
+      var linkNodes = svg.selectAll('.link').data(links);
+      linkNodes.exit().remove();
+      linkNodes.enter().append('path')
+        .attr('class', 'link')
+        .style('fill', 'none')
+        .style('stroke', 'rgba(0,0,0,0.2)')
+        .attr('d', diagonal);
 
     }
 
