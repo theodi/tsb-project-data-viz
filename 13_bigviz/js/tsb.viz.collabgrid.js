@@ -131,10 +131,10 @@ tsb.viz.collabGrid = {
         })
         .attr('r', 5);
 
-      var collaborators = _.uniq(_.flatten(_.pluck(org.projects, 'participants')));
+      var collaborators = _.filter(_.uniq(_.flatten(_.pluck(org.projects, 'participants'))), function(p) { return p != org; });
       collaborators.forEach(function(collaborator, collaboratorIndex) {
-        collaborator.x = w/2 + collaboratorDistance * Math.cos(Math.PI*2*collaboratorIndex/collaborators.length);
-        collaborator.y = h/2 + collaboratorDistance * Math.sin(Math.PI*2*collaboratorIndex/collaborators.length);
+        collaborator.x = w/2 + collaboratorDistance * Math.cos(Math.PI*2*collaboratorIndex/(collaborators.length-1));
+        collaborator.y = h/2 + collaboratorDistance * Math.sin(Math.PI*2*collaboratorIndex/(collaborators.length-1));
       });
 
       var collaboratorNodes = svg.selectAll('.collaborator').data(collaborators);
@@ -170,7 +170,9 @@ tsb.viz.collabGrid = {
       var links = [];
       org.projects.forEach(function(project) {
         project.participants.forEach(function(participant) {
-          links.push({source:project, target:participant});
+          if (participant != org) {
+            links.push({source:project, target:participant});
+          }
         })
       })
 
