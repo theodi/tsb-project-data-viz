@@ -81,22 +81,48 @@ tsb.viz.collabGrid = {
     var svg = this.svg;
     var w = this.w;
     var h = this.h;
+    var projectDistance = 50;
 
     function exploreOrganization(org) {
-      var root = svg.selectAll('circle.root')
+      var rootNode = svg.selectAll('circle.root')
         .data([org])
 
-      root.exit().remove()
-      root.enter().append('circle')
+      rootNode.exit().remove()
+      rootNode.enter().append('circle')
         .attr('cx', w/2)
         .attr('cy', h/2)
         .attr('r', 0)
-        .style('fill', '#333')
+        .style('fill', 'none')
+        .style('stroke', '#333')
         .transition()
         .attr('r', 20)
+
+      console.log(org);
+
+      var projectNodes = svg.selectAll('circle.project')
+        .data(org.projects);
+
+      projectNodes.exit().remove()
+      projectNodes.enter().append('circle')
+        .attr('cx', function(d, i) { return w/2 + projectDistance * Math.cos(Math.PI*2*i/org.projects.length); })
+        .attr('cy', function(d, i) { return h/2 + projectDistance * Math.sin(Math.PI*2*i/org.projects.length); })
+        .attr('r', 0)
+        .style('stroke', function(d) { return tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode]; })
+        .style('fill', 'none')
+        .transition()
+        .delay(function(d,i) {
+          return i * 30;
+        })
+        .attr('r', 5);
     }
 
-    var startOrg = _.shuffle(participants)[0];
+    var startOrg = participants[0];
+    for(var i=0; i<participants.length; i++) {
+      if (participants[i].projects.length > 5) {
+        startOrg = participants[i];
+        break;
+      }
+    }
     exploreOrganization(startOrg);
   },
   resize: function(w, h) {
