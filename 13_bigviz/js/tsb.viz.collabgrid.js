@@ -56,8 +56,6 @@ tsb.viz.collabGrid = {
         }
       })
 
-      console.log('projects', projects.length, 'participants', participants.length);
-
       function prop(name) {
         return function(o) {
           return o[name];
@@ -67,8 +65,6 @@ tsb.viz.collabGrid = {
       var projectsByBudgetAreaCode = _.groupBy(projects, prop('budgetAreaCode'));
       var budgetAreaCodes = _.keys(projectsByBudgetAreaCode);
       var participantsByBudgetAreaCode = {};
-
-      console.log('projectsByBudgetAreaCode', projectsByBudgetAreaCode)
 
       budgetAreaCodes.forEach(function(budgetAreaCode) {
         var projects = projectsByBudgetAreaCode[budgetAreaCode];
@@ -149,10 +145,13 @@ tsb.viz.collabGrid = {
 
       var collaboratorNodes = nodeGroup.selectAll('.collaborator').data(collaborators);
       collaboratorNodes.exit().remove()
-      collaboratorNodes.enter().append('circle')
+      var collaboratorGroup = collaboratorNodes.enter().append('g');
+
+      collaboratorGroup.attr('transform', function(d) { return 'translate(' + (d.x) + ',' + (d.y) + ')'; });
+      var collaboratorCircle = collaboratorGroup.append('circle')
       .attr('class', 'collaborator')
-        .attr('cx', function(d) { return d.x; })
-        .attr('cy', function(d) { return d.y; })
+        .attr('cx', 0)
+        .attr('cy', 0)
         .attr('r', 0)
         .style('stroke', '#333')
         .style('fill', '#FFF')
@@ -161,6 +160,21 @@ tsb.viz.collabGrid = {
           return i * 30;
         })
         .attr('r', participantSizeToRadius);
+
+      var collabolatorProjects = collaboratorGroup.selectAll('.project')
+        .data(function(d) {
+          return d.projects;
+        })
+      collabolatorProjects.exit().remove()
+      collabolatorProjects.enter().append('rect')
+        .attr('class', 'project')
+        .attr('x', function(d, i) { return -7; })
+        .attr('y', function(d, i) { return -20 -i * 8; })
+        .attr('width', function(d) { return 14; })
+        .attr('height', function(d) { return 6; })
+        .attr('r', 0)
+        .style('fill', function(d) { return tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode]; })
+        .style('stroke', 'none')
 
       collaboratorNodes.on('mouseover', function(d) {
         tooltip.style('display', 'block')
@@ -199,6 +213,7 @@ tsb.viz.collabGrid = {
     var startOrg = participants[0];
     for(var i=0; i<participants.length; i++) {
       if (participants[i].projects.length > 5) {
+        if (i < 100) continue;
         startOrg = participants[i];
         break;
       }
