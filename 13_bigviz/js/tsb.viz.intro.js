@@ -71,35 +71,28 @@ tsb.viz.intro = {
     }.bind(this));
   },
   createProjects: function(projects) {
-    var pw = 8;
+    var pw = 5;
     var ph = 20;
-    var spacingX = 4;
-    var spacingY = 8;
-    var marginY = 8;
+    var spacingX = 2;
+    var spacingY = 10;
+    var marginX = 8;
+    var marginY = 15;
 
-    var maxWidth = tsb.common.getMaxWidth(this.w);
-    var leftMargin = this.leftMargin = (this.w - maxWidth)/2;
-    var containerMargin = tsb.config.themes.current.containerMargin;
-
-    maxWidth = this.w;
-    leftMargin = 0;
-    containerMargin = 0;
-    marginY = 0;
-
-    var projectsPerRow = Math.floor((maxWidth + spacingX - containerMargin*2) / (pw + spacingX));
-
-    var numFullRows = Math.floor(projects.length / projectsPerRow);
-
-    ph = Math.floor((this.h - marginY*2 + spacingY - numFullRows * spacingY)/numFullRows);
+    var projectsPerRow = Math.floor(this.w - 2 * marginX) / (pw + spacingX);
+    var numAvailableRows = Math.floor(this.h - 2 * marginY) / (ph + spacingY);
+    var maxNumProjects = numAvailableRows * projectsPerRow;
+    var numFullRows = Math.floor(maxNumProjects / projectsPerRow);
 
     projects.forEach(function(project, projectIndex) {
-      var row = Math.floor(projectIndex / projectsPerRow);
-      var px = leftMargin + containerMargin + (projectIndex % projectsPerRow) * (pw + spacingX);
+      var distributedIndex = Math.floor(projectIndex * maxNumProjects / projects.length);
+      if (Math.random() > 0.99) console.log(distributedIndex, projectIndex);
+      var row = Math.floor(distributedIndex / projectsPerRow);
+      var px = marginX + (distributedIndex % projectsPerRow) * (pw + spacingX);
       var py = marginY + row * (ph + spacingY);
+      if (row >= numFullRows) ph = 0; //don't draw invisible projects
       var budgetAreaCode = tsb.common.extractBudgetAreaCode(project.budgetArea);
       var color = tsb.config.themes.current.budgetAreaColor[budgetAreaCode];
-      if (row >= numFullRows) ph = 0;
-      this.makeRect(px, py, pw, ph, color, 'project', projectIndex);
+      this.makeRect(px, py, pw, ph, color, 'project', distributedIndex);
     }.bind(this));
     this.drawRects();
   },
