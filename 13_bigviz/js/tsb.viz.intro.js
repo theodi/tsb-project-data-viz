@@ -85,7 +85,6 @@ tsb.viz.intro = {
 
     projects.forEach(function(project, projectIndex) {
       var distributedIndex = Math.floor(projectIndex * maxNumProjects / projects.length);
-      if (Math.random() > 0.99) console.log(distributedIndex, projectIndex);
       var row = Math.floor(distributedIndex / projectsPerRow);
       var px = marginX + (distributedIndex % projectsPerRow) * (pw + spacingX);
       var py = marginY + row * (ph + spacingY);
