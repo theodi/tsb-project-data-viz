@@ -96,7 +96,7 @@ tsb.viz.priorityAreas = {
     }.bind(this))
   },
   drawGraph: function(data) {
-    console.log('drawGraph', data);
+    tsb.common.log('drawGraph', data);
     var n = tsb.config.budgetAreas.length; // number of layers / budget areas
     var m = this.endYear - this.startYear + 1; // number of samples per layer / years
     var stack = d3.layout.stack().offset('wiggle');

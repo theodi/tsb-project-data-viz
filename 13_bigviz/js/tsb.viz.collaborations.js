@@ -2,7 +2,7 @@ var tsb = tsb || { viz : {} };
 
 tsb.viz.collaborations = {
   init: function(svg, w, h) {
-    console.log('collab', tsb.config.themes.current.collaborationsBgColor)
+    tsb.common.log('collab', tsb.config.themes.current.collaborationsBgColor)
     this.svg = svg;
     this.w = w;
     this.h = h;

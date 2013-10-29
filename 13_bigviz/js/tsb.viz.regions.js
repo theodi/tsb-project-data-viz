@@ -195,7 +195,7 @@ tsb.viz.regions = {
       var statsTop = 180;
 
       tsb.state.dataSource.getAreaSummaryForYearInRegion(this.year, regionCode).then(function(data) {
-        console.log(regionInfo.name, data);
+        tsb.common.log(regionInfo.name, data);
         var totalGrantsSum = data.rows.reduce(function(prev, area) {
           return prev + Number(area.grantsSum);
         }, 0);
