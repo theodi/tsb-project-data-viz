@@ -184,7 +184,10 @@ tsb.viz.regions = {
                 .selectAll('path')
                 .style('fill', tsb.config.themes.current.regionsRegionColor);
             })
-        })
+            .on('click', function() {
+              this.openLink(this.year, null, regionInfo.name);
+            }.bind(this))
+        }.bind(this))
 
       region
         .style('fill', tsb.config.themes.current.regionsRegionColor)
@@ -312,7 +315,7 @@ tsb.viz.regions = {
     }.bind(this));
   },
   openLink: function(year, area, region) {
-    var areaLabel = tsb.config.budgetAreaLabels[area];
+    var areaLabel = area ? tsb.config.budgetAreaLabels[area] : '';
     var start = year + '-01-01';
     var end = year + '-12-31';
     var region
