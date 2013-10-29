@@ -341,15 +341,16 @@ tsb.viz.collaborations = {
       tooltip.node().parentNode.appendChild(tooltip.node());
     }
 
-    var startOrg = participants[0];
-    for(var i=0; i<participants.length; i++) {
-      if (participants[i].projects.length > 5) {
-        if (Math.random() > 0.9) console.log(participants[i].id);
-        if (participants[i].label.indexOf('Imperial') > -1) {
-          startOrg = participants[i];
+    var randomParticipants = _.shuffle(participants);
+    var startOrg = [0];
+    for(var i=0; i<randomParticipants.length; i++) {
+      if (randomParticipants[i].projects.length > 5) {
+        //if (Math.random() > 0.9) console.log(participants[i].id);
+        //if (participants[i].label.indexOf('Imperial') > -1) {
+          startOrg = randomParticipants[i];
           break;
         }
-      }
+      //}
     }
     exploreOrganization(startOrg);
   },
