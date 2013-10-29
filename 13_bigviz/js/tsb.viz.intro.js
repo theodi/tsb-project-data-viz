@@ -76,10 +76,10 @@ tsb.viz.intro = {
     var spacingX = 2;
     var spacingY = 10;
     var marginX = 8;
-    var marginY = 15;
+    var marginY = 5;
 
     var projectsPerRow = Math.floor(this.w - 2 * marginX) / (pw + spacingX);
-    var numAvailableRows = Math.floor(this.h - 2 * marginY) / (ph + spacingY);
+    var numAvailableRows = Math.floor((this.h - 2 * marginY + spacingY) / (ph + spacingY));
     var maxNumProjects = numAvailableRows * projectsPerRow;
     var numFullRows = Math.floor(maxNumProjects / projectsPerRow);
 
@@ -88,7 +88,7 @@ tsb.viz.intro = {
       var row = Math.floor(distributedIndex / projectsPerRow);
       var px = marginX + (distributedIndex % projectsPerRow) * (pw + spacingX);
       var py = marginY + row * (ph + spacingY);
-      if (row >= numFullRows) ph = 0; //don't draw invisible projects
+      if (row > numFullRows) ph = 0; //don't draw invisible projects
       var budgetAreaCode = tsb.common.extractBudgetAreaCode(project.budgetArea);
       var color = tsb.config.themes.current.budgetAreaColor[budgetAreaCode];
       this.makeRect(px, py, pw, ph, color, 'project', distributedIndex);
