@@ -1,4 +1,12 @@
-var tsb = tsb || {};
+var tsb = {
+  viz : {},
+  state : {
+    w : window.innerWidth,
+    h : 480,
+    svg : null
+  }
+};
+
 tsb.common = tsb.common || {};
 
 tsb.common.extractBudgetAreaCode = function(budgetArea) {
