@@ -267,6 +267,7 @@ tsb.viz.collaborations = {
         .attr('height', function(d) { return 0; })
         .attr('r', 0)
         .style('fill', function(d) { return tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode]; })
+        .style('opacity', function(d, i) { return (i < 10) ? 1 : Math.max(0, 1 - (i - 10)/8) })
         .style('stroke', 'none')
         .transition()
         .delay(function(d, i) { return 500 + i * 50})
@@ -341,9 +342,11 @@ tsb.viz.collaborations = {
     var startOrg = participants[0];
     for(var i=0; i<participants.length; i++) {
       if (participants[i].projects.length > 5) {
-        if (i < 100) continue;
-        startOrg = participants[i];
-        break;
+        if (Math.random() > 0.9) console.log(participants[i].id);
+        if (participants[i].label.indexOf('Imperial') > -1) {
+          startOrg = participants[i];
+          break;
+        }
       }
     }
     exploreOrganization(startOrg);
