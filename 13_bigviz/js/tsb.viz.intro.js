@@ -116,14 +116,6 @@ tsb.viz.intro = {
     };
     this.rectangles.push(rect);
     var projectRect = d3.select(rect);
-    //var projectRect = this.svg
-    //  .append('g')
-    //  .append('rect')
-    //  .attr('class', className)
-    //  .attr('x', x).attr('y', y+h)
-    //  .attr('width', w).attr('height', this.staticMode ? h : 0)
-    //  .attr('fill', color)
-    //  .style('opacity', tsb.config.themes.current.budgetAreaColorAlpha);
 
     function interpolateProperty(propertyName, targetValue) {
       return function() {
@@ -138,10 +130,8 @@ tsb.viz.intro = {
     else {
       projectRect
         .transition().delay(Math.random()*this.duration)
-        //.property('y', y)
         .tween('animy', interpolateProperty('y', y))
         .tween('animh', interpolateProperty('height', h))
-        //.property('height', h)
         .each('end', this.onProjectAnimComplete.bind(this));
     }
   },
