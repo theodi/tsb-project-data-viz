@@ -65,10 +65,10 @@ tsb.config.themes = {
     introVizBtnLabelColors: ['#0DBC37', '#00B7FF', '#F9BC26'],
     budgetAreaColorAlpha: 0.55,
     budgetAreaColor : {
-      'TRANSPO'            : '#00B7FF',
+      'TRANSPO'         : '#00B7FF',
       'TECH'            : '#D60303',
       'MANF'            : '#FF6700',
-      'ENV_SUS'            : '#0DBC37',
+      'ENV_SUS'         : '#0DBC37',
       'tsb-programmes'  : '#B13198',
       'DIGS'            : '#EF3AAB',
       'ENRG'            : '#F9BC26',
@@ -78,7 +78,8 @@ tsb.config.themes = {
     priorityAreasBgColor: '#FFFFFF',
     collaborationsBgColor: '#FFFFFF',
     regionsBgColor: '#FFFFFF',
-    regionsRegionColor: '#DDDDDD'
+    regionsRegionColor: '#999',
+    regionsRegionHighlighColor: '#000'
   }
 }
 

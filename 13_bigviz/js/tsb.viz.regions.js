@@ -167,7 +167,24 @@ tsb.viz.regions = {
 
       region.transition()
         .delay(mapAnimDelay).duration(mapAnimTime)
-        .attr('transform', 'translate('+regionX/this.mapScale+','+regionY/this.mapScale+')');
+        .attr('transform', 'translate('+regionX/this.mapScale+','+regionY/this.mapScale+')')
+        .each('end', function() {
+           region
+            .on('mouseover', function() {
+              region
+                .transition()
+                .style('fill', tsb.config.themes.current.regionsRegionHighlighColor)
+                .selectAll('path')
+                .style('fill', tsb.config.themes.current.regionsRegionHighlighColor);
+            })
+            .on('mouseleave', function() {
+              region
+                .transition()
+                .style('fill', tsb.config.themes.current.regionsRegionColor)
+                .selectAll('path')
+                .style('fill', tsb.config.themes.current.regionsRegionColor);
+            })
+        })
 
       region
         .style('fill', tsb.config.themes.current.regionsRegionColor)
