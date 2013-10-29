@@ -111,7 +111,7 @@ tsb.viz.intro = {
       y: y+h,
       width: w,
       height: this.staticMode ? h : 0,
-      color: color,
+      color: d3.rgb(color).darker(1.5).toString(),
       opacity: tsb.config.themes.current.budgetAreaColorAlpha
     };
     this.rectangles.push(rect);
