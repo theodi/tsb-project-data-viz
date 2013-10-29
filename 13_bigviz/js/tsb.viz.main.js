@@ -1,13 +1,5 @@
-var tsb = {
-  viz : {},
-  state : {
-    w : window.innerWidth,
-    h : 480,
-    svg : null
-  }
-};
-
 function init() {
+  tsb.common.log('tsb.init');
   tsb.state.dataSource = new tsb.SPARQLDataSource();
 
   var svg = tsb.state.svg = d3.select('#home-viz').append('svg')
@@ -19,13 +11,20 @@ function init() {
   var currentViz = null;
 
   function checkScene() {
+    tsb.common.log('tsb.checkScene');
     if (currentViz && currentViz.close) {
       currentViz.close();
     }
 
+    d3.select('#home-viz')
+    .style('position', 'relative')
+
     svg.remove();
     svg = tsb.state.svg = d3.select('#home-viz').append('svg')
     .attr('width', tsb.state.w)
+    .style('position', 'absolute')
+    .style('top', 0)
+    .style('left', 0)
     .attr('height', tsb.state.h);
     var staticMode = (document.location.search == "?static=true");
     if (document.location.hash == '#introopened') {

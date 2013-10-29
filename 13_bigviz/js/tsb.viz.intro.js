@@ -1,6 +1,7 @@
 var tsb = tsb || { viz : {} };
 
 tsb.viz.intro = {
+  canvas: null,
   init: function(svg, w, h, staticMode) {
     this.svg = svg;
     this.w = w;
@@ -8,7 +9,6 @@ tsb.viz.intro = {
     this.staticMode = staticMode;
     this.year = (new Date().getFullYear());
     this.duration = 60000;
-    this.loadData();
     this.minimizeDelay = 3000;
     this.minimizeTime = 2000;
     this.titleScale = 1;
@@ -20,11 +20,23 @@ tsb.viz.intro = {
     this.subVizBtnSize = 270;
     this.subVizBtnMargin = 160;
 
+    tsb.common.log('tsb.intro.init');
+
     this.bg = svg
     .append('rect')
     .attr('class', 'bg')
-    .attr('width', this.w).attr('height', this.h)
-    .attr('fill', tsb.config.themes.current.introBgColor);
+    //.attr('width', this.w).attr('height', this.h)
+    //.attr('fill', 'red');
+
+    if (!this.canvas) {
+      this.canvas = document.getElementById('home-viz-canvas');
+      this.canvas.width = w;
+      this.canvas.height = h;
+      this.ctx = this.canvas.getContext('2d');
+      this.ctx.fillStyle = tsb.config.themes.current.introBgColor;
+      this.ctx.fillRect(0, 0, w, h);
+    }
+    this.loadData();
   },
   close: function() {
     if (this.updateLabelsAnim) {
@@ -33,12 +45,14 @@ tsb.viz.intro = {
     }
   },
   loadData: function() {
+    tsb.common.log('tsb.intro.loading...');
     this.numProjects = 0;
     this.displayedNumProjects = 0;
     var svg = this.svg;
     var w = this.w;
     var h = this.h;
     tsb.state.dataSource.getProjectsForYear(this.year).then(function(projects) {
+      tsb.common.log('tsb.intro.loaded', projects.rows.length);
       this.createProjects(projects.rows);
       var alreadyOpened = document.location.hash == '#introopened';
       this.addLabels(alreadyOpened);
@@ -87,8 +101,58 @@ tsb.viz.intro = {
       if (row >= numFullRows) ph = 0;
       this.makeRect(px, py, pw, ph, color, 'project', projectIndex);
     }.bind(this));
+    this.drawRects();
+  },
+  rectangles: [],
+  drawRects: function() {
+    this.rectangles.forEach(function(rect) {
+      if (rect.height == rect.prevHeight) return;
+      rect.prevHeight = rect.height;
+      this.ctx.fillStyle = rect.color;
+      this.ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+    }.bind(this));
   },
   makeRect: function(x, y, w, h, color, className, projectIndex) {
+    var rect = {
+      x: x,
+      y: y+h,
+      width: w,
+      height: this.staticMode ? h : 0,
+      color: color,
+      opacity: tsb.config.themes.current.budgetAreaColorAlpha
+    };
+    this.rectangles.push(rect);
+    var projectRect = d3.select(rect);
+    //var projectRect = this.svg
+    //  .append('g')
+    //  .append('rect')
+    //  .attr('class', className)
+    //  .attr('x', x).attr('y', y+h)
+    //  .attr('width', w).attr('height', this.staticMode ? h : 0)
+    //  .attr('fill', color)
+    //  .style('opacity', tsb.config.themes.current.budgetAreaColorAlpha);
+
+    function interpolateProperty(propertyName, targetValue) {
+      return function() {
+          var i = d3.interpolateNumber(this[propertyName], targetValue);
+          return function(t) { this[propertyName] = i(t); };
+      };
+    }
+
+    if (this.staticMode) {
+      this.numProjects++;
+    }
+    else {
+      projectRect
+        .transition().delay(Math.random()*this.duration)
+        //.property('y', y)
+        .tween('animy', interpolateProperty('y', y))
+        .tween('animh', interpolateProperty('height', h))
+        //.property('height', h)
+        .each('end', this.onProjectAnimComplete.bind(this));
+    }
+  },
+  makeRectOld: function(x, y, w, h, color, className, projectIndex) {
     var projectRect = this.svg
       .append('g')
       .append('rect')
@@ -162,8 +226,11 @@ tsb.viz.intro = {
 
     this.title.text(titleText);
     this.projectCount.text(projectCountText);
+
+    this.drawRects();
   },
   resize: function(w, h) {
+    console.log('resize', w, h);
     this.w = w;
     this.h = h;
 
@@ -184,8 +251,10 @@ tsb.viz.intro = {
     this.bg
       .attr('width', this.w);
 
-    this.labelGroup
-      .attr('transform', 'translate('+(this.titleX)+','+(this.titleY)+') scale('+this.titleScale+','+this.titleScale+')');
+    if (this.labelGroup) {
+      this.labelGroup
+        .attr('transform', 'translate('+(this.titleX)+','+(this.titleY)+') scale('+this.titleScale+','+this.titleScale+')');
+    }
 
     var margin = this.subVizBtnMargin;
     var spacing = (maxWidth - this.subVizBtnSize * this.numClipPaths) / (this.numClipPaths + 1);
