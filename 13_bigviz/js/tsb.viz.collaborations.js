@@ -8,7 +8,6 @@ tsb.viz.collaborations = {
     this.year = (new Date()).getFullYear();
 
     this.loadData();
-    this.resize(this.w, this.h);
 
     this.bg = svg
     .append('rect')
@@ -16,7 +15,63 @@ tsb.viz.collaborations = {
     .attr('width', this.w).attr('height', this.h)
     .attr('fill', '#FFFFFF');
 
+    this.title = svg
+      .append('text')
+      .style('fill', '#333')
+      .style('font-size', tsb.config.themes.current.titleFontSize + 'px')
+      .style('font-weight', tsb.config.themes.current.titleFontWeight)
+      .text('Organization\'s projects and their collaborators')
+
     this.addToolTip();
+    this.addBackBtn();
+    this.resize(this.w, this.h);
+  },
+  addBackBtn: function() {
+    this.backBtn = this.svg.append('g');
+
+    this.backBtnHit = this.backBtn.append('rect')
+      .attr('width', '2em')
+      .attr('height', '2em')
+      .style('fill', 'none')
+      .attr('rx', '5px')
+      .attr('ry', '5px')
+
+    this.backBtnArrow = this.backBtn.append('text')
+      .attr('x', '0.3em')
+      .attr('y', '0.75em')
+      .style('fill', '#AAA')
+      .style('font-size', '200%')
+      .style('font-weight', '300')
+      .text('«')
+
+    this.backBtn.on('mouseover', function() {
+      this.backBtnArrow.style('fill', '#000');
+    }.bind(this));
+
+    this.backBtn.on('mouseleave', function() {
+      this.backBtnArrow.style('fill', '#AAA');
+    }.bind(this));
+
+    this.backBtn.on('click', function() {
+      document.location.href = "#introopened";
+    }.bind(this));
+  },
+  resize: function(w, h) {
+    this.w = w;
+    this.h = h;
+
+    var maxWidth = this.maxWidth = tsb.common.getMaxWidth(this.w);
+    var leftMargin = this.leftMargin = (this.w - maxWidth)/2;
+    var containerMargin = tsb.config.themes.current.containerMargin;
+    var titleFontSize = tsb.config.themes.current.titleFontSize;
+
+    this.bg
+      .attr('width', this.w);
+
+    this.title.attr('x', leftMargin + containerMargin);
+    this.title.attr('y', titleFontSize + containerMargin);
+
+    this.backBtn.attr('transform', 'translate('+(leftMargin-titleFontSize*0.5)+','+titleFontSize*0.6+')');
   },
   loadData: function() {
     tsb.state.dataSource.getProjectsAndParticipantsForYear(this.year).then(function(data) {
@@ -155,7 +210,7 @@ tsb.viz.collaborations = {
       var collaborators = _.filter(_.uniq(_.flatten(_.pluck(org.projects, 'participants'))), function(p) { return p != org; });
       collaborators.forEach(function(collaborator, collaboratorIndex) {
         collaborator.x = w/2 + (collaboratorIndex - collaborators.length/2) * 40;
-        collaborator.y = h * 0.4;
+        collaborator.y = h * 0.5;
       });
 
       var collaboratorNodes = nodeGroup.selectAll('.collaborator').data(collaborators);
@@ -292,10 +347,6 @@ tsb.viz.collaborations = {
       }
     }
     exploreOrganization(startOrg);
-  },
-  resize: function(w, h) {
-    this.w = w;
-    this.h = h;
   },
   addToolTip: function() {
     this.tooltip = this.svg.append('g');
