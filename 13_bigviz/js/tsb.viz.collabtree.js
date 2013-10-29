@@ -230,7 +230,7 @@ tsb.viz.collabTree = {
       })
 
       collaboratorNodes.on('click', function(d) {
-        //tsb.common.log(d.x);
+        tooltip.style('display', 'none');
         var targetX = w/2;
         var targetY = h*0.9;
         var dx = targetX - d.x;
