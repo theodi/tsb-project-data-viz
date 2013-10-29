@@ -149,26 +149,28 @@ tsb.viz.collaborations = {
 
       var rootNode = nodeGroup.selectAll('.root').data([org])
 
-      rootNode.enter().append('circle')
-        .attr('class', 'root')
+      rootNode.enter()
+        .append('g')
+        .attr('class', 'root');
+
+      var rootNodeCircle = rootNode.append('circle')
         .attr('cx', function(d) { return d.x; })
         .attr('cy', function(d) { return d.y; })
         .attr('r', 0)
         .style('fill', 'white')
         .style('stroke', '#333')
 
-      rootNode
+      var rootNodeLabel = rootNode.append('text')
+        .attr('x', function(d) { return d.x; })
+        .attr('y', function(d) { return d.y + 30; })
+        .attr('text-anchor', 'middle')
+        .style('fill', 'black')
+        .style('font-size', '12px')
+        .text(org.label)
+
+      rootNodeCircle
         .transition()
         .attr('r', participantSizeToRadius)
-
-      rootNode.on('mouseover', function(d) {
-        tooltip.style('display', 'block')
-        tooltipText.text(d.label);
-      })
-
-      rootNode.on('mouseout', function() {
-        tooltip.style('display', 'none');
-      })
 
       rootNode.exit().remove()
 
