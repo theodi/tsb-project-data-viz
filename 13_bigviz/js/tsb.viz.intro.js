@@ -122,14 +122,14 @@ tsb.viz.intro = {
       .attr('dx', 0)
       .attr('dy', 0)
       .attr('fill', tsb.config.themes.current.introTextColor)
-      .style('font-size', tsb.config.themes.current.titleFontSize * 2)
+      .style('font-size', tsb.config.themes.current.titleFontSize * 2 + 'px')
       .style('font-weight', tsb.config.themes.current.introTextFontWeight);
 
     this.projectCount = labelGroup.append('text')
       .attr('dx', 0)
       .attr('dy', tsb.config.themes.current.titleFontSize*2.5)
       .attr('fill', tsb.config.themes.current.introTextColor)
-      .style('font-size', tsb.config.themes.current.titleFontSize * 2)
+      .style('font-size', tsb.config.themes.current.titleFontSize * 2 + 'px')
       .style('font-weight', tsb.config.themes.current.introTextFontWeight);
 
     labelGroup
@@ -239,7 +239,7 @@ tsb.viz.intro = {
       .append('text')
       .attr('text-anchor', 'middle')
       .attr('dy', tsb.config.themes.current.introVizBtnFontSize/2)
-      .style('font-size', tsb.config.themes.current.introVizBtnFontSize)
+      .style('font-size', tsb.config.themes.current.introVizBtnFontSize + 'px')
       .attr('fill', function(d) { return tsb.config.themes.current.introVizBtnLabelColors[d]; })
       .text(function(d) { return tsb.config.introVizBtnLabels[d]; });
 

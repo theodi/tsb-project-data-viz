@@ -52,7 +52,7 @@ tsb.config.themes = {
   odiDark: {
     defaultTextColor: '#222222',
     containerMargin: 15,
-    titleFontSize: 42,
+    titleFontSize: 38,
     titleFontWeight: 300,
     subTitleFontWeight: 100,
     introTextColor: '#FFFFFF',

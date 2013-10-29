@@ -20,7 +20,7 @@ tsb.viz.collaborations = {
     this.title = svg
       .append('text')
       .style('fill', '#333')
-      .style('font-size', tsb.config.themes.current.titleFontSize)
+      .style('font-size', tsb.config.themes.current.titleFontSize + 'px')
       .style('font-weight', tsb.config.themes.current.titleFontWeight)
       .text('SME collaborations in TSB priority areas')
 

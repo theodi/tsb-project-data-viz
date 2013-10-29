@@ -20,7 +20,7 @@ tsb.viz.priorityAreas = {
     this.title = svg
       .append('text')
       .style('fill', '#333')
-      .style('font-size', tsb.config.themes.current.titleFontSize)
+      .style('font-size', tsb.config.themes.current.titleFontSize + 'px')
       .style('font-weight', tsb.config.themes.current.titleFontWeight)
       .text('TSB spending by priority area during ' + (this.startYear+1) + ' - ' + (this.endYear-1))
 
@@ -28,7 +28,7 @@ tsb.viz.priorityAreas = {
       .append('text')
       .attr('dy', tsb.config.themes.current.titleFontSize * 1.25)
       .style('fill', '#F00')
-      .style('font-size', tsb.config.themes.current.titleFontSize)
+      .style('font-size', tsb.config.themes.current.titleFontSize + 'px')
       .style('font-weight', tsb.config.themes.current.subTitleFontWeight)
       .text('Space xploration')
       .style('opacity', 0);

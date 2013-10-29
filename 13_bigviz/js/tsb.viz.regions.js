@@ -23,7 +23,7 @@ tsb.viz.regions = {
       .attr('x', this.w * 0.03)
       .attr('y', '2em')
       .style('fill', '#333')
-      .style('font-size', '200%')
+      .style('font-size', tsb.config.themes.current.titleFontSize + 'px')
       .style('font-weight', '300')
       .text('TSB spending by region in ' + this.year)
 
@@ -46,7 +46,7 @@ tsb.viz.regions = {
       .attr('x', '0.3em')
       .attr('y', '0.75em')
       .style('fill', '#AAA')
-      .style('font-size', '200%')
+      .style('font-size', tsb.config.themes.current.titleFontSize + 'px')
       .style('font-weight', '300')
       .text('«')
 
@@ -181,7 +181,7 @@ tsb.viz.regions = {
         .text(name)
         .attr('dx', cx)
         .attr('dy', this.offsetFromTop - 40)
-        .style('font-size', 12)
+        .style('font-size', 12 + 'px')
         .style('opacity', 0)
         .transition()
         .delay(mapAnimDelay + mapAnimTime/2)
