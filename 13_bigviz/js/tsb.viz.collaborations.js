@@ -2,63 +2,300 @@ var tsb = tsb || { viz : {} };
 
 tsb.viz.collaborations = {
   init: function(svg, w, h) {
-    tsb.common.log('collab', tsb.config.themes.current.collaborationsBgColor)
     this.svg = svg;
     this.w = w;
     this.h = h;
-    this.institutionSize = 'medium';
-    this.institutionTopCount = 10;
-    this.institutionsOnlyLocal = false;
-    this.debug = false;
+    this.year = (new Date()).getFullYear();
+
+    this.loadData();
+    this.resize(this.w, this.h);
 
     this.bg = svg
     .append('rect')
     .attr('class', 'bg')
-    .attr('width', tsb.state.w).attr('height', tsb.state.h)
-    .attr('fill', tsb.config.themes.current.collaborationsBgColor);
+    .attr('width', this.w).attr('height', this.h)
+    .attr('fill', '#FFFFFF');
 
-    this.title = svg
-      .append('text')
-      .style('fill', '#333')
-      .style('font-size', tsb.config.themes.current.titleFontSize + 'px')
-      .style('font-weight', tsb.config.themes.current.titleFontWeight)
-      .text('SME collaborations in TSB priority areas')
-
-    this.addBackBtn();
     this.addToolTip();
-    this.resize(this.w, this.h);
-    this.initDebugLayout();
-    this.loadData();
   },
-  addBackBtn: function() {
-    this.backBtn = this.svg.append('g');
+  loadData: function() {
+    tsb.state.dataSource.getProjectsAndParticipantsForYear(this.year).then(function(data) {
+      var participants = [];
+      var participantsMap = {};
+      var projects = [];
+      var projectsMap = {};
 
-    this.backBtnHit = this.backBtn.append('rect')
-      .attr('width', '2em')
-      .attr('height', '2em')
-      .style('fill', 'none')
-      .attr('rx', '5px')
-      .attr('ry', '5px')
+      data.rows.forEach(function(row) {
+        var project = projectsMap[row.project];
+        if (!project) {
+          project = {
+            id: row.project,
+            budgetArea: row.budgetArea,
+            budgetAreaCode: tsb.common.extractBudgetAreaCode(row.budgetArea),
+            participants: []
+          }
+          projectsMap[row.project] = project;
+          projects.push(project);
+        }
+        var participant = participantsMap[row.participant];
+        if (!participant) {
+          participant = {
+            id: row.participant,
+            label: row.participantLabel,
+            size: row.participantSizeLabel,
+            projects: []
+          }
+          participantsMap[row.participant] = participant;
+          participants.push(participant);
+        }
+        if (project.participants.indexOf(participant) == -1) {
+          project.participants.push(participant);
+        }
+        if (participant.projects.indexOf(project) == -1) {
+          participant.projects.push(project);
+        }
+      })
 
-    this.backBtnArrow = this.backBtn.append('text')
-      .attr('x', '0.3em')
-      .attr('y', '0.75em')
-      .style('fill', '#AAA')
-      .style('font-size', '200%')
-      .style('font-weight', '300')
-      .text('«')
+      function prop(name) {
+        return function(o) {
+          return o[name];
+        }
+      }
 
-    this.backBtn.on('mouseover', function() {
-      this.backBtnArrow.style('fill', '#000');
+      var projectsByBudgetAreaCode = _.groupBy(projects, prop('budgetAreaCode'));
+      var budgetAreaCodes = _.keys(projectsByBudgetAreaCode);
+      var participantsByBudgetAreaCode = {};
+
+      budgetAreaCodes.forEach(function(budgetAreaCode) {
+        var projects = projectsByBudgetAreaCode[budgetAreaCode];
+        var participants = _.uniq(_.flatten(_.pluck(projects, 'participants')));
+        participantsByBudgetAreaCode[budgetAreaCode] = participants;
+      })
+
+      this.buildViz(participants, projects, participantsByBudgetAreaCode, projectsByBudgetAreaCode);
     }.bind(this));
+  },
+  buildViz: function(participants, projects, participantsByBudgetAreaCode, projectsByBudgetAreaCode) {
+    var svg = this.svg;
+    var w = this.w;
+    var h = this.h;
+    var projectDistance = 50;
+    var collaboratorDistance = 150;
+    var tooltip = this.tooltip;
+    var tooltipText = this.tooltipText;
 
-    this.backBtn.on('mouseleave', function() {
-      this.backBtnArrow.style('fill', '#AAA');
-    }.bind(this));
+    function exploreOrganization(org) {
+      var rootGroup = svg.append('g');
+      var linkGroup = rootGroup.append('g');
+      var nodeGroup = rootGroup.append('g');
+      //ROOT
+      org.x = w/2;
+      org.y = h*0.9;
 
-    this.backBtn.on('click', function() {
-      document.location.href = "#introopened";
-    }.bind(this));
+      var rootNode = nodeGroup.selectAll('.root').data([org])
+
+      rootNode.enter().append('circle')
+        .attr('class', 'root')
+        .attr('cx', function(d) { return d.x; })
+        .attr('cy', function(d) { return d.y; })
+        .attr('r', 0)
+        .style('fill', 'white')
+        .style('stroke', '#333')
+
+      rootNode
+        .transition()
+        .attr('r', participantSizeToRadius)
+
+      rootNode.on('mouseover', function(d) {
+        tooltip.style('display', 'block')
+        tooltipText.text(d.label);
+      })
+
+      rootNode.on('mouseout', function() {
+        tooltip.style('display', 'none');
+      })
+
+      rootNode.exit().remove()
+
+      //PROJECTS
+
+      org.projects.forEach(function(project, projectIndex) {
+        project.x = w/2 + (projectIndex - org.projects.length/2) * 40;
+        project.y = h*0.7;
+      })
+
+      function participantSizeToRadius(d) {
+        if (d.size == 'micro') return 5;
+        if (d.size == 'small') return 5;
+        if (d.size == 'medium') return 5;
+        if (d.size == 'large') return 10;
+        if (d.size == 'academic') return 10;
+      }
+
+      var projectNodes = nodeGroup.selectAll('.project').data(org.projects);
+      projectNodes.enter().append('rect')
+        .attr('class', 'project')
+        .attr('x', function(d) { return d.x - 7; })
+        .attr('y', function(d) { return d.y; })
+        .attr('width', function(d) { return 14; })
+        .attr('height', function(d) { return 6; })
+        .attr('r', 0)
+        .style('fill', function(d) { return tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode]; })
+        .style('stroke', 'none');
+
+      projectNodes
+        .transition().duration(1000)
+        .attr('x', function(d) { return d.x - 7; })
+        .style('fill', function(d) { return tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode]; })
+
+      projectNodes.exit().transition().duration(1000).style('opacity', 0).remove()
+
+      //COLLABORATORS
+
+      var collaborators = _.filter(_.uniq(_.flatten(_.pluck(org.projects, 'participants'))), function(p) { return p != org; });
+      collaborators.forEach(function(collaborator, collaboratorIndex) {
+        collaborator.x = w/2 + (collaboratorIndex - collaborators.length/2) * 40;
+        collaborator.y = h * 0.4;
+      });
+
+      var collaboratorNodes = nodeGroup.selectAll('.collaborator').data(collaborators);
+      var g = collaboratorNodes.enter().append('g')
+        .attr('class', 'collaborator')
+        .attr('transform', function(d) { return 'translate(' + (d.x) + ',' + (d.y) + ')'; })
+      g.append('circle').attr('class', 'collaboratorCircle')
+      g.append('circle').attr('class', 'collaboratorCircleUni')
+
+      collaboratorNodes.exit().remove()
+
+      collaboratorNodes
+        .attr('transform', function(d) { return 'translate(' + (d.x) + ',' + (d.y) + ')'; });
+
+      var collaboratorCircle = collaboratorNodes.select('circle.collaboratorCircle');
+      collaboratorCircle
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', 0)
+        .style('stroke', '#333')
+        .style('fill', '#FFF')
+        .transition()
+        .delay(function(d,i) {
+          return i * 30;
+        })
+        .attr('r', participantSizeToRadius);
+
+      var collaboratorCircleUni = collaboratorNodes.select('circle.collaboratorCircleUni');
+      collaboratorCircleUni
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', 0)
+        .style('stroke', 'rgba(30, 30, 30, 0.4)')
+        .style('fill', 'transparent')
+        .transition()
+        .delay(function(d,i) {
+          return i * 30;
+        })
+        .attr('r', function(d) {
+          if (d.size != 'academic') return 0;
+          return 3 + participantSizeToRadius(d);
+        });
+
+      var collabolatorProjects = collaboratorNodes.selectAll('.collaboratorProject')
+        .data(function(d) {
+          return d.projects;
+        })
+      collabolatorProjects.exit().transition().duration(1000).style('opacity', 0).remove()
+      collabolatorProjects.enter().append('rect')
+        .attr('class', 'collaboratorProject')
+        .attr('x', function(d, i) { return -7; })
+        .attr('y', function(d, i) { return -25 -i * 8 + 6; })
+        .attr('width', function(d) { return 14; })
+        .attr('height', function(d) { return 0; })
+        .attr('r', 0)
+        .style('fill', function(d) { return tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode]; })
+        .style('stroke', 'none')
+        .transition()
+        .delay(function(d, i) { return 500 + i * 50})
+        .attr('y', function(d, i) { return -25 - i * 8; })
+        .attr('height', function(d) { return 6; })
+
+      collaboratorNodes.on('mouseover', function(d) {
+        if (d3.event.target.nodeName == 'circle') {
+          tooltip.style('display', 'block')
+          tooltipText.text(d.label);
+        }
+      })
+
+      collaboratorNodes.on('mouseout', function() {
+        tooltip.style('display', 'none');
+      })
+
+      collaboratorNodes.on('click', function(d) {
+        tooltip.style('display', 'none');
+        var targetX = w/2;
+        var targetY = h*0.9;
+        var dx = targetX - d.x;
+        var dy = targetY - d.y;
+        rootGroup
+          .transition()
+          .duration(1000)
+          .attr('transform', function(d) { return 'translate(' + (dx) + ',' + (dy) + ')'; })
+          .each('end', function() {
+            exploreOrganization(d);
+            rootGroup
+              .transition()
+              .duration(1000)
+              .style('opacity', 0).remove();
+          })
+      })
+
+      //LINKS
+
+      var diagonal = d3.svg.diagonal().projection(function(d) { return [d.x, d.y]; });
+
+      var links = [];
+      org.projects.forEach(function(project) {
+        links.push({ source:project, target:org, project: project});
+        project.participants.forEach(function(participant) {
+          if (participant != org) {
+            links.push({source:project, target:participant, project: project});
+          }
+        })
+      })
+
+      var linkNodes = linkGroup.selectAll('.link').data(links);
+
+      linkNodes.enter().append('path')
+        .attr('class', 'link')
+        .style('fill', 'none')
+        .style('stroke', function(d) {
+          return tsb.config.themes.current.budgetAreaColor[d.project.budgetAreaCode];
+        })
+
+      linkNodes
+        .transition().duration(1000)
+        .style('stroke', function(d) {
+          return tsb.config.themes.current.budgetAreaColor[d.project.budgetAreaCode];
+        })
+        .attr('d', diagonal);
+
+      linkNodes.exit().remove();
+
+      tooltip.node().parentNode.appendChild(tooltip.node());
+    }
+
+    var startOrg = participants[0];
+    for(var i=0; i<participants.length; i++) {
+      if (participants[i].projects.length > 5) {
+        if (i < 100) continue;
+        startOrg = participants[i];
+        break;
+      }
+    }
+    exploreOrganization(startOrg);
+  },
+  resize: function(w, h) {
+    this.w = w;
+    this.h = h;
   },
   addToolTip: function() {
     this.tooltip = this.svg.append('g');
@@ -67,7 +304,7 @@ tsb.viz.collaborations = {
     this.tooltipBg = this.tooltip.append('rect')
       .attr('width', '240px')
       .attr('height', '1.3em')
-      .style('fill', 'red')
+      .style('fill', '#000')
       .attr('rx', '5px')
       .attr('ry', '5px')
 
@@ -81,331 +318,5 @@ tsb.viz.collaborations = {
     this.svg.on('mousemove', function(e) {
       this.tooltip.attr('transform', function(d) { return 'translate(' + (d3.event.x + 10) + ',' + (d3.event.y-20) + ')'; });
     }.bind(this))
-  },
-  resize: function(w, h) {
-    this.w = w;
-    this.h = h;
-
-    var maxWidth = this.maxWidth = tsb.common.getMaxWidth(this.w);
-    var leftMargin = this.leftMargin = (this.w - maxWidth)/2;
-    var containerMargin = tsb.config.themes.current.containerMargin;
-    var titleFontSize = tsb.config.themes.current.titleFontSize;
-
-    this.title.attr('x', leftMargin + containerMargin);
-    this.title.attr('y', titleFontSize + containerMargin);
-
-    this.backBtn.attr('transform', 'translate('+(leftMargin-titleFontSize*0.5)+','+titleFontSize*0.6+')');
-
-    this.updateDebugLayout();
-  },
-  initDebugLayout: function() {
-    if (!this.debug) return;
-    this.debugContainer = this.svg.append('rect')
-      .attr('class', 'debug-bg')
-      .style('fill', 'rgba(255,0,0,0.4)')
-    this.updateDebugLayout();
-  },
-  updateDebugLayout: function() {
-    if (!this.debug) return;
-    var maxWidth = tsb.common.getMaxWidth(this.w);
-    this.svg.select('rect.debug-bg')
-      .attr('x', (this.w - maxWidth)/2)
-      .attr('y', 0)
-      .attr('width', maxWidth)
-      .attr('height', this.h)
-  },
-  loadData: function() {
-   tsb.state.dataSource.getInstitutions(this.institutionSize).then(function(data) {
-      data.rows.forEach(function(row) {
-        row.numProjects = Number(row.numProjects);
-        row.id = row.org.substr(row.org.lastIndexOf('/')+1)
-      });
-
-      data.rows.sort(function(a, b) {
-        return b.numProjects - a.numProjects;
-      });
-
-      var topBest = tsb.common.inital(data.rows, this.institutionTopCount);
-
-      this.addOrganizations(topBest);
-    }.bind(this));
-  },
-  addOrganizations: function(organizations) {
-    var maxNumProjects = tsb.common.max(organizations, 'numProjects');
-    var sizeScale = d3.scale.linear().domain([0, maxNumProjects]).range([5, 10]);
-
-    var containerMargin = tsb.config.themes.current.containerMargin;
-    var titleFontSize = tsb.config.themes.current.titleFontSize;
-    var marginTop = containerMargin*3 + titleFontSize;
-    var marginBottom = 2 * containerMargin
-    var availableHeight = this.h - marginTop - marginBottom;
-    var numRows = 2;
-    var rowHeight = availableHeight / numRows;
-    var cellWidth = rowHeight * 1.2;
-    var numColumns = Math.floor(this.maxWidth / cellWidth);
-    var columnWidth = (this.maxWidth - 2*containerMargin)/numColumns;
-
-    organizations = organizations.slice(0, numColumns * numRows);
-
-    organizations.forEach(function(organization, organizationIndex) {
-      var column = organizationIndex % numColumns;
-      var row = Math.floor(organizationIndex / numColumns);
-      var x = this.leftMargin + containerMargin + columnWidth * column + columnWidth/2;
-      var y = marginTop + rowHeight * row + rowHeight/2;
-
-      var organizationGroup = this.svg.append('g')
-        .attr('id', 'organizationGroup_' + organization.id)
-        .attr('class', 'organizationGroup')
-        .attr('transform', 'translate('+x+','+y+')')
-
-      var organizationCenter = organizationGroup.append('circle')
-        .attr('class', 'organizationCircle')
-        .attr('cx', 0)
-        .attr('cy', 0)
-        .attr('r', rowHeight/8)
-        .attr('stroke', '#000000')
-        .attr('fill', 'none')
-
-      var organizationLabel = organizationGroup.append("text")
-        .attr("class", "pointLabel")
-        .attr('y', rowHeight/2)
-        .attr('text-anchor', 'middle')
-        .attr('font-size', '80%')
-        .text(organization.orgLabel)
-        .attr('fill', 'black')
-
-      var organizationProjectCount = organizationGroup.append("text")
-        .attr("class", "pointLabel")
-        .attr('y', 4)
-        .attr('text-anchor', 'middle')
-        .attr('font-size', '80%')
-        .text(organization.numProjects)
-        .attr('fill', 'black')
-
-      tsb.state.dataSource.getOrganizationCollaborators(organization.org).then(function(data) {
-        this.addCollaborators(organization, organizationGroup, rowHeight/2, data);
-      }.bind(this));
-    }.bind(this))
-  },
-  addCollaborators: function(organization, organizationGroup, radius, collaboratorsDataSet) {
-    collaboratorsDataSet.rows.forEach(function(collaboratorInfo) {
-      collaboratorInfo.budgetAreaCode = tsb.common.extractBudgetAreaCode(collaboratorInfo.budgetArea);
-    });
-    var collaboratorsByBudgetArea = collaboratorsDataSet.groupBy('budgetAreaCode');
-
-    tsb.config.budgetAreas.forEach(function(budgetAreaCode, budgetAreaCodeIndex) {
-      var x = radius/2 * Math.cos(2 * Math.PI * budgetAreaCodeIndex/tsb.config.budgetAreas.length);
-      var y = radius/2 * Math.sin(2 * Math.PI * budgetAreaCodeIndex/tsb.config.budgetAreas.length);
-      var areaColor = tsb.config.themes.current.budgetAreaColor[budgetAreaCode];
-      var collabolatorsInBudgetArea = collaboratorsByBudgetArea[budgetAreaCode];
-      if (collabolatorsInBudgetArea) {
-        var areaCircle = organizationGroup.append('circle')
-          .attr('cx', x)
-          .attr('cy', y)
-          .attr('fill', areaColor)
-          .attr('r', Math.max(5, collabolatorsInBudgetArea.rows.length/3))
-        areaCircle.on('mouseover', function() {
-          this.tooltip.style('display', 'block')
-          var areaName = tsb.config.budgetAreaLabels[budgetAreaCode];
-          this.tooltipText.text(areaName + ' : ' + collabolatorsInBudgetArea.rows.length + ' collaborators');
-          this.tooltipBg.style('fill', areaColor);
-          areaCircle.transition().attr('r', Math.max(5, collabolatorsInBudgetArea.rows.length/3+4));
-        }.bind(this))
-
-        areaCircle.on('mouseout', function() {
-          this.tooltip.style('display', 'none');
-          this.tooltipBg.style('fill', areaColor);
-          areaCircle.transition().attr('r', Math.max(5, collabolatorsInBudgetArea.rows.length/3));
-        }.bind(this))
-
-        areaCircle.on('click', function() {
-          var areaName = tsb.config.budgetAreaLabels[budgetAreaCode];
-          this.openLink(organization.orgLabel, areaName)
-        }.bind(this));
-      }
-      this.tooltip.node().parentNode.appendChild(this.tooltip.node());
-    }.bind(this));
-  },
-  loadDataOld: function() {
-    var margin = 80;
-    var w = this.w;
-    var h = this.h;
-    var self = this;
-    var rectGrid = d3.layout.grid()
-      .cols(this.institutionNumColumns  )
-      .bands()
-      .size([w-2*margin, h-2*margin])
-      .padding([0, 0.4]);
-    var lineFunction = d3.svg.line()
-                             .x(function(d) { return d.x; })
-                             .y(function(d) { return d.y; })
-                             .interpolate("linear");
-
-    tsb.state.dataSource.getInstitutions(self.institutionSize).then(function(data) {
-      data.rows.forEach(function(row) {
-        row.numProjects = Number(row.numProjects);
-        row.id = row.org.substr(row.org.lastIndexOf('/')+1)
-      });
-
-      data.rows.sort(function(a, b) {
-        return b.numProjects - a.numProjects;
-      })
-
-      var topBest = tsb.common.inital(data.rows, self.institutionTopCount);
-
-      var maxNumProjects = tsb.common.max(topBest, 'numProjects');
-
-      var sizeScale = d3.scale.linear().domain([0, maxNumProjects]).range([5, 10]);
-
-      var point = self.svg.selectAll(".point")
-        .data(rectGrid(topBest));
-        point.enter()
-        .append('g')
-        .attr('id', function(d) { return 'g_' + d.id; })
-        .attr("transform", function(d) {
-          return "translate(" + (margin + d.x + rectGrid.nodeSize()[0]/2) + "," + (margin + d.y + rectGrid.nodeSize()[1]/2) + ")";
-        })
-
-      point.append("path")
-        .attr("class", "point")
-        .attr("stroke", "black")
-        .attr("stroke-width", 1)
-        .attr("fill", "none")
-        .attr("d", function(d) { return lineFunction(self.superPoints(0, 4)); })
-        .transition().duration(1000)
-        .delay(function(d, i) { return i * 100; })
-        .attr("d", function(d) { return lineFunction(self.superPoints(sizeScale(d.numProjects), 4)); })
-
-      var textTop = 110;
-      if (self.institutionTopCount == 20) textTop = 90;
-
-      point.append("text")
-        .attr("class", "pointLabel")
-        .attr('y', textTop)
-        .attr('text-anchor', 'middle')
-        .attr('font-size', '80%')
-        .text(function(d) { return d.orgLabel })
-        .attr('fill', 'black')
-
-      topBest.forEach(self.pullCollaborators);
-    });
-  },
-  pullCollaboratorsOld: function(academicOrg, academicOrgIndex) {
-    var g = d3.select('#g_' + academicOrg.id);
-    var r = 60;
-    if (this.institutionTopCount == 20) r = 50;
-    var minr = 20;
-    var sizes = {
-      large: 4,
-      medium: 3,
-      small: 2,
-      micro: 1,
-      academic: 2
-    };
-    var self = this;
-    var numAreas = 9;
-    var angleStep = Math.PI * 2 / numAreas;
-    var radiusStep = (r - minr)/3;
-    tsb.state.dataSource.getOrganizationCollaborators(academicOrg.org).then(function(data) {
-      randomPoints = d3.range(data.rows.length).map(function() {
-        while(true) {
-          x = Math.random() * 2 * r - r
-          y = Math.random() * 2 * r - r
-          len = Math.sqrt(x*x + y*y)
-          if (len < r && len > minr) {
-            return {x:x, y:y};
-          }
-        }
-      })
-      data.rows.forEach(function(collaboratorInfo, collaboratorIndex) {
-        if (collaboratorInfo.collaborator == academicOrg.org) {
-          return;
-        }
-        var isLocal = true;
-        if (self.institutionsOnlyLocal && collaboratorInfo.collaboratorRegion != academicOrg.orgRegion) {
-          isLocal = false;
-        }
-
-        var budgetAreaCode = tsb.common.extractBudgetAreaCode(collaboratorInfo.budgetArea);
-        var areaColor = tsb.config.themes.current.budgetAreaColor[budgetAreaCode];
-        var areaIndex = tsb.config.budgetAreas.indexOf(budgetAreaCode);
-        var sizeLabel = collaboratorInfo.collaboratorSizeLabel;
-        var size = sizes[sizeLabel];
-        var angle = tsb.common.randomInRange(angleStep * areaIndex, angleStep * (areaIndex + 1))
-        var radius = tsb.common.randomInRange(minr + radiusStep * (size - 1), minr + radiusStep * (size));
-        if (sizeLabel=='academic') radius = minr * 0.8;
-
-        var x = radius * Math.cos(angle);
-        var y = radius * Math.sin(angle);
-
-        circle = g.append('circle')
-          .attr('r', size)
-          .style('stroke', areaColor)
-          .style('fill', (sizeLabel=='academic') ? areaColor : 'none')
-          .style('opacity', isLocal ? 0.75 : 0.15)
-          //.attr('cx', randomPoints[collaboratorIndex].x)
-          //.attr('cy', randomPoints[collaboratorIndex].y)
-          .attr('cx', x)
-          .attr('cy', y);
-      });
-
-      //if (uniqueAreasOnce) {
-      //  uniqueAreasOnce = false;
-      //  for(var areaName in colorMap) {
-      //    var color = colorMap[areaName];
-      //    svg.append('text')
-      //      .text(areaName)
-      //      .attr('x', 50 + color.index * 100)
-      //      .attr('y', 30)
-      //      .style('fill', color.color)
-      //  }
-      //}
-    })
-  },
-  onInstitutionSizeChange: function(e) {
-    this.institutionSize = e.target.options[e.target.selectedIndex].value;
-    this.init();
-  },
-  onInstitutionTopChange: function(e) {
-    this.institutionTopCount = e.target.options[e.target.selectedIndex].value;
-    this.init();
-  },
-  onInstitutionLocalChange: function(e) {
-    var reach = e.target.options[e.target.selectedIndex].value;
-    this.institutionsOnlyLocal = reach == 'local';
-    this.init();
-  },
-  superPoints: function(r, p) {
-    var npoints = 64;
-    return d3.range(npoints).map(function(i) {
-      var angle = Math.PI*2*i/(npoints-1);
-      var xsign = 1;
-      var ysign = 1;
-      if (angle > 3 * Math.PI/2) {
-        angle = 2 * Math.PI - angle;
-        xsign = 1;
-        ysign = -1;
-      }
-      else if (angle > 2 * Math.PI/2) {
-        angle = angle - Math.PI;
-        xsign = -1;
-        ysign = -1;
-      }
-      else if (angle > Math.PI/2) {
-        angle = Math.PI - angle;
-        xsign = -1;
-        ysign = 1;
-      }
-      return {
-        x: xsign * r * Math.pow(Math.cos(angle), 2/p),
-        y: ysign * r * Math.pow(Math.sin(angle), 2/p)
-      }
-    })
-  },
-  openLink: function(orgLabel, areaLabel) {
-    var q = encodeURIComponent('"'+orgLabel+'"');
-    var url = tsb.config.domain +
-      '/projects?utf8=✓&search_string='+q+'&budget_area_label%5B'+areaLabel+'%5D=true'
-    window.open(url);
-  },
-};
+  }
+}
