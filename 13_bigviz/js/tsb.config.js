@@ -6,6 +6,10 @@ tsb.config.sparqlEndpoint = 'http://tsb-projects.labs.theodi.org/sparql.json';
 tsb.config.budgetAreaBase = 'http://tsb-projects.labs.theodi.org/id/budget-area/';
 tsb.config.ukMapSVG = 'assets/United_Kingdom_Map_-_Region.svg';
 
+tsb.config.text = {};
+tsb.config.text.introTitle = 'In YEAR we funded ';
+tsb.config.text.introTitle2 = 'NUMPROJECTS innovative projects';
+
 tsb.config.odiColors = [
   '#2254F4', '#00B7FF', '#08DEF9', '#1DD3A7',
   '#0DBC37', '#67EF67', '#F9BC26', '#FF6700',

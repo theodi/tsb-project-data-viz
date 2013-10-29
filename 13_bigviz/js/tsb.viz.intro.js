@@ -150,8 +150,8 @@ tsb.viz.intro = {
     this.resize(this.w, this.h); //force layout update
   },
   updateLabels: function() {
-    var titleText = 'In ' + this.year + ' we funded ';
-    var projectCountText = this.numProjects + ' innovate projects';
+    var titleText = tsb.config.text.introTitle.replace('YEAR', this.year);
+    var projectCountText = tsb.config.text.introTitle2.replace('NUMPROJECTS', this.numProjects);
 
     if (this.eatenLetters >= 0) {
       this.eatenLetters += 0.5;
