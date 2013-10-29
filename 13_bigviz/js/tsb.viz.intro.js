@@ -53,7 +53,8 @@ tsb.viz.intro = {
     var h = this.h;
     tsb.state.dataSource.getProjectsForYear(this.year).then(function(projects) {
       tsb.common.log('tsb.intro.loaded', projects.rows.length);
-      this.createProjects(projects.rows);
+
+      this.createProjects(_.shuffle(projects.rows));
       var alreadyOpened = document.location.hash == '#introopened';
       this.addLabels(alreadyOpened);
       if (!this.staticMode) {
