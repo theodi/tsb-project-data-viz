@@ -170,7 +170,14 @@ tsb.viz.intro = {
       .attr('dy', 0)
       .attr('fill', tsb.config.themes.current.introTextColor)
       .style('font-size', tsb.config.themes.current.titleFontSize * 2 + 'px')
-      .style('font-weight', tsb.config.themes.current.introTextFontWeight);
+      .style('font-weight', tsb.config.themes.current.introTextFontWeight)
+
+    this.title2 = labelGroup.append('text')
+      .attr('dx', 0)
+      .attr('dy', 0)
+      .attr('fill', tsb.config.themes.current.introTextColor)
+      .style('font-size', tsb.config.themes.current.titleFontSize * 2 + 'px')
+      .style('font-weight', tsb.config.themes.current.introTextFontWeight)
 
     this.projectCount = labelGroup.append('text')
       .attr('dx', 0)
@@ -178,6 +185,31 @@ tsb.viz.intro = {
       .attr('fill', tsb.config.themes.current.introTextColor)
       .style('font-size', tsb.config.themes.current.titleFontSize * 2 + 'px')
       .style('font-weight', tsb.config.themes.current.introTextFontWeight);
+
+    this.projectCount2 = labelGroup.append('text')
+      .attr('dx', 0)
+      .attr('dy', tsb.config.themes.current.titleFontSize*2.5)
+      .attr('fill', tsb.config.themes.current.introTextColor)
+      .style('font-size', tsb.config.themes.current.titleFontSize * 2 + 'px')
+      .style('font-weight', tsb.config.themes.current.introTextFontWeight);
+
+    this.subTitle = labelGroup.append('text')
+      .attr('dx', 0)
+      .attr('dy', tsb.config.themes.current.titleFontSize*2.5)
+      .attr('fill', tsb.config.themes.current.introSubTitleTextColor)
+      .style('font-size', tsb.config.themes.current.titleFontSize * 2 + 'px')
+      .style('font-weight', tsb.config.themes.current.introTextFontWeight)
+      .style('opacity', 0)
+      .text('Explore more about:');
+
+    this.subTitle2 = labelGroup.append('text')
+      .attr('dx', 0)
+      .attr('dy', tsb.config.themes.current.titleFontSize*2.5)
+      .attr('fill', tsb.config.themes.current.introSubTitleTextColor)
+      .style('font-size', tsb.config.themes.current.titleFontSize * 2 + 'px')
+      .style('font-weight', tsb.config.themes.current.introTextFontWeight)
+      .style('opacity', 0)
+      .text('Explore more about:');
 
     labelGroup
       .style('opacity', (this.staticMode || alreadyOpened) ? 1 : 0)
@@ -208,7 +240,9 @@ tsb.viz.intro = {
     }
 
     this.title.text(titleText);
+    this.title2.text(titleText);
     this.projectCount.text(projectCountText);
+    this.projectCount2.text(projectCountText);
 
     this.drawRects();
   },
@@ -319,6 +353,18 @@ tsb.viz.intro = {
         this.titleY = titleFontSize + containerMargin;
         this.titleScale = 0.5;
       }.bind(this));
+
+      this.subTitle
+        .transition()
+        .delay(this.minimizeDelay + this.minimizeTime)
+        .duration(this.minimizeTime)
+        .style('opacity', 1)
+
+      this.subTitle2
+        .transition()
+        .delay(this.minimizeDelay + this.minimizeTime)
+        .duration(this.minimizeTime)
+        .style('opacity', 1)
 
     this.subVizButtons.selectAll('.cookieCutter')
       .transition()
