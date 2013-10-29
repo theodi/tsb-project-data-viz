@@ -223,7 +223,6 @@ tsb.viz.intro = {
     this.drawRects();
   },
   resize: function(w, h) {
-    console.log('resize', w, h);
     this.w = w;
     this.h = h;
 
