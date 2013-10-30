@@ -17,6 +17,7 @@ tsb.viz.regions = {
     this.labelAnimTime = 1000/this.speedup;
 
     this.maxGrant = 170000000;
+    this.alreadyOpened = false;
 
     this.bg = svg
     .append('rect')
@@ -166,7 +167,8 @@ tsb.viz.regions = {
     }.bind(this));
   },
   explodeMap: function() {
-     tsb.config.regionCodeList.forEach(function(regionCode, regionIndex) {
+    this.isVizOpened = true;
+    tsb.config.regionCodeList.forEach(function(regionCode, regionIndex) {
       var regionInfo = tsb.config.regionsMap[regionCode];
       var region = this.svg.select('.' + regionInfo.id);
       var regionBbox = region.node().getBoundingClientRect();
@@ -342,9 +344,12 @@ tsb.viz.regions = {
     }.bind(this));
   },
   createViz: function(dataByRegion) {
-    this.showTitles();
-    this.explodeMap();
-    this.addRegionsLabels();
+    if (!this.alreadyOpened) {
+      this.alreadyOpened = true;
+      this.showTitles();
+      this.explodeMap();
+      this.addRegionsLabels();
+    }
     this.addRegionData(dataByRegion);
   },
   openLink: function(year, area, region) {
