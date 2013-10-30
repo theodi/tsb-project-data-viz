@@ -9,6 +9,7 @@ tsb.viz.regions = {
     this.offsetFromTop = 350;
     this.unusedShapes = ['Ireland', 'IsleOfMan', 'ChannelIslands', 'Border1', 'Border2', 'Border3'];
     this.year = (new Date()).getFullYear();
+    this.years = d3.range(this.year-4, this.year+1);
 
     this.maxGrant = 170000000;
 
@@ -25,8 +26,36 @@ tsb.viz.regions = {
       .style('fill', '#333')
       .style('font-size', tsb.config.themes.current.titleFontSize + 'px')
       .style('font-weight', '300')
-      .text('TSB spending by region in ' + this.year)
+      .text('TSB spending by region')
       .style('opacity', 0)
+
+    var yearsGroup = this.yearsGroup = svg.append('g')
+      .attr('transform', 'translate(10, 40)');
+
+    this.years.forEach(function(year, yearIndex) {
+      var yearBtn = yearsGroup.append('text')
+        .attr('x', tsb.config.themes.current.titleFontSize * 2 * yearIndex)
+        .attr('y', 0)
+        .style('fill', '#333')
+        .style('font-size', tsb.config.themes.current.titleFontSize*0.8 + 'px')
+        .style('font-weight', '300')
+        .text(year)
+        .style('opacity', year == this.year ? 1 : 0.5);
+
+      yearBtn.on('mouseover', function() {
+        yearBtn.style('opacity', 1);
+      }.bind(this))
+      yearBtn.on('mouseleave', function() {
+        yearBtn.style('opacity', year == this.year ? 1 : 0.5);
+      }.bind(this))
+      yearBtn.on('click', function() {
+        yearsGroup.selectAll('text').style('opacity', 0.5);
+        yearBtn.style('opacity', 1);
+        this.year = year;
+      }.bind(this))
+
+      console.log(yearBtn);
+    }.bind(this))
 
     this.addBackBtn();
     this.addToolTip();
@@ -99,6 +128,11 @@ tsb.viz.regions = {
     this.title.attr('y', titleFontSize + containerMargin);
 
     this.backBtn.attr('transform', 'translate('+(leftMargin-titleFontSize*0.5)+','+titleFontSize*0.6+')');
+
+    var yearsX = leftMargin + maxWidth - this.years.length * titleFontSize * 2;
+    var yearsY = titleFontSize + containerMargin;
+
+    this.yearsGroup.attr('transform', 'translate('+yearsX+','+yearsY+')');
   },
   loadMap: function() {
     d3.xml(tsb.config.ukMapSVG, 'image/svg+xml', function(xml) {
