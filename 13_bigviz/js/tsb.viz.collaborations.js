@@ -228,7 +228,7 @@ tsb.viz.collaborations = {
         var budgetAreaName = tsb.config.budgetAreaLabels[d.budgetAreaCode];
         var budgetAreaColor = tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode];
         tooltipBg.style('fill', budgetAreaColor);
-        tooltipText.text(budgetAreaName + ' ' + d.label);
+        tooltipText.text(budgetAreaName + ': ' + d.label.substr(0, 20) + '...');
       })
 
       projectNodes.on('mouseout', function() {
@@ -311,7 +311,7 @@ tsb.viz.collaborations = {
         var budgetAreaName = tsb.config.budgetAreaLabels[d.budgetAreaCode];
         var budgetAreaColor = tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode];
         tooltipBg.style('fill', budgetAreaColor);
-        tooltipText.text(budgetAreaName + ' ' + d.label);
+        tooltipText.text(budgetAreaName + ': ' + d.label.substr(0, 20) + '...');
       })
 
       collabolatorProjects.on('mouseout', function() {
