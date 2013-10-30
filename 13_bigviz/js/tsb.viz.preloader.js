@@ -35,7 +35,7 @@ tsb.viz.preloader = {
     bars[2] = makeRect(g, centerX, centerY, rw, rh*0, colors[2]);
     bars[3] = makeRect(g, centerX, centerY, rw, rh*0, colors[3]);
 
-    var progressBG = makeRect(g, centerX, centerY+rh, rw, 2, 'rgba(255,255,255,0.55)');
+    var progressBG = makeRect(g, centerX, centerY+rh, rw, 2, '#999');
     var progress = makeRect(g, centerX-rw/3, centerY+rh, 0*rw/3, 2, 'rgba(0,0,0,0.5)');
 
     var stopped = false;
