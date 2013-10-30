@@ -38,15 +38,17 @@ tsb.viz.preloader = {
     var progressBG = makeRect(g, centerX, centerY+rh, rw, 2, '#999');
     var progress = makeRect(g, centerX-rw/3, centerY+rh, 0*rw/3, 2, 'rgba(0,0,0,0.5)');
 
-    var stopped = false;
+    var playing = false;
+    var lastPlayedAnim = 0;
 
     function anim(i) {
+      lastPlayedAnim = i;
       bars[i]
         .attr('y', centerY-rh/2)
         .style('fill', colors[i])
         .transition()
           .duration(400).attr('height', rh)
-          .each('end', function() { if (!stopped) anim((i+1)%4); })
+          .each('end', function() { if (playing) anim((i+1)%4); })
         .transition().delay(400)
           .attr('height', rh*0)
           .attr('y', centerY + rh/2)
@@ -54,13 +56,14 @@ tsb.viz.preloader = {
     }
 
     this.start = function() {
-      stopped = false;
-      anim(0);
+      if (playing) return;
+      playing = true;
+      anim(lastPlayedAnim);
     }
 
     this.stop = function() {
       var deferred = Q.defer();
-      stopped = true;
+      playing = false;
 
       progressBG.transition()
         .attr('width', 0)
