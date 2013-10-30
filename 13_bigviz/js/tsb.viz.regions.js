@@ -233,7 +233,7 @@ tsb.viz.regions = {
         var totalNumProjects = data.rows.reduce(function(prev, area) {
           return prev + Number(area.numProjects);
         }, 0);
-        var totalGrantsSumStr = Math.floor(totalGrantsSum/1000000*10)/10 + 'M';
+        var totalGrantsSumStr = '£'+Math.floor(totalGrantsSum/1000000) + 'm';
         this.svg.append('text')
           .text('Projects')
           //.attr('class', 'label')
