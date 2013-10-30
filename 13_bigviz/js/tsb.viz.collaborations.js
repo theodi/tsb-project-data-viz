@@ -29,7 +29,7 @@ tsb.viz.collaborations = {
   },
   addPreloader: function() {
     var g = this.svg.append('g');
-    var rw = 10;
+    var rw = 30;
     var rh = 30;
     function makeRect(parent, x, y, w, h, rotation, color) {
       var rg = parent.append('g');
@@ -54,10 +54,13 @@ tsb.viz.collaborations = {
       tsb.config.odiColors[6],
       tsb.config.odiColors[9]
     ]
-    bars[0] = makeRect(g, centerX, centerY, rw, rh, 0*90, colors[0]);
-    bars[1] = makeRect(g, centerX, centerY, rw, rh, 1*90, colors[1]);
-    bars[2] = makeRect(g, centerX, centerY, rw, rh, 2*90, colors[2]);
-    bars[3] = makeRect(g, centerX, centerY, rw, rh, 3*90, colors[3]);
+    bars[0] = makeRect(g, centerX, centerY, rw, rh*0, 0*0, colors[0]);
+    bars[1] = makeRect(g, centerX, centerY, rw, rh*0, 1*0, colors[1]);
+    bars[2] = makeRect(g, centerX, centerY, rw, rh*0, 2*0, colors[2]);
+    bars[3] = makeRect(g, centerX, centerY, rw, rh*0, 3*0, colors[3]);
+
+
+    makeRect(g, centerX, centerY+rh, rw, rh/5, 3*0, '#EEE');
 
     function anim(i) {
       bars[i]
@@ -73,10 +76,6 @@ tsb.viz.collaborations = {
     }
 
     anim(0);
-
-    //var r2 = makeRect(g, this.w/2 - rh/2, this.h/2 - rw, rh, rw, tsb.config.odiColors[3]);
-    //var r3 = makeRect(g, this.w/2 - rh/2 - rw, this.h/2, rw, rh, tsb.config.odiColors[6]);
-    //var r4 = makeRect(g, this.w/2 - rh/2, this.h/2 + rh, rh, rw, tsb.config.odiColors[9]);
   },
   addBackBtn: function() {
     this.backBtn = this.svg.append('g');
