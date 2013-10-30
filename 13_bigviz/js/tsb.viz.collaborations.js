@@ -177,12 +177,26 @@ tsb.viz.collaborations = {
         .attr('text-anchor', 'middle')
         .style('fill', 'black')
         .style('font-size', '12px')
-        .text(org.label)
+        .text(org.label + ' (more ⨠)')
         .style('opacity', 0)
+
+      rootNodeLabel
         .transition()
         .delay(500)
         .duration(1000)
         .style('opacity', 1)
+
+      rootNodeLabel.on('mouseover', function(d) {
+        rootNodeLabel.transition().style('opacity', 0.5)
+      });
+
+      rootNodeLabel.on('mouseleave', function(d) {
+        rootNodeLabel.transition().style('opacity', 1)
+      })
+
+      rootNodeLabel.on('click', function(d) {
+        window.open(d.id.replace('/id/', '/doc/'));
+      })
 
       rootNodeCircle
         .transition()
