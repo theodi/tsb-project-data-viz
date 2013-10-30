@@ -176,6 +176,11 @@ tsb.viz.collaborations = {
         .style('fill', 'black')
         .style('font-size', '12px')
         .text(org.label)
+        .style('opacity', 0)
+        .transition()
+        .delay(500)
+        .duration(1000)
+        .style('opacity', 1)
 
       rootNodeCircle
         .transition()
@@ -337,13 +342,15 @@ tsb.viz.collaborations = {
         .style('stroke', function(d) {
           return tsb.config.themes.current.budgetAreaColor[d.project.budgetAreaCode];
         })
+        .style('opacity', 0)
 
       linkNodes
         .transition().duration(1000)
         .style('stroke', function(d) {
           return tsb.config.themes.current.budgetAreaColor[d.project.budgetAreaCode];
         })
-        .attr('d', diagonal);
+        .attr('d', diagonal)
+        .style('opacity', 1);
 
       linkNodes.exit().remove();
 
