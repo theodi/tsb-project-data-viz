@@ -24,7 +24,59 @@ tsb.viz.collaborations = {
 
     this.addToolTip();
     this.addBackBtn();
+    this.addPreloader();
     this.resize(this.w, this.h);
+  },
+  addPreloader: function() {
+    var g = this.svg.append('g');
+    var rw = 10;
+    var rh = 30;
+    function makeRect(parent, x, y, w, h, rotation, color) {
+      var rg = parent.append('g');
+      rg.attr('transform', 'translate('+(x)+','+y+') rotate('+rotation+') translate('+(w)+','+0+')');
+      var r = rg.append('rect')
+      .attr('x', -w/2)
+      .attr('y', -h/2)
+      .attr('width', w)
+      .attr('height', h)
+      .style('fill', color);
+      return r;
+    }
+
+    var centerX = this.w/2;
+    var centerY = this.h/2;
+
+    var self = this;
+    var bars = [];
+    var colors = [
+      tsb.config.odiColors[0],
+      tsb.config.odiColors[3],
+      tsb.config.odiColors[6],
+      tsb.config.odiColors[9]
+    ]
+    bars[0] = makeRect(g, centerX, centerY, rw, rh, 0*90, colors[0]);
+    bars[1] = makeRect(g, centerX, centerY, rw, rh, 1*90, colors[1]);
+    bars[2] = makeRect(g, centerX, centerY, rw, rh, 2*90, colors[2]);
+    bars[3] = makeRect(g, centerX, centerY, rw, rh, 3*90, colors[3]);
+
+    function anim(i) {
+      bars[i]
+        .attr('y', -rh/2)
+        .style('fill', colors[i])
+        .transition()
+          .duration(400).attr('height', rh)
+          .each('end', function() { anim((i+1)%4); })
+        .transition().delay(400)
+          .attr('height', rh*0)
+          .attr('y', rh/2)
+          .style('fill', colors[(i+1)%4])
+    }
+
+    anim(0);
+
+    //var r2 = makeRect(g, this.w/2 - rh/2, this.h/2 - rw, rh, rw, tsb.config.odiColors[3]);
+    //var r3 = makeRect(g, this.w/2 - rh/2 - rw, this.h/2, rw, rh, tsb.config.odiColors[6]);
+    //var r4 = makeRect(g, this.w/2 - rh/2, this.h/2 + rh, rh, rw, tsb.config.odiColors[9]);
   },
   addBackBtn: function() {
     this.backBtn = this.svg.append('g');
