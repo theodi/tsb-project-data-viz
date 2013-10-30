@@ -60,8 +60,6 @@ tsb.viz.regions = {
         this.year = year;
         this.loadData();
       }.bind(this))
-
-      console.log(yearBtn);
     }.bind(this))
 
     this.addBackBtn();
@@ -240,117 +238,168 @@ tsb.viz.regions = {
   },
   addRegionData: function(dataByRegion) {
     var statsTop = 180;
+    var self = this;
 
-    tsb.config.regionCodeList.forEach(function(regionCode, regionIndex) {
-      var regionInfo = tsb.config.regionsMap[regionCode];
-      var data = dataByRegion[regionIndex];
-      var cx = this.margin + (this.spacing + this.colWidth) * regionIndex;
+    function colPos(d, i) {
+      return self.margin + (self.spacing + self.colWidth) * i;
+    }
 
-      tsb.common.log(regionInfo.name, data);
-      var totalGrantsSum = data.rows.reduce(function(prev, area) {
-        return prev + Number(area.grantsSum);
-      }, 0);
+    function calcNumProjects(d, i) {
+      var data = dataByRegion[i];
       var totalNumProjects = data.rows.reduce(function(prev, area) {
         return prev + Number(area.numProjects);
       }, 0);
+      return totalNumProjects;
+    }
+
+    function calcTotalGrant(d, i) {
+      var data = dataByRegion[i];
+      var totalGrantsSum = data.rows.reduce(function(prev, area) {
+        return prev + Number(area.grantsSum);
+      }, 0);
       var totalGrantsSumStr = '£'+Math.floor(totalGrantsSum/1000000) + 'm';
-      this.svg.append('text')
-        .text('Projects')
-        //.attr('class', 'label')
-        .attr('dx', cx)
-        .attr('dy', statsTop)
-        .style('fill', '#222')
-        .style('opacity', 0)
-        .style('font-size', '60%')
-        .style('text-transform', 'uppercase')
-        .transition()
-        .delay(this.mapAnimDelay+this.mapAnimTime)
-        .duration(this.labelAnimTime)
-        .style('opacity', 1)
+      return totalGrantsSumStr;
+    }
 
-      this.svg.append('text')
-        .text(totalNumProjects)
-        //.attr('class', 'bigNum')
-        .attr('dx', cx)
-        .attr('dy', statsTop + 25)
-        .style('opacity', 0)
-        .style('font-size', '120%')
-        .transition()
-        .delay(this.mapAnimDelay+this.mapAnimTime)
-        .duration(this.labelAnimTime)
-        .style('opacity', 1)
+    var projectLabels = this.svg.selectAll('.projectLabel').data(dataByRegion);
 
-      this.svg.append('text')
-        .text('Grants')
-        //.attr('class', 'label')
-        .attr('dx', cx)
-        .attr('dy', statsTop + 60)
-        .style('fill', '#222')
-        .style('opacity', 0)
-        .style('font-size', '60%')
-        .style('text-transform', 'uppercase')
-        .transition()
-        .delay(this.mapAnimDelay+this.mapAnimTime)
-        .duration(this.labelAnimTime)
-        .style('opacity', 1)
+    projectLabels.enter()
+      .append('text')
+      .text('Projects')
+      .attr('class', 'projectLabel')
+      .style('fill', '#222')
+      .style('opacity', 0)
+      .style('font-size', '60%')
+      .style('text-transform', 'uppercase')
 
-      this.svg.append('text')
-        .text(totalGrantsSumStr)
-        //.attr('class', 'bigNum')
-        .attr('dx', cx)
-        .attr('dy', statsTop + 85)
-        .style('opacity', 0)
-        .style('font-size', '120%')
-        .transition()
-        .delay(this.mapAnimDelay+this.mapAnimTime)
-        .duration(this.labelAnimTime)
-        .style('opacity', 0.2 + 0.8*totalGrantsSum/this.maxGrant)
+    projectLabels
+      .attr('dx', colPos.bind(this))
+      .attr('dy', statsTop)
+      .transition()
+      .delay(this.mapAnimDelay+this.mapAnimTime)
+      .duration(this.labelAnimTime)
+      .style('opacity', 1)
 
+    var projectsNumbers = this.svg.selectAll('.numProjects').data(dataByRegion);
+
+    projectsNumbers.enter()
+      .append('text')
+      .attr('class', 'numProjects')
+      .style('fill', '#222')
+      .style('opacity', 0)
+      .style('font-size', '120%')
+
+    projectsNumbers
+      .attr('dx', colPos.bind(this))
+      .attr('dy', statsTop + 25)
+      .text(calcNumProjects)
+      .transition()
+      .delay(this.mapAnimDelay+this.mapAnimTime)
+      .duration(this.labelAnimTime)
+      .style('opacity', 1)
+
+    var grantsLabel = this.svg.selectAll('.grantLabel').data(dataByRegion);
+
+    grantsLabel.enter()
+      .append('text')
+      .text('Grants')
+      .attr('class', 'grantLabel')
+      .style('fill', '#222')
+      .style('opacity', 0)
+      .style('font-size', '60%')
+      .style('text-transform', 'uppercase')
+
+    grantsLabel
+      .attr('dx', colPos.bind(this))
+      .attr('dy', statsTop + 60)
+      .transition()
+      .delay(this.mapAnimDelay+this.mapAnimTime)
+      .duration(this.labelAnimTime)
+      .style('opacity', 1)
+
+    var totalGrants = this.svg.selectAll('.totalGrants').data(dataByRegion);
+
+    totalGrants.enter()
+      .append('text')
+      .attr('class', 'totalGrants')
+      .style('fill', '#222')
+      .style('opacity', 0)
+      .style('font-size', '120%')
+
+    totalGrants
+      .attr('dx', colPos.bind(this))
+      .attr('dy', statsTop + 85)
+      .text(calcTotalGrant)
+      .transition()
+      .delay(this.mapAnimDelay+this.mapAnimTime)
+      .duration(this.labelAnimTime)
+      .style('opacity', 1)
+
+    var barsData = [];
+    tsb.config.regionCodeList.map(function(regionCode, regionIndex) {
+      var data = dataByRegion[regionIndex];
+      data.rows.sort(function(a, b) {
+        if (a.budgetArea > b.budgetArea) return 1;
+        if (a.budgetArea < b.budgetArea) return -1;
+        return 0;
+      })
+      while(data.rows.length < tsb.config.budgetAreas.length) {
+        data.rows.push({
+          budgetArea: tsb.config.budgetAreas[0],
+          grantsSum: 0,
+          numGrants: 0,
+          umProjects: 0,
+          year: 0
+        })
+      }
       data.rows.forEach(function(area, areaIndex) {
-        var h = Math.max(5, 20 * area.grantsSum/10000000);
         var budgetAreaCode = tsb.common.extractBudgetAreaCode(area.budgetArea);
-        var areaBar = this.svg.append('rect');
+        var budgetAreaColor = tsb.config.themes.current.budgetAreaColor[budgetAreaCode];
+        var barData = {
+          regionCode: regionCode,
+          regionIndex: regionIndex,
+          area: area,
+          areaIndex: areaIndex,
+          budgetAreaColor: budgetAreaColor
+        }
+        barsData.push(barData);
+      })
+    })
 
-        areaBar
-          .attr('x', cx + areaIndex * 7)
-          .attr('fill', tsb.config.themes.current.budgetAreaColor[budgetAreaCode])
-          .attr('width', 5)
-          .attr('y', statsTop - 20)
-          .attr('height', 0)
-          .transition()
-          .delay(this.mapAnimDelay+this.mapAnimTime+50*areaIndex)
-          .duration(this.labelAnimTime)
-          .attr('y', statsTop - 20 - h)
-          .attr('height', h);
+    function areaBarHeight(d) {
+      return Math.min(90, Math.max(5, 20 * d.area.grantsSum/12000000));
+    }
 
-        areaBar.on('mouseover', function() {
-          this.tooltip.style('display', 'block')
-          var areaName = tsb.config.budgetAreaLabels[budgetAreaCode];
-          var grantsSum = Math.floor(area.grantsSum/1000000*10)/10 + 'M'
-          this.tooltipText.text(areaName + ' : ' + grantsSum + ' for ' + area.numProjects + ' projects');
-          this.tooltipBg.style('fill', tsb.config.themes.current.budgetAreaColor[budgetAreaCode])
-        }.bind(this))
+    var areaBars = this.svg.selectAll('.areaBar').data(barsData);
 
-        areaBar.on('click', function(d) {
-          this.openLink(this.year, budgetAreaCode, regionInfo.name);
-        }.bind(this))
+    areaBars.exit().remove();
+    areaBars.enter().append('rect')
+      .attr('y', statsTop - 20)
+      .attr('class', 'areaBar')
+      .attr('width', 5)
+      .attr('height', 0)
 
-        areaBar.on('mouseout', function() {
-          this.tooltip.style('display', 'none');
-        }.bind(this))
-
-        this.tooltip.node().parentNode.appendChild(this.tooltip.node());
-      }.bind(this))
-    }.bind(this));
+    areaBars
+      .attr('fill', function(d) { return d.budgetAreaColor; })
+      .transition()
+      .attr('x', function(d) {
+        return colPos(d.regionCode, d.regionIndex) + d.areaIndex * 7;
+      })
+      .delay(function(d) { return this.alreadyOpened ? 0 : this.mapAnimDelay+this.mapAnimTime+50*d.areaIndex; }.bind(this) )
+      .duration(this.labelAnimTime)
+      .attr('y', function(d) { return  statsTop - 20 - (areaBarHeight(d))})
+      .attr('height', areaBarHeight)
   },
   createViz: function(dataByRegion) {
     if (!this.alreadyOpened) {
-      this.alreadyOpened = true;
       this.showTitles();
       this.explodeMap();
       this.addRegionsLabels();
     }
     this.addRegionData(dataByRegion);
+    if (!this.alreadyOpened) {
+      this.alreadyOpened = true;
+    }
   },
   openLink: function(year, area, region) {
     var areaLabel = area ? tsb.config.budgetAreaLabels[area] : '';
