@@ -274,6 +274,8 @@ tsb.viz.collaborations = {
         .data(function(d) {
           return d.projects;
         })
+
+
       collabolatorProjects.exit().transition().duration(1000).style('opacity', 0).remove()
       collabolatorProjects.enter().append('rect')
         .attr('class', 'collaboratorProject')
@@ -302,6 +304,23 @@ tsb.viz.collaborations = {
       })
 
       collaboratorNodes.on('click', function(d) {
+        var collaboratorGroup = d3.event.target.parentNode;
+        var numProjects = d3.select(collaboratorGroup).selectAll('.collaboratorProject').size();
+        collabolatorProjects.transition()
+          .duration(1000)
+          .attr('x', function(pd, pi) {
+            if (this.parentNode == collaboratorGroup) {
+              return (pi - numProjects/2) * 40 - 7;
+            }
+            else return d3.select(this).attr('x');
+          })
+          .style('opacity', function(pd, pi) {
+            if (this.parentNode == collaboratorGroup) {
+              return 1;
+            }
+            else return 0;
+          })
+          .attr('y', -h*0.2)
         tooltip.style('display', 'none');
         var targetX = w/2;
         var targetY = h*0.9;
@@ -318,7 +337,12 @@ tsb.viz.collaborations = {
               .duration(1000)
               .style('opacity', 0).remove();
           })
-      })
+
+        //collaborator.projects.forEach(function(project, projectIndex) {
+        //  project.x = w/2 + (projectIndex - collaborator.projects.length/2) * 40;
+        //  project.y = h*0.7;
+        //})
+      }.bind(this));
 
       //LINKS
 
