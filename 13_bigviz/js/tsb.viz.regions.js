@@ -360,6 +360,7 @@ tsb.viz.regions = {
           regionIndex: regionIndex,
           area: area,
           areaIndex: areaIndex,
+          budgetAreaCode: budgetAreaCode,
           budgetAreaColor: budgetAreaColor
         }
         barsData.push(barData);
@@ -389,6 +390,25 @@ tsb.viz.regions = {
       .duration(this.labelAnimTime)
       .attr('y', function(d) { return  statsTop - 20 - (areaBarHeight(d))})
       .attr('height', areaBarHeight)
+
+
+    areaBars.on('mouseover', function(d) {
+      this.tooltip.node().parentNode.appendChild(this.tooltip.node());
+      this.tooltip.style('display', 'block')
+      var areaName = tsb.config.budgetAreaLabels[d.budgetAreaCode];
+      var grantsSum = Math.floor(d.area.grantsSum/1000000*10)/10 + 'M'
+      this.tooltipText.text(areaName + ' : ' + grantsSum + ' for ' + d.area.numProjects + ' projects');
+      this.tooltipBg.style('fill', d.budgetAreaColor)
+    }.bind(this))
+
+    areaBars.on('mouseleave', function(d) {
+      this.tooltip.style('display', 'none')
+    });
+
+    areaBars.on('click', function(d) {
+      var regionName = tsb.config.regionsMap[d.regionCode].name;
+      this.openLink(this.year, d.budgetAreaCode, regionName);
+    }.bind(this));
   },
   createViz: function(dataByRegion) {
     if (!this.alreadyOpened) {
