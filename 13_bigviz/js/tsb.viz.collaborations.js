@@ -20,65 +20,16 @@ tsb.viz.collaborations = {
       .style('fill', '#333')
       .style('font-size', tsb.config.themes.current.titleFontSize + 'px')
       .style('font-weight', tsb.config.themes.current.titleFontWeight)
+      .style('opacity', 0)
       .text('Organization\'s projects and their collaborators in ' + this.year)
 
     this.addToolTip();
     this.addBackBtn();
-    this.addPreloader();
     this.resize(this.w, this.h);
   },
-  addPreloader: function() {
-    var g = this.svg.append('g');
-    var rw = 30;
-    var rh = 30;
-    function makeRect(parent, x, y, w, h, rotation, color) {
-      var rg = parent.append('g');
-      rg.attr('transform', 'translate('+(x)+','+y+') rotate('+rotation+') translate('+(w)+','+0+')');
-      var r = rg.append('rect')
-      .attr('x', -w/2)
-      .attr('y', -h/2)
-      .attr('width', w)
-      .attr('height', h)
-      .style('fill', color);
-      return r;
-    }
-
-    var centerX = this.w/2;
-    var centerY = this.h/2;
-
-    var self = this;
-    var bars = [];
-    var colors = [
-      tsb.config.odiColors[0],
-      tsb.config.odiColors[3],
-      tsb.config.odiColors[6],
-      tsb.config.odiColors[9]
-    ]
-    bars[0] = makeRect(g, centerX, centerY, rw, rh*0, 0*0, colors[0]);
-    bars[1] = makeRect(g, centerX, centerY, rw, rh*0, 1*0, colors[1]);
-    bars[2] = makeRect(g, centerX, centerY, rw, rh*0, 2*0, colors[2]);
-    bars[3] = makeRect(g, centerX, centerY, rw, rh*0, 3*0, colors[3]);
-
-
-    makeRect(g, centerX, centerY+rh, rw, rh/5, 3*0, '#EEE');
-
-    function anim(i) {
-      bars[i]
-        .attr('y', -rh/2)
-        .style('fill', colors[i])
-        .transition()
-          .duration(400).attr('height', rh)
-          .each('end', function() { anim((i+1)%4); })
-        .transition().delay(400)
-          .attr('height', rh*0)
-          .attr('y', rh/2)
-          .style('fill', colors[(i+1)%4])
-    }
-
-    anim(0);
-  },
   addBackBtn: function() {
-    this.backBtn = this.svg.append('g');
+    this.backBtn = this.svg.append('g')
+    .style('opacity', 0)
 
     this.backBtnHit = this.backBtn.append('rect')
       .attr('width', '2em')
@@ -126,60 +77,67 @@ tsb.viz.collaborations = {
   },
   loadData: function() {
     tsb.state.dataSource.getProjectsAndParticipantsForYear(this.year).then(function(data) {
-      var participants = [];
-      var participantsMap = {};
-      var projects = [];
-      var projectsMap = {};
+      tsb.viz.preloader.stop().then(function() {
+        this.title.transition()
+          .style('opacity', 1)
+        this.backBtn.transition()
+          .style('opacity', 1)
 
-      data.rows.forEach(function(row) {
-        var project = projectsMap[row.project];
-        if (!project) {
-          project = {
-            id: row.project,
-            budgetArea: row.budgetArea,
-            budgetAreaCode: tsb.common.extractBudgetAreaCode(row.budgetArea),
-            participants: []
+        var participants = [];
+        var participantsMap = {};
+        var projects = [];
+        var projectsMap = {};
+
+        data.rows.forEach(function(row) {
+          var project = projectsMap[row.project];
+          if (!project) {
+            project = {
+              id: row.project,
+              budgetArea: row.budgetArea,
+              budgetAreaCode: tsb.common.extractBudgetAreaCode(row.budgetArea),
+              participants: []
+            }
+            projectsMap[row.project] = project;
+            projects.push(project);
           }
-          projectsMap[row.project] = project;
-          projects.push(project);
-        }
-        var participant = participantsMap[row.participant];
-        if (!participant) {
-          participant = {
-            id: row.participant,
-            label: row.participantLabel,
-            size: row.participantSizeLabel,
-            projects: []
+          var participant = participantsMap[row.participant];
+          if (!participant) {
+            participant = {
+              id: row.participant,
+              label: row.participantLabel,
+              size: row.participantSizeLabel,
+              projects: []
+            }
+            participantsMap[row.participant] = participant;
+            participants.push(participant);
           }
-          participantsMap[row.participant] = participant;
-          participants.push(participant);
-        }
-        if (project.participants.indexOf(participant) == -1) {
-          project.participants.push(participant);
-        }
-        if (participant.projects.indexOf(project) == -1) {
-          participant.projects.push(project);
-        }
-      })
+          if (project.participants.indexOf(participant) == -1) {
+            project.participants.push(participant);
+          }
+          if (participant.projects.indexOf(project) == -1) {
+            participant.projects.push(project);
+          }
+        })
 
-      function prop(name) {
-        return function(o) {
-          return o[name];
+        function prop(name) {
+          return function(o) {
+            return o[name];
+          }
         }
-      }
 
-      var projectsByBudgetAreaCode = _.groupBy(projects, prop('budgetAreaCode'));
-      var budgetAreaCodes = _.keys(projectsByBudgetAreaCode);
-      var participantsByBudgetAreaCode = {};
+        var projectsByBudgetAreaCode = _.groupBy(projects, prop('budgetAreaCode'));
+        var budgetAreaCodes = _.keys(projectsByBudgetAreaCode);
+        var participantsByBudgetAreaCode = {};
 
-      budgetAreaCodes.forEach(function(budgetAreaCode) {
-        var projects = projectsByBudgetAreaCode[budgetAreaCode];
-        var participants = _.uniq(_.flatten(_.pluck(projects, 'participants')));
-        participantsByBudgetAreaCode[budgetAreaCode] = participants;
-      })
+        budgetAreaCodes.forEach(function(budgetAreaCode) {
+          var projects = projectsByBudgetAreaCode[budgetAreaCode];
+          var participants = _.uniq(_.flatten(_.pluck(projects, 'participants')));
+          participantsByBudgetAreaCode[budgetAreaCode] = participants;
+        })
 
-      this.buildViz(participants, projects, participantsByBudgetAreaCode, projectsByBudgetAreaCode);
-    }.bind(this));
+        this.buildViz(participants, projects, participantsByBudgetAreaCode, projectsByBudgetAreaCode);
+      }.bind(this));
+      }.bind(this));
   },
   buildViz: function(participants, projects, participantsByBudgetAreaCode, projectsByBudgetAreaCode) {
     var svg = this.svg;
