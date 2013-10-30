@@ -35,8 +35,8 @@ tsb.viz.preloader = {
     bars[2] = makeRect(g, centerX, centerY, rw, rh*0, colors[2]);
     bars[3] = makeRect(g, centerX, centerY, rw, rh*0, colors[3]);
 
-    makeRect(g, centerX, centerY+rh, rw, 2, 'rgba(255,255,255,0.55)');
-    makeRect(g, centerX-rw/3, centerY+rh, rw/3, 2, 'rgba(0,0,0,0.5)');
+    var progressBG = makeRect(g, centerX, centerY+rh, rw, 2, 'rgba(255,255,255,0.55)');
+    var progress = makeRect(g, centerX-rw/3, centerY+rh, rw/3, 2, 'rgba(0,0,0,0.5)');
 
     var stopped = false;
 
@@ -59,7 +59,19 @@ tsb.viz.preloader = {
     }
 
     this.stop = function() {
+      var deferred = Q.defer();
       stopped = true;
+
+      progressBG.transition()
+        .attr('width', 0)
+        .attr('x', centerX+rw/2)
+      progress.transition()
+        .attr('width', 0)
+        .attr('x', centerX+rw/2)
+        .each('end', function() {
+          deferred.resolve();
+        })
+      return deferred.promise;
     }
   }
 }

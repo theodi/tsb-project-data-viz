@@ -52,23 +52,25 @@ tsb.viz.intro = {
     var w = this.w;
     var h = this.h;
     tsb.state.dataSource.getProjectsForYear(this.year).then(function(projects) {
-      tsb.common.log('tsb.intro.loaded', projects.rows.length);
+      tsb.viz.preloader.stop().then(function() {
+        tsb.common.log('tsb.intro.loaded', projects.rows.length);
 
-      this.createProjects(_.shuffle(projects.rows));
-      var alreadyOpened = document.location.hash == '#introopened';
-      this.addLabels(alreadyOpened);
-      if (!this.staticMode) {
-        this.addVizButtons();
-        if (document.location.hash != '#introopened') {
+        this.createProjects(_.shuffle(projects.rows));
+        var alreadyOpened = document.location.hash == '#introopened';
+        this.addLabels(alreadyOpened);
+        if (!this.staticMode) {
+          this.addVizButtons();
+          if (document.location.hash != '#introopened') {
+            this.showVizButtons();
+          }
+        }
+        if (alreadyOpened) {
+          this.minimizeTime = 0;
+          this.minimizeDelay = 0;
+          this.eatenLetters = 50;
           this.showVizButtons();
         }
-      }
-      if (alreadyOpened) {
-        this.minimizeTime = 0;
-        this.minimizeDelay = 0;
-        this.eatenLetters = 50;
-        this.showVizButtons();
-      }
+      }.bind(this));
     }.bind(this));
   },
   createProjects: function(projects) {
