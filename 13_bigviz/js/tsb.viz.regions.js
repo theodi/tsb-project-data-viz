@@ -11,6 +11,11 @@ tsb.viz.regions = {
     this.year = (new Date()).getFullYear();
     this.years = d3.range(this.year-4, this.year+1);
 
+    this.speedup = 1;
+    this.mapAnimDelay = 1000/this.speedup;
+    this.mapAnimTime = 2000/this.speedup;
+    this.labelAnimTime = 1000/this.speedup;
+
     this.maxGrant = 170000000;
 
     this.bg = svg
@@ -157,6 +162,7 @@ tsb.viz.regions = {
     }.bind(this));
   },
   explodeMap: function() {
+    var regionCodeList = tsb.common.keys(tsb.config.regionsMap);
 
   },
   showTitles: function() {
@@ -170,10 +176,8 @@ tsb.viz.regions = {
     this.showTitles();
     this.explodeMap();
 
-    var speedup = 1;
-    var mapAnimDelay = 1000/speedup;
-    var mapAnimTime = 2000/speedup;
-    var labelAnimTime = 1000/speedup;
+    //return;
+
     var regionCodeList = tsb.common.keys(tsb.config.regionsMap);
     var offsetLeft = 0;
     var margin = this.w * 0.05;
@@ -198,7 +202,7 @@ tsb.viz.regions = {
       var cx = margin + (spacing + colWidth) * regionIndex;
 
       region.transition()
-        .delay(mapAnimDelay).duration(mapAnimTime)
+        .delay(this.mapAnimDelay).duration(this.mapAnimTime)
         .attr('transform', 'translate('+regionX/this.mapScale+','+regionY/this.mapScale+')')
         .each('end', function() {
            region
@@ -236,8 +240,8 @@ tsb.viz.regions = {
         .style('font-size', 12 + 'px')
         .style('opacity', 0)
         .transition()
-        .delay(mapAnimDelay + mapAnimTime/2)
-        .duration(labelAnimTime)
+        .delay(this.mapAnimDelay + this.mapAnimTime/2)
+        .duration(this.labelAnimTime)
         .style('opacity', 1)
         //.attr('text-anchor', 'middle')
 
@@ -268,8 +272,8 @@ tsb.viz.regions = {
           .style('font-size', '60%')
           .style('text-transform', 'uppercase')
           .transition()
-          .delay(mapAnimDelay+mapAnimTime)
-          .duration(labelAnimTime)
+          .delay(this.mapAnimDelay+this.mapAnimTime)
+          .duration(this.labelAnimTime)
           .style('opacity', 1)
 
         this.svg.append('text')
@@ -280,8 +284,8 @@ tsb.viz.regions = {
           .style('opacity', 0)
           .style('font-size', '120%')
           .transition()
-          .delay(mapAnimDelay+mapAnimTime)
-          .duration(labelAnimTime)
+          .delay(this.mapAnimDelay+this.mapAnimTime)
+          .duration(this.labelAnimTime)
           .style('opacity', 1)
 
         this.svg.append('text')
@@ -294,8 +298,8 @@ tsb.viz.regions = {
           .style('font-size', '60%')
           .style('text-transform', 'uppercase')
           .transition()
-          .delay(mapAnimDelay+mapAnimTime)
-          .duration(labelAnimTime)
+          .delay(this.mapAnimDelay+this.mapAnimTime)
+          .duration(this.labelAnimTime)
           .style('opacity', 1)
 
         this.svg.append('text')
@@ -306,8 +310,8 @@ tsb.viz.regions = {
           .style('opacity', 0)
           .style('font-size', '120%')
           .transition()
-          .delay(mapAnimDelay+mapAnimTime)
-          .duration(labelAnimTime)
+          .delay(this.mapAnimDelay+this.mapAnimTime)
+          .duration(this.labelAnimTime)
           .style('opacity', 0.2 + 0.8*totalGrantsSum/this.maxGrant)
 
         data.rows.forEach(function(area, areaIndex) {
@@ -322,8 +326,8 @@ tsb.viz.regions = {
             .attr('y', statsTop - 20)
             .attr('height', 0)
             .transition()
-            .delay(mapAnimDelay+mapAnimTime+50*areaIndex)
-            .duration(labelAnimTime)
+            .delay(this.mapAnimDelay+this.mapAnimTime+50*areaIndex)
+            .duration(this.labelAnimTime)
             .attr('y', statsTop - 20 - h)
             .attr('height', h);
 
