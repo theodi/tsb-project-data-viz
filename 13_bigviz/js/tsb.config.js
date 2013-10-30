@@ -16,6 +16,8 @@ tsb.config.odiColors = [
   '#D60303', '#EF3AAB', '#E6007C', '#B13198'
 ];
 
+tsb.config.regionCodeList = ['N92000002','E12000009','W92000004','E12000005','E12000002','S92000003','E12000001','E12000003','E12000004','E12000006','E12000007','E12000008'];
+
 tsb.config.regionsMap = {
   'N92000002' : { name: 'Northern Ireland', id: 'NorthernIreland'} ,
   'E12000009' : { name: 'South West', id: 'SouthWest'} ,

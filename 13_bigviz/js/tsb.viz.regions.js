@@ -125,6 +125,10 @@ tsb.viz.regions = {
     this.w = w;
     this.h = h;
 
+    this.margin = this.w * 0.05;
+    this.colWidth = 100;
+    this.spacing = (this.w - 2 * this.margin - tsb.config.regionCodeList.length * this.colWidth)/(tsb.config.regionCodeList.length-1);
+
     var maxWidth = this.maxWidth = tsb.common.getMaxWidth(this.w);
     var leftMargin = this.leftMargin = (this.w - maxWidth)/2;
     var containerMargin = tsb.config.themes.current.containerMargin;
@@ -162,35 +166,12 @@ tsb.viz.regions = {
     }.bind(this));
   },
   explodeMap: function() {
-    var regionCodeList = tsb.common.keys(tsb.config.regionsMap);
-
-  },
-  showTitles: function() {
-    this.title.transition()
-      .style('opacity', 1)
-
-    this.backBtn.transition()
-      .style('opacity', 1)
-  },
-  createViz: function(dataByRegion) {
-    this.showTitles();
-    this.explodeMap();
-
-    //return;
-
-    var regionCodeList = tsb.common.keys(tsb.config.regionsMap);
-    var offsetLeft = 0;
-    var margin = this.w * 0.05;
-
-    var colWidth = 100;
-    var spacing = (this.w - 2 * margin - regionCodeList.length * colWidth)/(regionCodeList.length-1);
-
-    regionCodeList.forEach(function(regionCode, regionIndex) {
+     tsb.config.regionCodeList.forEach(function(regionCode, regionIndex) {
       var regionInfo = tsb.config.regionsMap[regionCode];
       var region = this.svg.select('.' + regionInfo.id);
       var regionBbox = region.node().getBoundingClientRect();
       var regionWidth = regionBbox.right - regionBbox.left;
-      regionX = margin + (spacing + colWidth) * regionIndex - regionBbox.left + colWidth/2 - regionWidth*0.8;
+      regionX = this.margin + (this.spacing + this.colWidth) * regionIndex - regionBbox.left + this.colWidth/2 - regionWidth*0.8;
       var regionY = -regionBbox.top + this.offsetFromTop;
 
       if (regionCode == 'S92000003') {
@@ -199,7 +180,7 @@ tsb.viz.regions = {
         regionX += 20;
       }
 
-      var cx = margin + (spacing + colWidth) * regionIndex;
+      var cx = this.margin + (this.spacing + this.colWidth) * regionIndex;
 
       region.transition()
         .delay(this.mapAnimDelay).duration(this.mapAnimTime)
@@ -229,6 +210,22 @@ tsb.viz.regions = {
         .style('fill', tsb.config.themes.current.regionsRegionColor)
         .selectAll('path')
         .style('fill', tsb.config.themes.current.regionsRegionColor);
+    }.bind(this));
+  },
+  showTitles: function() {
+    this.title.transition()
+      .style('opacity', 1)
+
+    this.backBtn.transition()
+      .style('opacity', 1)
+  },
+  createViz: function(dataByRegion) {
+    this.showTitles();
+    this.explodeMap();
+
+    return;
+
+   
 
       var name = regionInfo.name;
       if (name.indexOf('Yorkshire') == 0) name = 'Yorkshire';
@@ -350,8 +347,6 @@ tsb.viz.regions = {
           this.tooltip.node().parentNode.appendChild(this.tooltip.node());
         }.bind(this))
       //}.bind(this));
-
-    }.bind(this));
   },
   openLink: function(year, area, region) {
     var areaLabel = area ? tsb.config.budgetAreaLabels[area] : '';
