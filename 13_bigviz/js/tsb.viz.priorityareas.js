@@ -23,6 +23,7 @@ tsb.viz.priorityAreas = {
       .style('font-size', tsb.config.themes.current.titleFontSize + 'px')
       .style('font-weight', tsb.config.themes.current.titleFontWeight)
       .text('TSB spending by priority area during ' + (this.startYear+1) + ' - ' + (this.endYear-1))
+      .style('opacity', 0)
 
     this.subTitle = svg
       .append('text')
@@ -37,7 +38,8 @@ tsb.viz.priorityAreas = {
     this.resize(this.w, this.h);
   },
   addBackBtn: function() {
-    this.backBtn = this.svg.append('g');
+    this.backBtn = this.svg.append('g')
+      .style('opacity', 0)
 
     this.backBtnHit = this.backBtn.append('rect')
       .attr('width', '2em')
@@ -91,8 +93,14 @@ tsb.viz.priorityAreas = {
       results.push(tsb.state.dataSource.getAreaSummaryForYear(year))
     }
     Q.all(results).then(function(data) {
-      var mappedData = this.mapData(data);
-      this.drawGraph(mappedData);
+      tsb.viz.preloader.stop().then(function() {
+        this.title.transition()
+          .style('opacity', 1)
+        this.backBtn.transition()
+          .style('opacity', 1)
+        var mappedData = this.mapData(data);
+        this.drawGraph(mappedData);
+      }.bind(this))
     }.bind(this))
   },
   drawGraph: function(data) {
