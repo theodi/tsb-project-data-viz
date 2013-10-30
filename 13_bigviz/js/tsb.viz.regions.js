@@ -26,6 +26,7 @@ tsb.viz.regions = {
       .style('font-size', tsb.config.themes.current.titleFontSize + 'px')
       .style('font-weight', '300')
       .text('TSB spending by region in ' + this.year)
+      .style('opacity', 0)
 
     this.addBackBtn();
     this.addToolTip();
@@ -33,7 +34,8 @@ tsb.viz.regions = {
     this.loadMap();
   },
   addBackBtn: function() {
-    this.backBtn = this.svg.append('g');
+    this.backBtn = this.svg.append('g')
+      .style('opacity', 0)
 
     this.backBtnHit = this.backBtn.append('rect')
       .attr('width', '2em')
@@ -119,7 +121,13 @@ tsb.viz.regions = {
       this.loadData();
     }.bind(this));
   },
-  explodeMap: function() {
+  explodeMap: function(dataByRegion) {
+    this.title.transition()
+      .style('opacity', 1)
+
+    this.backBtn.transition()
+      .style('opacity', 1)
+
     var speedup = 1;
     var mapAnimDelay = 1000/speedup;
     var mapAnimTime = 2000/speedup;
@@ -214,7 +222,10 @@ tsb.viz.regions = {
 
       var statsTop = 180;
 
-      tsb.state.dataSource.getAreaSummaryForYearInRegion(this.year, regionCode).then(function(data) {
+      //tsb.state.dataSource.getAreaSummaryForYearInRegion(this.year, regionCode).then(function(data) {
+
+      var data = dataByRegion[regionIndex];
+
         tsb.common.log(regionInfo.name, data);
         var totalGrantsSum = data.rows.reduce(function(prev, area) {
           return prev + Number(area.grantsSum);
@@ -310,7 +321,7 @@ tsb.viz.regions = {
 
           this.tooltip.node().parentNode.appendChild(this.tooltip.node());
         }.bind(this))
-      }.bind(this));
+      //}.bind(this));
 
     }.bind(this));
   },
@@ -324,6 +335,15 @@ tsb.viz.regions = {
     window.open(url);
   },
   loadData:function(){
-    this.explodeMap();
+    var results = [];
+    var regionCodeList = tsb.common.keys(tsb.config.regionsMap);
+    regionCodeList.forEach(function(regionCode, regionIndex) {
+      results.push(tsb.state.dataSource.getAreaSummaryForYearInRegion(this.year, regionCode))
+    }.bind(this));
+    Q.all(results).then(function(dataByRegion) {
+      tsb.viz.preloader.stop().then(function() {
+        this.explodeMap(dataByRegion);
+      }.bind(this))
+    }.bind(this))
   }
 }
