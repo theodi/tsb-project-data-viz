@@ -9,6 +9,7 @@ function init() {
   window.addEventListener('hashchange', checkScene, false);
 
   var currentViz = null;
+  var currentVizGroup = svg.append('g');
 
   tsb.viz.preloader.init(svg, tsb.state.w, tsb.state.h);
 
@@ -53,7 +54,7 @@ function init() {
     }
 
     tsb.viz.preloader.start();
-    currentViz.init(svg, tsb.state.w, tsb.state.h, staticMode);
+    currentViz.init(currentVizGroup, tsb.state.w, tsb.state.h, staticMode);
   }
   checkScene();
 
