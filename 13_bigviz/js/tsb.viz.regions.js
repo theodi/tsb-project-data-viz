@@ -152,10 +152,8 @@ tsb.viz.regions = {
       var region = this.svg.select('.' + regionInfo.id);
       var regionBbox = region.node().getBoundingClientRect();
       var regionWidth = regionBbox.right - regionBbox.left;
-      //regionX = margin + offsetLeft - regionBbox.left + regionIndex * spacing;
       regionX = margin + (spacing + colWidth) * regionIndex - regionBbox.left + colWidth/2 - regionWidth*0.8;
       var regionY = -regionBbox.top + this.offsetFromTop;
-      //offsetLeft += regionWidth;
 
       if (regionCode == 'S92000003') {
         //scotland
@@ -164,14 +162,6 @@ tsb.viz.regions = {
       }
 
       var cx = margin + (spacing + colWidth) * regionIndex;
-
-      //this.svg.append('rect')
-      //  .attr('x', regionBbox.left + regionX)
-      //  .attr('y', regionBbox.top + regionY)
-      //  .attr('width', regionBbox.right - regionBbox.left)
-      //  .attr('height', regionBbox.bottom - regionBbox.top)
-      //  .style('stroke', 'red')
-      //  .style('fill', 'none')
 
       region.transition()
         .delay(mapAnimDelay).duration(mapAnimTime)
