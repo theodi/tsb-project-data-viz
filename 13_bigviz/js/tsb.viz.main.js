@@ -10,6 +10,8 @@ function init() {
 
   var currentViz = null;
 
+  tsb.viz.preloader.init(svg, tsb.state.w, tsb.state.h);
+
   function checkScene() {
     tsb.common.log('tsb.checkScene');
     if (currentViz && currentViz.close) {
@@ -19,8 +21,9 @@ function init() {
     d3.select('#home-viz')
     .style('position', 'relative')
 
-    svg.remove();
-    svg = tsb.state.svg = d3.select('#home-viz').append('svg')
+    //svg.remove();
+    //svg = tsb.state.svg = d3.select('#home-viz').append('svg')
+    svg
     .attr('width', tsb.state.w)
     .style('position', 'absolute')
     .style('top', 0)
@@ -49,6 +52,7 @@ function init() {
       currentViz = tsb.viz.intro;
     }
 
+    tsb.viz.preloader.start();
     currentViz.init(svg, tsb.state.w, tsb.state.h, staticMode);
   }
   checkScene();
