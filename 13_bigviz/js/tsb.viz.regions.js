@@ -180,8 +180,6 @@ tsb.viz.regions = {
         regionX += 20;
       }
 
-      var cx = this.margin + (this.spacing + this.colWidth) * regionIndex;
-
       region.transition()
         .delay(this.mapAnimDelay).duration(this.mapAnimTime)
         .attr('transform', 'translate('+regionX/this.mapScale+','+regionY/this.mapScale+')')
@@ -219,16 +217,12 @@ tsb.viz.regions = {
     this.backBtn.transition()
       .style('opacity', 1)
   },
-  createViz: function(dataByRegion) {
-    this.showTitles();
-    this.explodeMap();
-
-    return;
-
-   
-
+  addRegionsLabels: function() {
+    tsb.config.regionCodeList.forEach(function(regionCode, regionIndex) {
+      var regionInfo = tsb.config.regionsMap[regionCode];
       var name = regionInfo.name;
       if (name.indexOf('Yorkshire') == 0) name = 'Yorkshire';
+      var cx = this.margin + (this.spacing + this.colWidth) * regionIndex;
 
       var nameLabel = this.svg.append('text')
         .text(name)
@@ -240,113 +234,118 @@ tsb.viz.regions = {
         .delay(this.mapAnimDelay + this.mapAnimTime/2)
         .duration(this.labelAnimTime)
         .style('opacity', 1)
-        //.attr('text-anchor', 'middle')
+    }.bind(this));
+  },
+  addRegionData: function(dataByRegion) {
+    var statsTop = 180;
 
-      var nameLabelBBox = nameLabel.node().getBoundingClientRect();
-      var dx = 0;//-(nameLabelBBox.right - nameLabelBBox.left)/2;
-
-      var statsTop = 180;
-
-      //tsb.state.dataSource.getAreaSummaryForYearInRegion(this.year, regionCode).then(function(data) {
-
+    tsb.config.regionCodeList.forEach(function(regionCode, regionIndex) {
+      var regionInfo = tsb.config.regionsMap[regionCode];
       var data = dataByRegion[regionIndex];
+      var cx = this.margin + (this.spacing + this.colWidth) * regionIndex;
 
-        tsb.common.log(regionInfo.name, data);
-        var totalGrantsSum = data.rows.reduce(function(prev, area) {
-          return prev + Number(area.grantsSum);
-        }, 0);
-        var totalNumProjects = data.rows.reduce(function(prev, area) {
-          return prev + Number(area.numProjects);
-        }, 0);
-        var totalGrantsSumStr = '£'+Math.floor(totalGrantsSum/1000000) + 'm';
-        this.svg.append('text')
-          .text('Projects')
-          //.attr('class', 'label')
-          .attr('dx', cx + dx)
-          .attr('dy', statsTop)
-          .style('fill', '#222')
-          .style('opacity', 0)
-          .style('font-size', '60%')
-          .style('text-transform', 'uppercase')
+      tsb.common.log(regionInfo.name, data);
+      var totalGrantsSum = data.rows.reduce(function(prev, area) {
+        return prev + Number(area.grantsSum);
+      }, 0);
+      var totalNumProjects = data.rows.reduce(function(prev, area) {
+        return prev + Number(area.numProjects);
+      }, 0);
+      var totalGrantsSumStr = '£'+Math.floor(totalGrantsSum/1000000) + 'm';
+      this.svg.append('text')
+        .text('Projects')
+        //.attr('class', 'label')
+        .attr('dx', cx)
+        .attr('dy', statsTop)
+        .style('fill', '#222')
+        .style('opacity', 0)
+        .style('font-size', '60%')
+        .style('text-transform', 'uppercase')
+        .transition()
+        .delay(this.mapAnimDelay+this.mapAnimTime)
+        .duration(this.labelAnimTime)
+        .style('opacity', 1)
+
+      this.svg.append('text')
+        .text(totalNumProjects)
+        //.attr('class', 'bigNum')
+        .attr('dx', cx)
+        .attr('dy', statsTop + 25)
+        .style('opacity', 0)
+        .style('font-size', '120%')
+        .transition()
+        .delay(this.mapAnimDelay+this.mapAnimTime)
+        .duration(this.labelAnimTime)
+        .style('opacity', 1)
+
+      this.svg.append('text')
+        .text('Grants')
+        //.attr('class', 'label')
+        .attr('dx', cx)
+        .attr('dy', statsTop + 60)
+        .style('fill', '#222')
+        .style('opacity', 0)
+        .style('font-size', '60%')
+        .style('text-transform', 'uppercase')
+        .transition()
+        .delay(this.mapAnimDelay+this.mapAnimTime)
+        .duration(this.labelAnimTime)
+        .style('opacity', 1)
+
+      this.svg.append('text')
+        .text(totalGrantsSumStr)
+        //.attr('class', 'bigNum')
+        .attr('dx', cx)
+        .attr('dy', statsTop + 85)
+        .style('opacity', 0)
+        .style('font-size', '120%')
+        .transition()
+        .delay(this.mapAnimDelay+this.mapAnimTime)
+        .duration(this.labelAnimTime)
+        .style('opacity', 0.2 + 0.8*totalGrantsSum/this.maxGrant)
+
+      data.rows.forEach(function(area, areaIndex) {
+        var h = Math.max(5, 20 * area.grantsSum/10000000);
+        var budgetAreaCode = tsb.common.extractBudgetAreaCode(area.budgetArea);
+        var areaBar = this.svg.append('rect');
+
+        areaBar
+          .attr('x', cx + areaIndex * 7)
+          .attr('fill', tsb.config.themes.current.budgetAreaColor[budgetAreaCode])
+          .attr('width', 5)
+          .attr('y', statsTop - 20)
+          .attr('height', 0)
           .transition()
-          .delay(this.mapAnimDelay+this.mapAnimTime)
+          .delay(this.mapAnimDelay+this.mapAnimTime+50*areaIndex)
           .duration(this.labelAnimTime)
-          .style('opacity', 1)
+          .attr('y', statsTop - 20 - h)
+          .attr('height', h);
 
-        this.svg.append('text')
-          .text(totalNumProjects)
-          //.attr('class', 'bigNum')
-          .attr('dx', cx + dx)
-          .attr('dy', statsTop + 25)
-          .style('opacity', 0)
-          .style('font-size', '120%')
-          .transition()
-          .delay(this.mapAnimDelay+this.mapAnimTime)
-          .duration(this.labelAnimTime)
-          .style('opacity', 1)
-
-        this.svg.append('text')
-          .text('Grants')
-          //.attr('class', 'label')
-          .attr('dx', cx + dx)
-          .attr('dy', statsTop + 60)
-          .style('fill', '#222')
-          .style('opacity', 0)
-          .style('font-size', '60%')
-          .style('text-transform', 'uppercase')
-          .transition()
-          .delay(this.mapAnimDelay+this.mapAnimTime)
-          .duration(this.labelAnimTime)
-          .style('opacity', 1)
-
-        this.svg.append('text')
-          .text(totalGrantsSumStr)
-          //.attr('class', 'bigNum')
-          .attr('dx', cx + dx)
-          .attr('dy', statsTop + 85)
-          .style('opacity', 0)
-          .style('font-size', '120%')
-          .transition()
-          .delay(this.mapAnimDelay+this.mapAnimTime)
-          .duration(this.labelAnimTime)
-          .style('opacity', 0.2 + 0.8*totalGrantsSum/this.maxGrant)
-
-        data.rows.forEach(function(area, areaIndex) {
-          var h = Math.max(5, 20 * area.grantsSum/10000000);
-          var budgetAreaCode = tsb.common.extractBudgetAreaCode(area.budgetArea);
-          var areaBar = this.svg.append('rect');
-
-          areaBar
-            .attr('x', cx + dx + areaIndex * 7)
-            .attr('fill', tsb.config.themes.current.budgetAreaColor[budgetAreaCode])
-            .attr('width', 5)
-            .attr('y', statsTop - 20)
-            .attr('height', 0)
-            .transition()
-            .delay(this.mapAnimDelay+this.mapAnimTime+50*areaIndex)
-            .duration(this.labelAnimTime)
-            .attr('y', statsTop - 20 - h)
-            .attr('height', h);
-
-          areaBar.on('mouseover', function() {
-            this.tooltip.style('display', 'block')
-            var areaName = tsb.config.budgetAreaLabels[budgetAreaCode];
-            var grantsSum = Math.floor(area.grantsSum/1000000*10)/10 + 'M'
-            this.tooltipText.text(areaName + ' : ' + grantsSum + ' for ' + area.numProjects + ' projects');
-            this.tooltipBg.style('fill', tsb.config.themes.current.budgetAreaColor[budgetAreaCode])
-          }.bind(this))
-
-          areaBar.on('click', function(d) {
-            this.openLink(this.year, budgetAreaCode, regionInfo.name);
-          }.bind(this))
-
-          areaBar.on('mouseout', function() {
-            this.tooltip.style('display', 'none');
-          }.bind(this))
-
-          this.tooltip.node().parentNode.appendChild(this.tooltip.node());
+        areaBar.on('mouseover', function() {
+          this.tooltip.style('display', 'block')
+          var areaName = tsb.config.budgetAreaLabels[budgetAreaCode];
+          var grantsSum = Math.floor(area.grantsSum/1000000*10)/10 + 'M'
+          this.tooltipText.text(areaName + ' : ' + grantsSum + ' for ' + area.numProjects + ' projects');
+          this.tooltipBg.style('fill', tsb.config.themes.current.budgetAreaColor[budgetAreaCode])
         }.bind(this))
-      //}.bind(this));
+
+        areaBar.on('click', function(d) {
+          this.openLink(this.year, budgetAreaCode, regionInfo.name);
+        }.bind(this))
+
+        areaBar.on('mouseout', function() {
+          this.tooltip.style('display', 'none');
+        }.bind(this))
+
+        this.tooltip.node().parentNode.appendChild(this.tooltip.node());
+      }.bind(this))
+    }.bind(this));
+  },
+  createViz: function(dataByRegion) {
+    this.showTitles();
+    this.explodeMap();
+    this.addRegionsLabels();
+    this.addRegionData(dataByRegion);
   },
   openLink: function(year, area, region) {
     var areaLabel = area ? tsb.config.budgetAreaLabels[area] : '';
