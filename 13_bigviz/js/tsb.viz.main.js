@@ -22,7 +22,7 @@ function init() {
     d3.select('#home-viz')
     .style('position', 'relative')
 
-    //svg.remove();
+    currentVizGroup.selectAll('*').remove();
     //svg = tsb.state.svg = d3.select('#home-viz').append('svg')
     svg
     .attr('width', tsb.state.w)
