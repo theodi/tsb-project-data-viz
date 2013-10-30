@@ -52,6 +52,7 @@ tsb.viz.regions = {
         yearsGroup.selectAll('text').style('opacity', 0.5);
         yearBtn.style('opacity', 1);
         this.year = year;
+        this.loadData();
       }.bind(this))
 
       console.log(yearBtn);
@@ -155,12 +156,19 @@ tsb.viz.regions = {
       this.loadData();
     }.bind(this));
   },
-  explodeMap: function(dataByRegion) {
+  explodeMap: function() {
+
+  },
+  showTitles: function() {
     this.title.transition()
       .style('opacity', 1)
 
     this.backBtn.transition()
       .style('opacity', 1)
+  },
+  createViz: function(dataByRegion) {
+    this.showTitles();
+    this.explodeMap();
 
     var speedup = 1;
     var mapAnimDelay = 1000/speedup;
@@ -168,15 +176,7 @@ tsb.viz.regions = {
     var labelAnimTime = 1000/speedup;
     var regionCodeList = tsb.common.keys(tsb.config.regionsMap);
     var offsetLeft = 0;
-    var totalWidth = 0;
     var margin = this.w * 0.05;
-    regionCodeList.forEach(function(regionCode, regionIndex) {
-      var regionInfo = tsb.config.regionsMap[regionCode];
-      var region = this.svg.select('.' + regionInfo.id);
-      var regionBbox = region.node().getBoundingClientRect();
-      var regionWidth = regionBbox.right - regionBbox.left;
-      totalWidth += regionWidth;
-    }.bind(this));
 
     var colWidth = 100;
     var spacing = (this.w - 2 * margin - regionCodeList.length * colWidth)/(regionCodeList.length-1);
@@ -358,16 +358,19 @@ tsb.viz.regions = {
       '/projects?utf8=✓&search_string=&date_from='+start+'&date_to='+end+'&budget_area_label%5B'+areaLabel+'%5D&region_labels%5B'+region+'%5D=true';
     window.open(url);
   },
-  loadData:function(){
-    var results = [];
-    var regionCodeList = tsb.common.keys(tsb.config.regionsMap);
-    regionCodeList.forEach(function(regionCode, regionIndex) {
-      results.push(tsb.state.dataSource.getAreaSummaryForYearInRegion(this.year, regionCode))
-    }.bind(this));
-    Q.all(results).then(function(dataByRegion) {
-      tsb.viz.preloader.stop().then(function() {
-        this.explodeMap(dataByRegion);
+  loadData: function() {
+    tsb.viz.preloader.start();
+    setTimeout(function() {
+      var results = [];
+      var regionCodeList = tsb.common.keys(tsb.config.regionsMap);
+      regionCodeList.forEach(function(regionCode, regionIndex) {
+        results.push(tsb.state.dataSource.getAreaSummaryForYearInRegion(this.year, regionCode))
+      }.bind(this));
+      Q.all(results).then(function(dataByRegion) {
+        tsb.viz.preloader.stop().then(function() {
+          this.createViz(dataByRegion);
+        }.bind(this))
       }.bind(this))
-    }.bind(this))
+    }.bind(this), 2000)
   }
 }
