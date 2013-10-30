@@ -93,6 +93,7 @@ tsb.viz.collaborations = {
           if (!project) {
             project = {
               id: row.project,
+              label: row.projectLabel,
               budgetArea: row.budgetArea,
               budgetAreaCode: tsb.common.extractBudgetAreaCode(row.budgetArea),
               participants: []
@@ -137,7 +138,7 @@ tsb.viz.collaborations = {
 
         this.buildViz(participants, projects, participantsByBudgetAreaCode, projectsByBudgetAreaCode);
       }.bind(this));
-      }.bind(this));
+    }.bind(this));
   },
   buildViz: function(participants, projects, participantsByBudgetAreaCode, projectsByBudgetAreaCode) {
     var svg = this.svg;
@@ -147,6 +148,7 @@ tsb.viz.collaborations = {
     var collaboratorDistance = 150;
     var tooltip = this.tooltip;
     var tooltipText = this.tooltipText;
+    var tooltipBg = this.tooltipBg;
 
     function exploreOrganization(org) {
       var rootGroup = svg.append('g');
@@ -221,6 +223,18 @@ tsb.viz.collaborations = {
 
       projectNodes.exit().transition().duration(1000).style('opacity', 0).remove()
 
+      projectNodes.on('mouseover', function(d) {
+        tooltip.style('display', 'block')
+        var budgetAreaName = tsb.config.budgetAreaLabels[d.budgetAreaCode];
+        var budgetAreaColor = tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode];
+        tooltipBg.style('fill', budgetAreaColor);
+        tooltipText.text(budgetAreaName + ' ' + d.label);
+      })
+
+      projectNodes.on('mouseout', function() {
+        tooltip.style('display', 'none');
+      })
+
       //COLLABORATORS
 
       var collaborators = _.filter(_.uniq(_.flatten(_.pluck(org.projects, 'participants'))), function(p) { return p != org; });
@@ -292,9 +306,23 @@ tsb.viz.collaborations = {
         .attr('y', function(d, i) { return -25 - i * 8; })
         .attr('height', function(d) { return 6; })
 
+      collabolatorProjects.on('mouseover', function(d) {
+        tooltip.style('display', 'block')
+        var budgetAreaName = tsb.config.budgetAreaLabels[d.budgetAreaCode];
+        var budgetAreaColor = tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode];
+        tooltipBg.style('fill', budgetAreaColor);
+        tooltipText.text(budgetAreaName + ' ' + d.label);
+      })
+
+      collabolatorProjects.on('mouseout', function() {
+        tooltip.style('display', 'none');
+      })
+
+
       collaboratorNodes.on('mouseover', function(d) {
         if (d3.event.target.nodeName == 'circle') {
           tooltip.style('display', 'block')
+          tooltipBg.style('fill', '#000000');
           tooltipText.text(d.label);
         }
       })
@@ -384,13 +412,14 @@ tsb.viz.collaborations = {
     var randomParticipants = _.shuffle(participants);
     var startOrg = [0];
     for(var i=0; i<randomParticipants.length; i++) {
-      if (randomParticipants[i].projects.length > 5) {
-        //if (Math.random() > 0.9) console.log(participants[i].id);
-        //if (participants[i].label.indexOf('Imperial') > -1) {
-          startOrg = randomParticipants[i];
-          break;
-        }
-      //}
+      var numCollaborators = 0;
+      randomParticipants[i].projects.forEach(function(project) {
+        numCollaborators += project.participants.length;
+      })
+      if (numCollaborators > 10) {
+        startOrg = randomParticipants[i];
+        break;
+      }
     }
     exploreOrganization(startOrg);
   },
