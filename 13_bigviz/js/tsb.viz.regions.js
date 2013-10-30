@@ -403,7 +403,7 @@ tsb.viz.regions = {
 
     areaBars.on('mouseleave', function(d) {
       this.tooltip.style('display', 'none')
-    });
+    }.bind(this));
 
     areaBars.on('click', function(d) {
       var regionName = tsb.config.regionsMap[d.regionCode].name;
