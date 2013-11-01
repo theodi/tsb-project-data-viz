@@ -47,8 +47,8 @@ tsb.viz.network = {
               label : '',
               participants : [],
               id : projectParticipant.project,
-              budgetArea : projectParticipant.budgetArea,
-              budgetAreaCode: tsb.common.extractBudgetAreaCode(projectParticipant.budgetArea)
+              priorityArea : projectParticipant.priorityArea,
+              priorityAreaCode: tsb.common.extractPriorityAreaCode(projectParticipant.priorityArea)
             };
             projects.push(project);
             projectMap[projectParticipant.project] = project;
@@ -72,8 +72,8 @@ tsb.viz.network = {
             //if project is worthy
             participant.projects.push({
               id: participantProject.project,
-              budgetArea: participantProject.budgetArea,
-              budgetAreaCode: tsb.common.extractBudgetAreaCode(participantProject.budgetArea)
+              priorityArea: participantProject.priorityArea,
+              priorityAreaCode: tsb.common.extractPriorityAreaCode(participantProject.priorityArea)
             })
           }
         })
@@ -113,7 +113,7 @@ tsb.viz.network = {
           if (!participantLinksMap[linkABHash] && !participantLinksMap[linkBAHash]) {
             participantLinksMap[linkABHash] = true;
             participantLinksMap[linkBAHash] = true;
-            if (project.budgetAreaCode == 'ENRG') {
+            if (project.priorityAreaCode == 'ENRG') {
               participantA.used = true;
               participantB.used = true;
               participantLinks.push({source:participantA.index, target:participantB.index, project:project});
@@ -143,7 +143,7 @@ tsb.viz.network = {
       .attr('x2', function(d) { return participants[d.target].x; })
       .attr('y2', function(d) { return participants[d.target].y; })
       .style('stroke', function(d) {
-        return tsb.config.themes.current.budgetAreaColor[d.project.budgetAreaCode];
+        return tsb.config.themes.current.priorityAreaColor[d.project.priorityAreaCode];
       })
 
     var participantNodes = this.svg.selectAll('g.participant')
@@ -175,7 +175,7 @@ tsb.viz.network = {
         .attr('r', function(d){
           return 2;
         })
-        .style('fill', function(d) { return tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode];})
+        .style('fill', function(d) { return tsb.config.themes.current.priorityAreaColor[d.priorityAreaCode];})
 
     
 

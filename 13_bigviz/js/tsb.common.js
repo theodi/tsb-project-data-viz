@@ -9,8 +9,8 @@ var tsb = {
 
 tsb.common = tsb.common || {};
 
-tsb.common.extractBudgetAreaCode = function(budgetArea) {
-  return budgetArea.substr(budgetArea.lastIndexOf('/') + 1);
+tsb.common.extractPriorityAreaCode = function(priorityArea) {
+  return priorityArea.substr(priorityArea.lastIndexOf('/') + 1);
 }
 
 tsb.common.inital = function(list, n) {

@@ -177,8 +177,8 @@ tsb.SPARQLDataSource = (function() {
 
   //org --participatesIn--> project -----------hasParticipant--> participant
   //                         competition                          label
-  //                          budgetArea                          enterpriseSize
-  //                           budgetAreaLabel                     label
+  //                          priorityArea                          enterpriseSize
+  //                           priorityAreaLabel                     label
   SPARQLDataSource.prototype.getOrganizationCollaborators = function(orgId) {
     var q =" \
     PREFIX tsb: <http://tsb-projects.labs.theodi.org/def/> \
@@ -186,13 +186,13 @@ tsb.SPARQLDataSource = (function() {
     PREFIX rdf: <http://www.w3.org/2000/01/rdf-schema#> \
     PREFIX w3: <http://www.w3.org/ns/org#> \
     PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> \
-    select ?collaborator ?collaboratorLabel ?collaboratorSizeLabel ?budgetArea ?collaboratorRegion (?collaboratorLat as ?lat) (?collaboratorLng as ?lng) ?project \
+    select ?collaborator ?collaboratorLabel ?collaboratorSizeLabel ?priorityArea ?collaboratorRegion (?collaboratorLat as ?lat) (?collaboratorLng as ?lng) ?project \
     where { \
          <" + orgId + "> tsb:participatesIn ?project . \
          ?org tsb:participatesIn ?project . \
          ?project tsb:competition ?competition . \
-         ?competition tsb:budgetArea ?budgetArea . \
-         ?budgetArea rdf:label ?budgetAreaLabel . \
+         ?competition tsb:priorityArea ?priorityArea . \
+         ?priorityArea rdf:label ?priorityAreaLabel . \
          ?project tsb:hasParticipant ?collaborator . \
          ?collaborator rdf:label ?collaboratorLabel . \
          ?collaborator tsb:enterpriseSize ?collaboratorSize . \
@@ -202,7 +202,7 @@ tsb.SPARQLDataSource = (function() {
          ?collaboratorSite geo:long ?collaboratorLng . \
          ?collaboratorSize rdf:label ?collaboratorSizeLabel . \
     } \
-    group by ?collaborator ?collaboratorLabel ?collaboratorSizeLabel ?budgetArea ?collaboratorRegion ?collaboratorLat ?collaboratorLng ?project \
+    group by ?collaborator ?collaboratorLabel ?collaboratorSizeLabel ?priorityArea ?collaboratorRegion ?collaboratorLat ?collaboratorLng ?project \
     ";
     return this.query(q);
   }
@@ -213,13 +213,13 @@ tsb.SPARQLDataSource = (function() {
     PREFIX tsb: <http://tsb-projects.labs.theodi.org/def/> \
     PREFIX ptime: <http://purl.org/NET/c4dm/timeline.owl#> \
     PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \
-    select ?budgetArea ?projectStartDate \
+    select ?priorityArea ?projectStartDate \
     where { \
         ?project a tsb:Project . \
         ?project tsb:projectDuration ?projectDuration . \
         ?projectDuration ptime:start ?projectStartDate . \
         ?project tsb:competition ?competition . \
-        ?competition tsb:budgetArea ?budgetArea . \
+        ?competition tsb:priorityArea ?priorityArea . \
         FILTER(?projectStartDate >= \""+year+"-01-01\"^^xsd:date) . \
         FILTER(?projectStartDate <= \""+year+"-12-31\"^^xsd:date) . \
     } \
@@ -233,7 +233,7 @@ tsb.SPARQLDataSource = (function() {
     PREFIX ptime: <http://purl.org/NET/c4dm/timeline.owl#> \
     PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \
     PREFIX rdf: <http://www.w3.org/2000/01/rdf-schema#> \
-    select ?project ?projectLabel ?budgetArea ?participant ?participantLabel ?participantSizeLabel \
+    select ?project ?projectLabel ?priorityArea ?participant ?participantLabel ?participantSizeLabel \
     where { \
         ?project a tsb:Project . \
         ?project tsb:projectDuration ?projectDuration . \
@@ -244,7 +244,7 @@ tsb.SPARQLDataSource = (function() {
         ?participant rdf:label ?participantLabel . \
         ?participant tsb:enterpriseSize ?participantSize . \
         ?participantSize rdf:label ?participantSizeLabel . \
-        ?competition tsb:budgetArea ?budgetArea . \
+        ?competition tsb:priorityArea ?priorityArea . \
         FILTER(?projectStartDate >= \""+year+"-01-01\"^^xsd:date) . \
         FILTER(?projectStartDate <= \""+year+"-12-31\"^^xsd:date) . \
     } \
@@ -257,7 +257,7 @@ tsb.SPARQLDataSource = (function() {
       PREFIX tsb: <http://tsb-projects.labs.theodi.org/def/> \
       PREFIX ptime: <http://purl.org/NET/c4dm/timeline.owl#> \
       PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \
-      SELECT ?budgetArea (COUNT(?projectGrant) as ?numGrants) (SUM(?offerGrant) as ?grantsSum) ?year \
+      SELECT ?priorityArea (COUNT(?projectGrant) as ?numGrants) (SUM(?offerGrant) as ?grantsSum) ?year \
       WHERE { \
           ?project a tsb:Project . \
           ?project tsb:projectDuration ?projectDuration . \
@@ -265,11 +265,11 @@ tsb.SPARQLDataSource = (function() {
           ?projectGrant tsb:offerGrant ?offerGrant . \
           ?projectDuration ptime:start ?projectStartDate . \
           ?project tsb:competition ?competition . \
-          ?competition tsb:budgetArea ?budgetArea . \
+          ?competition tsb:priorityArea ?priorityArea . \
           FILTER(?projectStartDate >= \""+year+"-01-01\"^^xsd:date) . \
           FILTER(?projectStartDate <= \""+year+"-12-31\"^^xsd:date) . \
       } \
-      GROUP BY ?budgetArea (YEAR(?projectStartDate) as ?year)\
+      GROUP BY ?priorityArea (YEAR(?projectStartDate) as ?year)\
     ";
     return this.query(q);
   }
@@ -280,7 +280,7 @@ tsb.SPARQLDataSource = (function() {
       PREFIX ptime: <http://purl.org/NET/c4dm/timeline.owl#> \
       PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> \
       PREFIX w3: <http://www.w3.org/ns/org#> \
-      SELECT ?budgetArea (COUNT(DISTINCT ?project) as ?numProjects) (COUNT(?projectGrant) as ?numGrants) (SUM(?offerGrant) as ?grantsSum) ?year \
+      SELECT ?priorityArea (COUNT(DISTINCT ?project) as ?numProjects) (COUNT(?projectGrant) as ?numGrants) (SUM(?offerGrant) as ?grantsSum) ?year \
       WHERE { \
           ?project a tsb:Project . \
           ?project tsb:projectDuration ?projectDuration . \
@@ -291,11 +291,11 @@ tsb.SPARQLDataSource = (function() {
           ?projectGrant tsb:offerGrant ?offerGrant . \
           ?projectDuration ptime:start ?projectStartDate . \
           ?project tsb:competition ?competition . \
-          ?competition tsb:budgetArea ?budgetArea . \
+          ?competition tsb:priorityArea ?priorityArea . \
           FILTER(?projectStartDate >= \""+year+"-01-01\"^^xsd:date) . \
           FILTER(?projectStartDate <= \""+year+"-12-31\"^^xsd:date) . \
       } \
-      GROUP BY ?budgetArea (YEAR(?projectStartDate) as ?year)\
+      GROUP BY ?priorityArea (YEAR(?projectStartDate) as ?year)\
     ";
     return this.query(q);
   }

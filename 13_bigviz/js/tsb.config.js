@@ -3,7 +3,7 @@ var tsb = tsb || {};
 tsb.config = {};
 tsb.config.domain = 'http://tsb-projects.labs.theodi.org/';
 tsb.config.sparqlEndpoint = 'http://tsb-projects.labs.theodi.org/sparql.json';
-tsb.config.budgetAreaBase = 'http://tsb-projects.labs.theodi.org/id/budget-area/';
+tsb.config.priorityAreaBase = 'http://tsb-projects.labs.theodi.org/id/budget-area/';
 tsb.config.ukMapSVG = 'assets/United_Kingdom_Map_-_Region.svg';
 
 tsb.config.text = {};
@@ -34,8 +34,8 @@ tsb.config.regionsMap = {
 };
 
 
-tsb.config.budgetAreas = [ 'SPAC', 'TRANSPO', 'TECH', 'MANF', 'ENV_SUS', 'tsb-programmes', 'DIGS', 'ENRG', 'HLTHCR' ];
-tsb.config.budgetAreaLabels = {
+tsb.config.priorityAreas = [ 'SPAC', 'TRANSPO', 'TECH', 'MANF', 'ENV_SUS', 'tsb-programmes', 'DIGS', 'ENRG', 'HLTHCR' ];
+tsb.config.priorityAreaLabels = {
   'SPAC' : 'Space',
   'TRANSPO' : 'Transport',
   'TECH' : 'Technology',
@@ -65,8 +65,8 @@ tsb.config.themes = {
     introVizBtnBgColor: '#DDDDDD',
     introVizBtnLabelColors3: ['#00bb4d', '#00b7fa', '#FFDD00'],
     introVizBtnLabelColors: ['#0DBC37', '#00B7FF', '#F9BC26'],
-    budgetAreaColorAlpha: 0.55,
-    budgetAreaColor : {
+    priorityAreaColorAlpha: 0.55,
+    priorityAreaColor : {
       'TRANSPO'         : '#00B7FF',
       'TECH'            : '#D60303',
       'MANF'            : '#FF6700',

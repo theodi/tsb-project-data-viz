@@ -339,13 +339,13 @@ tsb.viz.regions = {
     tsb.config.regionCodeList.map(function(regionCode, regionIndex) {
       var data = dataByRegion[regionIndex];
       data.rows.sort(function(a, b) {
-        if (a.budgetArea > b.budgetArea) return 1;
-        if (a.budgetArea < b.budgetArea) return -1;
+        if (a.priorityArea > b.priorityArea) return 1;
+        if (a.priorityArea < b.priorityArea) return -1;
         return 0;
       })
-      while(data.rows.length < tsb.config.budgetAreas.length) {
+      while(data.rows.length < tsb.config.priorityAreas.length) {
         data.rows.push({
-          budgetArea: tsb.config.budgetAreas[0],
+          priorityArea: tsb.config.priorityAreas[0],
           grantsSum: 0,
           numGrants: 0,
           umProjects: 0,
@@ -353,15 +353,15 @@ tsb.viz.regions = {
         })
       }
       data.rows.forEach(function(area, areaIndex) {
-        var budgetAreaCode = tsb.common.extractBudgetAreaCode(area.budgetArea);
-        var budgetAreaColor = tsb.config.themes.current.budgetAreaColor[budgetAreaCode];
+        var priorityAreaCode = tsb.common.extractPriorityAreaCode(area.priorityArea);
+        var priorityAreaColor = tsb.config.themes.current.priorityAreaColor[priorityAreaCode];
         var barData = {
           regionCode: regionCode,
           regionIndex: regionIndex,
           area: area,
           areaIndex: areaIndex,
-          budgetAreaCode: budgetAreaCode,
-          budgetAreaColor: budgetAreaColor
+          priorityAreaCode: priorityAreaCode,
+          priorityAreaColor: priorityAreaColor
         }
         barsData.push(barData);
       })
@@ -381,7 +381,7 @@ tsb.viz.regions = {
       .attr('height', 0)
 
     areaBars
-      .attr('fill', function(d) { return d.budgetAreaColor; })
+      .attr('fill', function(d) { return d.priorityAreaColor; })
       .transition()
       .attr('x', function(d) {
         return colPos(d.regionCode, d.regionIndex) + d.areaIndex * 7;
@@ -395,10 +395,10 @@ tsb.viz.regions = {
     areaBars.on('mouseover', function(d) {
       this.tooltip.node().parentNode.appendChild(this.tooltip.node());
       this.tooltip.style('display', 'block')
-      var areaName = tsb.config.budgetAreaLabels[d.budgetAreaCode];
+      var areaName = tsb.config.priorityAreaLabels[d.priorityAreaCode];
       var grantsSum = Math.floor(d.area.grantsSum/1000000*10)/10 + 'M'
       this.tooltipText.text(areaName + ' : ' + grantsSum + ' for ' + d.area.numProjects + ' projects');
-      this.tooltipBg.style('fill', d.budgetAreaColor)
+      this.tooltipBg.style('fill', d.priorityAreaColor)
     }.bind(this))
 
     areaBars.on('mouseleave', function(d) {
@@ -407,7 +407,7 @@ tsb.viz.regions = {
 
     areaBars.on('click', function(d) {
       var regionName = tsb.config.regionsMap[d.regionCode].name;
-      this.openLink(this.year, d.budgetAreaCode, regionName);
+      this.openLink(this.year, d.priorityAreaCode, regionName);
     }.bind(this));
   },
   createViz: function(dataByRegion) {
@@ -422,7 +422,7 @@ tsb.viz.regions = {
     }
   },
   openLink: function(year, area, region) {
-    var areaLabel = area ? tsb.config.budgetAreaLabels[area] : '';
+    var areaLabel = area ? tsb.config.priorityAreaLabels[area] : '';
     var start = year + '-01-01';
     var end = year + '-12-31';
     var region

@@ -92,8 +92,8 @@ tsb.viz.intro = {
       var px = marginX + (distributedIndex % projectsPerRow) * (pw + spacingX);
       var py = marginY + row * (ph + spacingY);
       if (row > numFullRows) ph = 0; //don't draw invisible projects
-      var budgetAreaCode = tsb.common.extractBudgetAreaCode(project.budgetArea);
-      var color = tsb.config.themes.current.budgetAreaColor[budgetAreaCode];
+      var priorityAreaCode = tsb.common.extractPriorityAreaCode(project.priorityArea);
+      var color = tsb.config.themes.current.priorityAreaColor[priorityAreaCode];
       this.makeRect(px, py, pw, ph, color, 'project', distributedIndex);
     }.bind(this));
     this.drawRects();
@@ -114,7 +114,7 @@ tsb.viz.intro = {
       width: w,
       height: this.staticMode ? h : 0,
       color: d3.rgb(color).darker(2).toString(),
-      opacity: tsb.config.themes.current.budgetAreaColorAlpha
+      opacity: tsb.config.themes.current.priorityAreaColorAlpha
     };
     this.rectangles.push(rect);
     var projectRect = d3.select(rect);
@@ -145,7 +145,7 @@ tsb.viz.intro = {
       .attr('x', x).attr('y', y+h)
       .attr('width', w).attr('height', this.staticMode ? h : 0)
       .attr('fill', color)
-      .style('opacity', tsb.config.themes.current.budgetAreaColorAlpha);
+      .style('opacity', tsb.config.themes.current.priorityAreaColorAlpha);
 
     if (this.staticMode) {
       this.numProjects++;

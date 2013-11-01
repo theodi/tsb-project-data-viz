@@ -105,7 +105,7 @@ tsb.viz.priorityAreas = {
   },
   drawGraph: function(data) {
     tsb.common.log('drawGraph', data);
-    var n = tsb.config.budgetAreas.length; // number of layers / budget areas
+    var n = tsb.config.priorityAreas.length; // number of layers / budget areas
     var m = this.endYear - this.startYear + 1; // number of samples per layer / years
     var stack = d3.layout.stack().offset('wiggle');
     var layers = stack(data);
@@ -141,7 +141,7 @@ tsb.viz.priorityAreas = {
     .enter().append('path')
       .attr('d', area)
       .style('fill', function(d) {
-        return tsb.config.themes.current.budgetAreaColor[d[0].budgetArea];
+        return tsb.config.themes.current.priorityAreaColor[d[0].priorityArea];
       })
       .on('mouseenter', function(d) {
         layerPaths.transition()
@@ -149,14 +149,14 @@ tsb.viz.priorityAreas = {
           return (od == d) ? 1 : 0.25
         })
         subTitle
-          .style('fill', tsb.config.themes.current.budgetAreaColor[d[0].budgetArea])
-          .text(tsb.config.budgetAreaLabels[d[0].budgetArea])
+          .style('fill', tsb.config.themes.current.priorityAreaColor[d[0].priorityArea])
+          .text(tsb.config.priorityAreaLabels[d[0].priorityArea])
         subTitle.transition()
           .style('opacity', 1)
         svg.selectAll('text.priorityAreasTotal')
           .data(d.slice(1, d.length-1))
           .attr('fill', function(d) {
-            return tsb.config.themes.current.budgetAreaColor[d.budgetArea];
+            return tsb.config.themes.current.priorityAreaColor[d.priorityArea];
           })
           .text(function(d) {
             return '£'+Math.floor(d.grantsSum/1000000*10)/10 + 'm';
@@ -166,7 +166,7 @@ tsb.viz.priorityAreas = {
         svg.selectAll('text.priorityAreasGrants')
           .data(d.slice(1, d.length-1))
           .attr('fill', function(d) {
-            return tsb.config.themes.current.budgetAreaColor[d.budgetArea];
+            return tsb.config.themes.current.priorityAreaColor[d.priorityArea];
           })
           .text(function(d) { return d.numGrants + ' GRANTS'; })
           .transition()
@@ -204,7 +204,7 @@ tsb.viz.priorityAreas = {
       }.bind(this))
       .on('click', function(d) {
         var clickedYear = startYear + Math.floor((endYear - startYear) * d3.event.clientX / width);
-        var clickedArea = d[0].budgetArea;
+        var clickedArea = d[0].priorityArea;
         self.openLink(clickedYear, clickedArea)
       })
 
@@ -258,7 +258,7 @@ tsb.viz.priorityAreas = {
     this.svg.selectAll('path').on('mouseleave')(layers[0]);
   },
   openLink: function(year, area) {
-    var areaLabel = tsb.config.budgetAreaLabels[area]
+    var areaLabel = tsb.config.priorityAreaLabels[area]
     var start = year + '-01-01';
     var end = year + '-12-31';
     var url = tsb.config.domain +
@@ -270,23 +270,23 @@ tsb.viz.priorityAreas = {
     var areas = [];
     var startYear = this.startYear;
     var endYear = this.endYear;
-    tsb.config.budgetAreas.forEach(function(areaId) {
+    tsb.config.priorityAreas.forEach(function(areaId) {
       var areaStats = [];
       byArea[areaId] = areaStats;
       areas.push(areaStats);
       for(var year=this.startYear; year<=this.endYear; year++) {
-        areaStats[year-startYear] = { x: Number(year), y: 0, grantsSum:0, numGrants:0, budgetArea: areaId };
+        areaStats[year-startYear] = { x: Number(year), y: 0, grantsSum:0, numGrants:0, priorityArea: areaId };
       }
     }.bind(this));
     data.forEach(function(year) {
       if (year.rows.length == 1 && year.rows[0].numGrants == 0) return;
       year.rows.forEach(function(grantArea) {
-        var budgetAreaId = tsb.common.extractBudgetAreaCode(grantArea.budgetArea);
-        byArea[budgetAreaId][grantArea.year-startYear].y = Number(grantArea.grantsSum);
-        byArea[budgetAreaId][grantArea.year-startYear].grantsSum = grantArea.grantsSum;
-        byArea[budgetAreaId][grantArea.year-startYear].numGrants = grantArea.numGrants;
+        var priorityAreaId = tsb.common.extractPriorityAreaCode(grantArea.priorityArea);
+        byArea[priorityAreaId][grantArea.year-startYear].y = Number(grantArea.grantsSum);
+        byArea[priorityAreaId][grantArea.year-startYear].grantsSum = grantArea.grantsSum;
+        byArea[priorityAreaId][grantArea.year-startYear].numGrants = grantArea.numGrants;
         if (grantArea.year == endYear - 1)
-          byArea[budgetAreaId][grantArea.year-startYear+1].y = Number(grantArea.grantsSum);
+          byArea[priorityAreaId][grantArea.year-startYear+1].y = Number(grantArea.grantsSum);
       });
     });
     return areas;

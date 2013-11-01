@@ -94,8 +94,8 @@ tsb.viz.collaborations = {
             project = {
               id: row.project,
               label: row.projectLabel,
-              budgetArea: row.budgetArea,
-              budgetAreaCode: tsb.common.extractBudgetAreaCode(row.budgetArea),
+              priorityArea: row.priorityArea,
+              priorityAreaCode: tsb.common.extractPriorityAreaCode(row.priorityArea),
               participants: []
             }
             projectsMap[row.project] = project;
@@ -126,21 +126,21 @@ tsb.viz.collaborations = {
           }
         }
 
-        var projectsByBudgetAreaCode = _.groupBy(projects, prop('budgetAreaCode'));
-        var budgetAreaCodes = _.keys(projectsByBudgetAreaCode);
-        var participantsByBudgetAreaCode = {};
+        var projectsByPriorityAreaCode = _.groupBy(projects, prop('priorityAreaCode'));
+        var priorityAreaCodes = _.keys(projectsByPriorityAreaCode);
+        var participantsByPriorityAreaCode = {};
 
-        budgetAreaCodes.forEach(function(budgetAreaCode) {
-          var projects = projectsByBudgetAreaCode[budgetAreaCode];
+        priorityAreaCodes.forEach(function(priorityAreaCode) {
+          var projects = projectsByPriorityAreaCode[priorityAreaCode];
           var participants = _.uniq(_.flatten(_.pluck(projects, 'participants')));
-          participantsByBudgetAreaCode[budgetAreaCode] = participants;
+          participantsByPriorityAreaCode[priorityAreaCode] = participants;
         })
 
-        this.buildViz(participants, projects, participantsByBudgetAreaCode, projectsByBudgetAreaCode);
+        this.buildViz(participants, projects, participantsByPriorityAreaCode, projectsByPriorityAreaCode);
       }.bind(this));
     }.bind(this));
   },
-  buildViz: function(participants, projects, participantsByBudgetAreaCode, projectsByBudgetAreaCode) {
+  buildViz: function(participants, projects, participantsByPriorityAreaCode, projectsByPriorityAreaCode) {
     var svg = this.svg;
     var w = this.w;
     var h = this.h;
@@ -227,22 +227,22 @@ tsb.viz.collaborations = {
         .attr('width', function(d) { return 14; })
         .attr('height', function(d) { return 6; })
         .attr('r', 0)
-        .style('fill', function(d) { return tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode]; })
+        .style('fill', function(d) { return tsb.config.themes.current.priorityAreaColor[d.priorityAreaCode]; })
         .style('stroke', 'none');
 
       projectNodes
         .transition().duration(1000)
         .attr('x', function(d) { return d.x - 7; })
-        .style('fill', function(d) { return tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode]; })
+        .style('fill', function(d) { return tsb.config.themes.current.priorityAreaColor[d.priorityAreaCode]; })
 
       projectNodes.exit().transition().duration(1000).style('opacity', 0).remove()
 
       projectNodes.on('mouseover', function(d) {
         tooltip.style('display', 'block')
-        var budgetAreaName = tsb.config.budgetAreaLabels[d.budgetAreaCode];
-        var budgetAreaColor = tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode];
-        tooltipBg.style('fill', budgetAreaColor);
-        tooltipText.text(budgetAreaName + ': ' + d.label.substr(0, 20) + '...');
+        var priorityAreaName = tsb.config.priorityAreaLabels[d.priorityAreaCode];
+        var priorityAreaColor = tsb.config.themes.current.priorityAreaColor[d.priorityAreaCode];
+        tooltipBg.style('fill', priorityAreaColor);
+        tooltipText.text(priorityAreaName + ': ' + d.label.substr(0, 20) + '...');
       })
 
       projectNodes.on('mouseout', function() {
@@ -312,7 +312,7 @@ tsb.viz.collaborations = {
         .attr('width', function(d) { return 14; })
         .attr('height', function(d) { return 0; })
         .attr('r', 0)
-        .style('fill', function(d) { return tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode]; })
+        .style('fill', function(d) { return tsb.config.themes.current.priorityAreaColor[d.priorityAreaCode]; })
         .style('opacity', function(d, i) { return (i < 10) ? 1 : Math.max(0, 1 - (i - 10)/8) })
         .style('stroke', 'none')
         .transition()
@@ -322,10 +322,10 @@ tsb.viz.collaborations = {
 
       collabolatorProjects.on('mouseover', function(d) {
         tooltip.style('display', 'block')
-        var budgetAreaName = tsb.config.budgetAreaLabels[d.budgetAreaCode];
-        var budgetAreaColor = tsb.config.themes.current.budgetAreaColor[d.budgetAreaCode];
-        tooltipBg.style('fill', budgetAreaColor);
-        tooltipText.text(budgetAreaName + ': ' + d.label.substr(0, 20) + '...');
+        var priorityAreaName = tsb.config.priorityAreaLabels[d.priorityAreaCode];
+        var priorityAreaColor = tsb.config.themes.current.priorityAreaColor[d.priorityAreaCode];
+        tooltipBg.style('fill', priorityAreaColor);
+        tooltipText.text(priorityAreaName + ': ' + d.label.substr(0, 20) + '...');
       })
 
       collabolatorProjects.on('mouseout', function() {
@@ -406,14 +406,14 @@ tsb.viz.collaborations = {
         .attr('class', 'link')
         .style('fill', 'none')
         .style('stroke', function(d) {
-          return tsb.config.themes.current.budgetAreaColor[d.project.budgetAreaCode];
+          return tsb.config.themes.current.priorityAreaColor[d.project.priorityAreaCode];
         })
         .style('opacity', 0)
 
       linkNodes
         .transition().duration(1000)
         .style('stroke', function(d) {
-          return tsb.config.themes.current.budgetAreaColor[d.project.budgetAreaCode];
+          return tsb.config.themes.current.priorityAreaColor[d.project.priorityAreaCode];
         })
         .attr('d', diagonal)
         .style('opacity', 1);
