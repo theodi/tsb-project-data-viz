@@ -9,7 +9,7 @@ tsb.config.ukMapSVG = 'assets/United_Kingdom_Map_-_Region.svg';
 tsb.config.text = {};
 tsb.config.text.introTitle = 'In YEAR we funded ';
 tsb.config.text.introTitle2 = 'NUMPROJECTS innovative projects';
-tsb.config.text.priorityAreasTitle = 'TSB funding by priority area during START - END'
+tsb.config.text.priorityAreasTitle = 'TSB funding by priority area during START - END';
 
 tsb.config.odiColors = [
   '#2254F4', '#00B7FF', '#08DEF9', '#1DD3A7',
