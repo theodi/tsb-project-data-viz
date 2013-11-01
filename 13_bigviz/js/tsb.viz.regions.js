@@ -32,7 +32,7 @@ tsb.viz.regions = {
       .style('fill', '#333')
       .style('font-size', tsb.config.themes.current.titleFontSize + 'px')
       .style('font-weight', '300')
-      .text('TSB spending by region')
+      .text(tsb.config.text.regionsTitle)
       .style('opacity', 0)
 
     var yearsGroup = this.yearsGroup = svg.append('g')
