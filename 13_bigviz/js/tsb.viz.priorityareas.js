@@ -22,7 +22,7 @@ tsb.viz.priorityAreas = {
       .style('fill', '#333')
       .style('font-size', tsb.config.themes.current.titleFontSize + 'px')
       .style('font-weight', tsb.config.themes.current.titleFontWeight)
-      .text('TSB spending by priority area during ' + (this.startYear+1) + ' - ' + (this.endYear-1))
+      .text(tsb.config.text.priorityAreasTitle.replace('START', this.startYear+1).replace('END', this.endYear-1))
       .style('opacity', 0)
 
     this.subTitle = svg
