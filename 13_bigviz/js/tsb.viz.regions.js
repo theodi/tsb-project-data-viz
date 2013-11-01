@@ -427,7 +427,7 @@ tsb.viz.regions = {
     var end = year + '-12-31';
     var region
     var url = tsb.config.domain +
-      '/projects?utf8=✓&search_string=&date_from='+start+'&date_to='+end+'&budget_area_label%5B'+areaLabel+'%5D&region_labels%5B'+region+'%5D=true';
+      '/projects?utf8=✓&search_string=&date_from='+start+'&date_to='+end+'&priority_area_label%5B'+areaLabel+'%5D&region_labels%5B'+region+'%5D=true';
     window.open(url);
   },
   loadData: function() {
