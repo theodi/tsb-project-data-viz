@@ -322,6 +322,8 @@ tsb.viz.intro = {
         .attr('height', this.subVizBtnSize*1.2)
         .attr('fill', function(d) { return tsb.config.themes.current.introVizBtnBgColor; });
 
+    this.makePriorityAreasBtn(d3.select(subVizButtons[0][0]))
+
     subVizButtons
       .append('text')
       .attr('text-anchor', 'middle')
@@ -332,6 +334,66 @@ tsb.viz.intro = {
 
     subVizButtons.on('click', function(d) {
       document.location.href = tsb.config.introVizBtnLinks[d];
+    })
+  },
+  makePriorityAreasBtn: function(parent) {
+    var numYears = 12;
+    var set1 = tsb.config.priorityAreas.map(function(priorityArea, priorityAreaIndex) {
+      return d3.range(0, numYears).map(function(year) {
+        return {
+          priorityArea: priorityArea,
+          x: year - 3,
+          y: year/numYears * (3 * Math.random())};
+      });
+    })
+    var set2 = tsb.config.priorityAreas.map(function(priorityArea, priorityAreaIndex) {
+      return d3.range(0, numYears).map(function(year) {
+        return {
+          priorityArea: priorityArea,
+          x: year - 5,
+          y: year/numYears * (5 * Math.random())};
+      });
+    })
+    var stack = d3.layout.stack().offset('wiggle');
+    var layers1 = stack(set1);
+    var layers2 = stack(set2);
+
+    var x = d3.scale.linear()
+      .domain([0, 5])
+      .range([-this.subVizBtnSize/2, this.subVizBtnSize/2]);
+
+    var y = d3.scale.linear()
+      //.domain([0, 6])
+      .domain([0, d3.max(layers2.concat(layers1), function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); })])
+      .range([-this.subVizBtnSize/2, this.subVizBtnSize/2]);
+
+    var area = d3.svg.area()
+      .x(function(d) { return x(d.x); })
+      .y0(function(d) { return y(d.y0); })
+      .y1(function(d) {  return y(d.y0 + d.y); });
+
+    var layerPaths = parent.selectAll('path.stream').data(layers1)
+    .enter().append('path')
+      .attr('class', 'stream')
+      .attr('d', area)
+      .style('fill', function(d) {
+        return tsb.config.themes.current.priorityAreaColor[d[0].priorityArea];
+      })
+
+    parent.on('mouseenter', function() {
+      console.log('mouseenter')
+      layerPaths.data(layers2)
+        .transition()
+        .duration(1000)
+        .attr('d', area)
+    })
+
+    parent.on('mouseleave', function() {
+      console.log('mouseleave')
+      layerPaths.data(layers1)
+        .transition()
+        .duration(1000)
+        .attr('d', area)
     })
   },
   showVizButtons: function() {
