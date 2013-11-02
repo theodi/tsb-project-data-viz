@@ -314,15 +314,17 @@ tsb.viz.intro = {
     subVizButtons
        .attr('clip-path', function(d) { return 'url(#clipPath_'+d+')'});
 
-    subVizButtons
-      .append('rect')
-        .attr('x', -this.subVizBtnSize*0.6)
-        .attr('y', -this.subVizBtnSize*0.6)
-        .attr('width', this.subVizBtnSize*1.2)
-        .attr('height', this.subVizBtnSize*1.2)
-        .attr('fill', function(d) { return tsb.config.themes.current.introVizBtnBgColor; });
-
     this.makePriorityAreasBtn(d3.select(subVizButtons[0][0]))
+
+    subVizButtons
+      .append('circle')
+        .attr('class', 'cookieCutter')
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', 0)
+        .style('fill', 'none')
+        .style('stroke', '#09c')
+        .style('stroke-width', 15)
 
     subVizButtons
       .append('text')
@@ -343,7 +345,7 @@ tsb.viz.intro = {
         return {
           priorityArea: priorityArea,
           x: year - 3,
-          y: year/numYears * (3 * Math.random())};
+          y: year/numYears * (3 * Math.random() - 0.2)};
       });
     })
     var set2 = tsb.config.priorityAreas.map(function(priorityArea, priorityAreaIndex) {
@@ -363,8 +365,11 @@ tsb.viz.intro = {
       .range([-this.subVizBtnSize/2, this.subVizBtnSize/2]);
 
     var y = d3.scale.linear()
-      //.domain([0, 6])
-      .domain([0, d3.max(layers2.concat(layers1), function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); })])
+      .domain([0, d3.max(layers1, function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); })])
+      .range([-this.subVizBtnSize/3, this.subVizBtnSize/3]);
+
+    var y2 = d3.scale.linear()
+      .domain([0, d3.max(layers2, function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); })])
       .range([-this.subVizBtnSize/2, this.subVizBtnSize/2]);
 
     var area = d3.svg.area()
@@ -372,25 +377,56 @@ tsb.viz.intro = {
       .y0(function(d) { return y(d.y0); })
       .y1(function(d) {  return y(d.y0 + d.y); });
 
+    var area2 = d3.svg.area()
+      .x(function(d) { return x(d.x); })
+      .y0(function(d) { return y2(d.y0); })
+      .y1(function(d) {  return y2(d.y0 + d.y); });
+
+    function areaColor(d) {
+      return tsb.config.themes.current.priorityAreaColor[d[0].priorityArea];
+    }
+
+    function greyScaleAreaColor(d) {
+      var rgb = areaColor(d);
+      var c = d3.hsl(rgb);
+      c.s = 0;
+      c = c.brighter()
+      return c.toString();
+    }
+
     var layerPaths = parent.selectAll('path.stream').data(layers1)
     .enter().append('path')
       .attr('class', 'stream')
       .attr('d', area)
-      .style('fill', function(d) {
-        return tsb.config.themes.current.priorityAreaColor[d[0].priorityArea];
-      })
+      .style('fill', areaColor)
+      .style('opacity', 0)
+
+    var layerPathsStroke = parent.selectAll('path.streamstroke').data(layers1)
+      .enter().append('path')
+      .attr('class', 'streamstroke')
+      .attr('d', area)
+      .style('fill', 'none')
+      .style('stroke', 'rgba(255,255,255,0.25)')
 
     parent.on('mouseenter', function() {
-      console.log('mouseenter')
       layerPaths.data(layers2)
         .transition()
         .duration(1000)
-        .attr('d', area)
+        .attr('d', area2)
+        .style('opacity', 1)
+      layerPathsStroke.data(layers2)
+        .transition()
+        .duration(1000)
+        .attr('d', area2)
     })
 
     parent.on('mouseleave', function() {
-      console.log('mouseleave')
       layerPaths.data(layers1)
+        .transition()
+        .duration(1000)
+        .attr('d', area)
+        .style('opacity', 0)
+      layerPathsStroke.data(layers1)
         .transition()
         .duration(1000)
         .attr('d', area)
