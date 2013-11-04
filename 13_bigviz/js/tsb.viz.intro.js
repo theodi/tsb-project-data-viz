@@ -325,6 +325,7 @@ tsb.viz.intro = {
 
     this.makePriorityAreasBtn(d3.select(subVizButtons[0][0]))
     this.makeRegionsButton(d3.select(subVizButtons[0][1]));
+    this.makeCollaborationBtn(d3.select(subVizButtons[0][2]));
 
     subVizButtons
       .append('circle')
@@ -509,6 +510,35 @@ tsb.viz.intro = {
           .style('opacity', 0)
       })
     }.bind(this))
+  },
+  makeCollaborationBtn: function(parent) {
+    var root = d3.range(0,1);
+    var children = d3.range(0,3);
+    var grandChildren = d3.range(0,16);
+    var blockHeight = 10;
+    var blockWidth = 20;
+
+    parent.selectAll('rect.root')
+      .data(root)
+      .enter()
+      .append('rect')
+      .attr('x',  -blockWidth/2)
+      .attr('y',  this.subVizBtnSize/4)
+      .attr('width', blockWidth)
+      .attr('height', blockHeight)
+      .style('fill', 'none')
+      .style('stroke', '#FFFFFF')
+
+    parent.selectAll('rect.root')
+      .data(children)
+      .enter()
+      .append('rect')
+      .attr('x', function(d, i) { return (-Math.floor(children.length/2)+i)*blockWidth*2 - blockWidth/2})
+      .attr('y', -this.subVizBtnSize/4)
+      .attr('width', blockWidth)
+      .attr('height', blockHeight)
+      .style('fill', 'none')
+      .style('stroke', '#FFFFFF')
   },
   showVizButtons: function() {
     var maxWidth = this.maxWidth = tsb.common.getMaxWidth(this.w);
