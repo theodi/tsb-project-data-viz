@@ -518,27 +518,84 @@ tsb.viz.intro = {
     var blockHeight = 10;
     var blockWidth = 20;
 
+    root = root.map(function(d, i) {
+      return {
+        x: -blockWidth/2,
+        y: this.subVizBtnSize/4
+      }
+    }.bind(this))
+
+    children = children.map(function(d, i) {
+      return {
+        x: (-Math.floor(children.length/2)+i)*blockWidth*2 - blockWidth/2,
+        y: -this.subVizBtnSize/4
+      }
+    }.bind(this))
+
+    grandChildren = grandChildren.map(function(d, i) {
+      return {
+        x: (-Math.floor(grandChildren.length/2)+i)*blockWidth*2 - blockWidth/2,
+        y: -this.subVizBtnSize/1.9
+      }
+    }.bind(this))
+
     parent.selectAll('rect.root')
       .data(root)
       .enter()
       .append('rect')
-      .attr('x',  -blockWidth/2)
-      .attr('y',  this.subVizBtnSize/4)
+      .attr('x', function(d) { return d.x } )
+      .attr('y', function(d) { return d.y } )
       .attr('width', blockWidth)
       .attr('height', blockHeight)
       .style('fill', 'none')
       .style('stroke', '#FFFFFF')
 
-    parent.selectAll('rect.root')
+    parent.selectAll('rect.child')
       .data(children)
       .enter()
       .append('rect')
-      .attr('x', function(d, i) { return (-Math.floor(children.length/2)+i)*blockWidth*2 - blockWidth/2})
-      .attr('y', -this.subVizBtnSize/4)
+      .attr('x', function(d) { return d.x } )
+      .attr('y', function(d) { return d.y } )
       .attr('width', blockWidth)
       .attr('height', blockHeight)
       .style('fill', 'none')
       .style('stroke', '#FFFFFF')
+
+    parent.selectAll('rect.grandChild')
+      .data(grandChildren)
+      .enter()
+      .append('rect')
+      .attr('x', function(d) { return d.x } )
+      .attr('y', function(d) { return d.y } )
+      .attr('width', blockWidth)
+      .attr('height', blockHeight)
+      .style('fill', 'none')
+      .style('stroke', '#FFFFFF')
+
+    //LINKS
+
+    var diagonal = d3.svg.diagonal().projection(function(d) { return [d.x+blockWidth/2, d.y]; });
+    var links = [];
+
+    children.forEach(function(child) {
+      links.push({source:child, target:root[0]});
+    })
+
+    grandChildren.map(function(grandChild, grandChildIndex) {
+      links.push({source:grandChild, target:children[Math.floor(grandChildIndex/6)]});
+    })
+
+    console.log(links);
+
+    var linkNodes = parent.selectAll('.link').data(links);
+
+    linkNodes.enter().append('path')
+      .attr('class', 'link')
+      .style('fill', 'none')
+      .style('stroke', '#FFFFFF')
+      .style('opacity', '0.5')
+      .attr('d', diagonal)
+
   },
   showVizButtons: function() {
     var maxWidth = this.maxWidth = tsb.common.getMaxWidth(this.w);
