@@ -7,7 +7,6 @@ tsb.viz.regions = {
     this.h = h;
     this.mapScale = 0.18;
     this.offsetFromTop = 350;
-    this.unusedShapes = ['Ireland', 'IsleOfMan', 'ChannelIslands', 'Border1', 'Border2', 'Border3'];
     this.year = (new Date()).getFullYear();
     this.years = d3.range(this.year-4, this.year+1);
 
@@ -156,10 +155,6 @@ tsb.viz.regions = {
       mapX += this.w/2 - mapWidth/2;
       mapY += this.h/2 - mapHeight/2;
       this.svg.select('.map').attr('transform', 'translate(' + mapX + ',' + mapY + ') scale(' + this.mapScale + ',' + this.mapScale + ')');
-
-      this.unusedShapes.forEach(function(unusedShapeId) {
-        this.svg.select('#' + unusedShapeId).style('display', 'none');
-      }.bind(this));
 
       this.loadData();
     }.bind(this));
