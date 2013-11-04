@@ -21,7 +21,7 @@ tsb.viz.collaborations = {
       .style('font-size', tsb.config.themes.current.titleFontSize + 'px')
       .style('font-weight', tsb.config.themes.current.titleFontWeight)
       .style('opacity', 0)
-      .text('Organization\'s projects and their collaborators in ' + this.year)
+      .text(tsb.config.text.collaborationsTitle.replace('YEAR', this.year))
 
     this.addToolTip();
     this.addBackBtn();
