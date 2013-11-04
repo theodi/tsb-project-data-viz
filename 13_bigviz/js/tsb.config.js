@@ -18,6 +18,12 @@ tsb.config.odiColors = [
   '#D60303', '#EF3AAB', '#E6007C', '#B13198'
 ];
 
+tsb.config.odiUsedColors = [
+  '#00B7FF', '#D60303', '#FF6700', '#0DBC37',
+  '#B13198', '#EF3AAB', '#F9BC26', '#1DD3A7',
+  '#08DEF9',
+];
+
 tsb.config.regionCodeList = ['N92000002','E12000009','W92000004','E12000005','E12000002','S92000003','E12000001','E12000003','E12000004','E12000006','E12000007','E12000008'];
 
 tsb.config.regionsMap = {

@@ -314,6 +314,15 @@ tsb.viz.intro = {
     subVizButtons
        .attr('clip-path', function(d) { return 'url(#clipPath_'+d+')'});
 
+    subVizButtons
+      .append('circle')
+        .attr('class', 'cookieCutterBg')
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', this.subVizBtnSize/2)
+        //.style('fill', '#09c')
+        .style('fill', 'rgba(0,0,0,0.001)')
+
     this.makePriorityAreasBtn(d3.select(subVizButtons[0][0]))
     this.makeRegionsButton(d3.select(subVizButtons[0][1]));
 
@@ -459,10 +468,26 @@ tsb.viz.intro = {
         var regionInfo = tsb.config.regionsMap[regionCode];
         var region = mapGroup.select('.' + regionInfo.id);
         region
-        .selectAll('path')
-         .style('fill', 'none')
-         .style('stroke', '#FFF')
-         .style('stroke-width', '3')
+          .attr('class', region.attr('class') + ' regionShape')
+          .selectAll('path')
+           .style('stroke', '#FFF')
+           .style('stroke-width', '5')
+           .style('fill', 'none')
+
+        var regionClone = region.node().cloneNode(true);
+        regionClone.className = '';
+        regionClone.id = '';
+        map.node().appendChild(regionClone);
+
+        region
+          .attr('class', region.attr('class') + ' regionShape')
+          .selectAll('path')
+           .style('stroke', 'none')
+           .style('fill', tsb.config.odiUsedColors[regionIndex%tsb.config.odiUsedColors.length])
+
+        region
+           .style('opacity', 0)
+
       });
 
       parent.on('mouseenter', function() {
@@ -470,28 +495,18 @@ tsb.viz.intro = {
           .duration(1000)
           .attr('transform', 'translate(' + mapX2 + ',' + mapY2 + ') scale(' + mapScale2 + ',' + mapScale2 + ')');
 
-        tsb.config.regionCodeList.forEach(function(regionCode, regionIndex) {
-          var regionInfo = tsb.config.regionsMap[regionCode];
-          var region = mapGroup.select('.' + regionInfo.id);
-          region
-            .selectAll('path')
-            .transition()
-            .style('fill', 'red')
-        });
+        map.selectAll('.regionShape').transition()
+          .duration(1000)
+          .style('opacity', 1)
       })
 
       parent.on('mouseleave', function() {
         map.transition()
           .duration(1000)
           .attr('transform', 'translate(' + mapX + ',' + mapY + ') scale(' + mapScale + ',' + mapScale + ')');
-        tsb.config.regionCodeList.forEach(function(regionCode, regionIndex) {
-          var regionInfo = tsb.config.regionsMap[regionCode];
-          var region = mapGroup.select('.' + regionInfo.id);
-          region
-            .selectAll('path')
-            .transition()
-            .style('fill', 'rgba(255,0,0,0)')
-        });
+        map.selectAll('.regionShape').transition()
+          .duration(1000)
+          .style('opacity', 0)
       })
     }.bind(this))
   },
