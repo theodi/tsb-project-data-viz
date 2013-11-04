@@ -315,6 +315,7 @@ tsb.viz.intro = {
        .attr('clip-path', function(d) { return 'url(#clipPath_'+d+')'});
 
     this.makePriorityAreasBtn(d3.select(subVizButtons[0][0]))
+    this.makeRegionsButton(d3.select(subVizButtons[0][1]));
 
     subVizButtons
       .append('circle')
@@ -431,6 +432,68 @@ tsb.viz.intro = {
         .duration(1000)
         .attr('d', area)
     })
+  },
+  makeRegionsButton: function(parent) {
+    var mapGroup = parent.append('g');
+    d3.xml(tsb.config.ukMapSVG, 'image/svg+xml', function(xml) {
+      var svgDoc = document.importNode(xml.documentElement, true);
+      var svgMap = svgDoc.querySelector('.map');
+      mapGroup[0][0].appendChild(svgMap);
+      var bb = svgMap.getBoundingClientRect();
+      var mapWidth = (bb.right - bb.left);
+      var mapHeight = (bb.bottom - bb.top);
+      var mapScale = this.subVizBtnSize / mapWidth / 2.5;
+      var mapScale2 = this.subVizBtnSize / mapWidth / 1.5;
+      var mapX = -bb.left * mapScale;
+      var mapY = -bb.top * mapScale;
+      mapX += mapWidth/2 * mapScale * 0.8;
+      mapY += -mapHeight/3 * mapScale;
+      var mapX2 = -bb.left * mapScale2;
+      var mapY2 = -bb.top * mapScale2;
+      mapX2 += mapWidth/2 * mapScale2 * 0.8;
+      mapY2 += -mapHeight/3 * mapScale2;
+      var map = parent.select('.map');
+      map.attr('transform', 'translate(' + mapX + ',' + mapY + ') scale(' + mapScale + ',' + mapScale + ')');
+
+      tsb.config.regionCodeList.forEach(function(regionCode, regionIndex) {
+        var regionInfo = tsb.config.regionsMap[regionCode];
+        var region = mapGroup.select('.' + regionInfo.id);
+        region
+        .selectAll('path')
+         .style('fill', 'none')
+         .style('stroke', '#FFF')
+         .style('stroke-width', '3')
+      });
+
+      parent.on('mouseenter', function() {
+        map.transition()
+          .duration(1000)
+          .attr('transform', 'translate(' + mapX2 + ',' + mapY2 + ') scale(' + mapScale2 + ',' + mapScale2 + ')');
+
+        tsb.config.regionCodeList.forEach(function(regionCode, regionIndex) {
+          var regionInfo = tsb.config.regionsMap[regionCode];
+          var region = mapGroup.select('.' + regionInfo.id);
+          region
+            .selectAll('path')
+            .transition()
+            .style('fill', 'red')
+        });
+      })
+
+      parent.on('mouseleave', function() {
+        map.transition()
+          .duration(1000)
+          .attr('transform', 'translate(' + mapX + ',' + mapY + ') scale(' + mapScale + ',' + mapScale + ')');
+        tsb.config.regionCodeList.forEach(function(regionCode, regionIndex) {
+          var regionInfo = tsb.config.regionsMap[regionCode];
+          var region = mapGroup.select('.' + regionInfo.id);
+          region
+            .selectAll('path')
+            .transition()
+            .style('fill', 'rgba(255,0,0,0)')
+        });
+      })
+    }.bind(this))
   },
   showVizButtons: function() {
     var maxWidth = this.maxWidth = tsb.common.getMaxWidth(this.w);
