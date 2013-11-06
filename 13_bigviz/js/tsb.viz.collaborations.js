@@ -57,17 +57,19 @@ tsb.viz.collaborations = {
   },
   addBackBtn: function() {
     this.backBtn = this.svg.append('g')
-    .style('opacity', 0)
+      .style('opacity', 0)
 
     this.backBtnHit = this.backBtn.append('rect')
-      .attr('width', '2em')
-      .attr('height', '2em')
-      .style('fill', 'none')
+      .attr('width', '1.8em')
+      .attr('height', '1.8em')
+      .style('fill', 'rgba(0,0,0,0.0)')
       .attr('rx', '5px')
       .attr('ry', '5px')
+      .attr('stroke', 'rgba(0,0,0,0.1)')
+
 
     this.backBtnArrow = this.backBtn.append('text')
-      .attr('x', '0.3em')
+      .attr('x', '0.27em')
       .attr('y', '0.75em')
       .style('fill', '#AAA')
       .style('font-size', '200%')
@@ -75,11 +77,13 @@ tsb.viz.collaborations = {
       .text('«')
 
     this.backBtn.on('mouseover', function() {
-      this.backBtnArrow.style('fill', '#000');
+      this.backBtnArrow.style('fill', '#FFF');
+      this.backBtnHit.style('fill', '#000');
     }.bind(this));
 
     this.backBtn.on('mouseleave', function() {
       this.backBtnArrow.style('fill', '#AAA');
+      this.backBtnHit.style('fill', 'rgba(0,0,0,0)');
     }.bind(this));
 
     this.backBtn.on('click', function() {
@@ -101,7 +105,7 @@ tsb.viz.collaborations = {
     this.title.attr('x', leftMargin + containerMargin);
     this.title.attr('y', titleFontSize + containerMargin);
 
-    this.backBtn.attr('transform', 'translate('+(leftMargin-titleFontSize*0.5)+','+titleFontSize*0.6+')');
+    this.backBtn.attr('transform', 'translate('+(leftMargin-titleFontSize*0.75)+','+titleFontSize*0.6+')');
 
     var yearsX = leftMargin + maxWidth - this.years.length * titleFontSize * 2;
     var yearsY = titleFontSize + containerMargin;
