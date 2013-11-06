@@ -266,7 +266,7 @@ tsb.viz.priorityAreas = {
     var start = year + '-01-01';
     var end = year + '-12-31';
     var url = tsb.config.domain +
-      '/projects?utf8=✓&search_string=&date_from='+start+'&date_to='+end+'&priority_area_label%5B'+areaLabel+'%5D=true';
+      'projects?utf8=✓&search_string=&date_from='+start+'&date_to='+end+'&priority_area_label%5B'+areaLabel+'%5D=true';
     window.open(url);
   },
   mapData: function(data) {
