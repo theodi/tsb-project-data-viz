@@ -518,6 +518,8 @@ tsb.viz.intro = {
     var blockHeight = 10;
     var blockWidth = 20;
 
+    var nodeGroup = parent.append('g');
+
     root = root.map(function(d, i) {
       return {
         x: -blockWidth/2,
@@ -535,11 +537,11 @@ tsb.viz.intro = {
     grandChildren = grandChildren.map(function(d, i) {
       return {
         x: (-Math.floor(grandChildren.length/2)+i)*blockWidth*2 - blockWidth/2,
-        y: -this.subVizBtnSize/1.9
+        y: -Math.floor(this.subVizBtnSize/1.5)
       }
     }.bind(this))
 
-    parent.selectAll('rect.root')
+    nodeGroup.selectAll('rect.root')
       .data(root)
       .enter()
       .append('rect')
@@ -550,7 +552,7 @@ tsb.viz.intro = {
       .style('fill', 'none')
       .style('stroke', '#FFFFFF')
 
-    parent.selectAll('rect.child')
+    nodeGroup.selectAll('rect.child')
       .data(children)
       .enter()
       .append('rect')
@@ -561,7 +563,7 @@ tsb.viz.intro = {
       .style('fill', 'none')
       .style('stroke', '#FFFFFF')
 
-    parent.selectAll('rect.grandChild')
+    nodeGroup.selectAll('rect.grandChild')
       .data(grandChildren)
       .enter()
       .append('rect')
@@ -581,13 +583,15 @@ tsb.viz.intro = {
       links.push({source:child, target:root[0]});
     })
 
+    var childLinks = [];
+
     grandChildren.map(function(grandChild, grandChildIndex) {
-      links.push({source:grandChild, target:children[Math.floor(grandChildIndex/6)]});
+      childLinks.push({source:grandChild, target:children[Math.floor(grandChildIndex/6)]});
     })
 
     console.log(links);
 
-    var linkNodes = parent.selectAll('.link').data(links);
+    var linkNodes = nodeGroup.selectAll('.link').data(links);
 
     linkNodes.enter().append('path')
       .attr('class', 'link')
@@ -595,6 +599,34 @@ tsb.viz.intro = {
       .style('stroke', '#FFFFFF')
       .style('opacity', '0.5')
       .attr('d', diagonal)
+
+    var childLinkNodes = nodeGroup.selectAll('.childLink').data(childLinks);
+
+    childLinkNodes.enter().append('path')
+      .attr('class', 'childLink')
+      .style('fill', 'none')
+      .style('stroke', '#FFFFFF')
+      .style('opacity', '0.0')
+      .attr('d', diagonal)
+
+    parent.on('mouseenter', function() {
+      childLinkNodes.transition()
+        .duration(1000)
+        .style('opacity', '0.5')
+
+      nodeGroup.transition()
+        .duration(1000)
+        .attr('transform', 'translate(0,'+(this.subVizBtnSize*0.4)+')')
+    }.bind(this))
+
+    parent.on('mouseleave', function() {
+      childLinkNodes.transition()
+        .duration(1000)
+        .style('opacity', '0.0')
+      nodeGroup.transition()
+        .duration(1000)
+        .attr('transform', 'translate(0,0)')
+    })
 
   },
   showVizButtons: function() {
