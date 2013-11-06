@@ -6,6 +6,7 @@ tsb.viz.collaborations = {
     this.w = w;
     this.h = h;
     this.year = (new Date()).getFullYear();
+    this.years = d3.range(this.year-4, this.year+1);
 
     this.loadData();
 
@@ -22,6 +23,33 @@ tsb.viz.collaborations = {
       .style('font-weight', tsb.config.themes.current.titleFontWeight)
       .style('opacity', 0)
       .text(tsb.config.text.collaborationsTitle.replace('YEAR', this.year))
+
+    var yearsGroup = this.yearsGroup = svg.append('g')
+      .attr('transform', 'translate(10, 40)');
+
+    this.years.forEach(function(year, yearIndex) {
+      var yearBtn = yearsGroup.append('text')
+        .attr('x', tsb.config.themes.current.titleFontSize * 2 * yearIndex)
+        .attr('y', 0)
+        .style('fill', '#333')
+        .style('font-size', tsb.config.themes.current.titleFontSize*0.8 + 'px')
+        .style('font-weight', '300')
+        .text(year)
+        .style('opacity', year == this.year ? 1 : 0.5);
+
+      yearBtn.on('mouseover', function() {
+        yearBtn.style('opacity', 1);
+      }.bind(this))
+      yearBtn.on('mouseleave', function() {
+        yearBtn.style('opacity', year == this.year ? 1 : 0.5);
+      }.bind(this))
+      yearBtn.on('click', function() {
+        yearsGroup.selectAll('text').style('opacity', 0.5);
+        yearBtn.style('opacity', 1);
+        this.year = year;
+        this.loadData();
+      }.bind(this))
+    }.bind(this))
 
     this.addToolTip();
     this.addBackBtn();
@@ -74,8 +102,20 @@ tsb.viz.collaborations = {
     this.title.attr('y', titleFontSize + containerMargin);
 
     this.backBtn.attr('transform', 'translate('+(leftMargin-titleFontSize*0.5)+','+titleFontSize*0.6+')');
+
+    var yearsX = leftMargin + maxWidth - this.years.length * titleFontSize * 2;
+    var yearsY = titleFontSize + containerMargin;
+
+    this.yearsGroup.attr('transform', 'translate('+yearsX+','+yearsY+')');
   },
   loadData: function() {
+    if (this.rootGroup) {
+      this.rootGroup
+        .transition()
+        .duration(500)
+        .style('opacity', 0).remove();
+    }
+    tsb.viz.preloader.start();
     tsb.state.dataSource.getProjectsAndParticipantsForYear(this.year).then(function(data) {
       tsb.viz.preloader.stop().then(function() {
         this.title.transition()
@@ -149,9 +189,10 @@ tsb.viz.collaborations = {
     var tooltip = this.tooltip;
     var tooltipText = this.tooltipText;
     var tooltipBg = this.tooltipBg;
+    var self = this;
 
     function exploreOrganization(org) {
-      var rootGroup = svg.append('g');
+      var rootGroup = self.rootGroup = svg.append('g');
       var linkGroup = rootGroup.append('g');
       var nodeGroup = rootGroup.append('g');
       //ROOT
