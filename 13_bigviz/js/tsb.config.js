@@ -11,7 +11,7 @@ tsb.config.text.introTitle = 'In YEAR we funded ';
 tsb.config.text.introTitle2 = 'NUMPROJECTS innovative projects';
 tsb.config.text.priorityAreasTitle = 'Funding by priority area during START - END';
 tsb.config.text.regionsTitle = 'Funding by geographical region';
-tsb.config.text.collaborationsTitle = 'Organization\'s projects and collaborators';
+tsb.config.text.collaborationsTitle = 'Organizations, projects and collaborators';
 
 tsb.config.odiColors = [
   '#2254F4', '#00B7FF', '#08DEF9', '#1DD3A7',
