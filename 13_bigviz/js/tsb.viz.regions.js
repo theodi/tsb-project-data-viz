@@ -34,6 +34,15 @@ tsb.viz.regions = {
       .text(tsb.config.text.regionsTitle)
       .style('opacity', 0)
 
+    this.subTitle = svg
+      .append('text')
+      .attr('dy', tsb.config.themes.current.titleFontSize * 1.25)
+      .style('fill', '#333')
+      .style('font-size', tsb.config.themes.current.titleFontSize + 'px')
+      .style('font-weight', tsb.config.themes.current.subTitleFontWeight)
+      .text(tsb.config.text.regionsTitle2)
+      .style('opacity', 0);
+
     var yearsGroup = this.yearsGroup = svg.append('g')
       .attr('transform', 'translate(10, 40)');
 
@@ -138,6 +147,8 @@ tsb.viz.regions = {
 
     this.title.attr('x', leftMargin + containerMargin);
     this.title.attr('y', titleFontSize + containerMargin);
+    this.subTitle.attr('x', leftMargin + containerMargin);
+    this.subTitle.attr('y', titleFontSize + containerMargin);
 
     this.backBtn.attr('transform', 'translate('+(leftMargin-titleFontSize*0.75)+','+titleFontSize*0.6+')');
 
@@ -211,6 +222,9 @@ tsb.viz.regions = {
   },
   showTitles: function() {
     this.title.transition()
+      .style('opacity', 1)
+
+    this.subTitle.transition()
       .style('opacity', 1)
 
     this.backBtn.transition()
