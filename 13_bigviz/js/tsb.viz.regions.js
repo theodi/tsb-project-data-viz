@@ -7,6 +7,7 @@ tsb.viz.regions = {
     this.h = h;
     this.mapScale = 0.18;
     this.offsetFromTop = 350;
+    this.statsTop = 210;
     this.year = (new Date()).getFullYear();
     this.years = d3.range(this.year-4, this.year+1);
 
@@ -240,7 +241,7 @@ tsb.viz.regions = {
       var nameLabel = this.svg.append('text')
         .text(name)
         .attr('dx', cx)
-        .attr('dy', this.offsetFromTop - 40)
+        .attr('dy', this.offsetFromTop - 30)
         .style('font-size', 12 + 'px')
         .style('opacity', 0)
         .transition()
@@ -250,7 +251,7 @@ tsb.viz.regions = {
     }.bind(this));
   },
   addRegionData: function(dataByRegion) {
-    var statsTop = 180;
+    var statsTop = this.statsTop;
     var self = this;
 
     function colPos(d, i) {
@@ -324,7 +325,7 @@ tsb.viz.regions = {
 
     grantsLabel
       .attr('dx', colPos.bind(this))
-      .attr('dy', statsTop + 60)
+      .attr('dy', statsTop + 55)
       .transition()
       .delay(this.mapAnimDelay+this.mapAnimTime)
       .duration(this.labelAnimTime)
@@ -341,7 +342,7 @@ tsb.viz.regions = {
 
     totalGrants
       .attr('dx', colPos.bind(this))
-      .attr('dy', statsTop + 85)
+      .attr('dy', statsTop + 80)
       .text(calcTotalGrant)
       .transition()
       .delay(this.mapAnimDelay+this.mapAnimTime)
