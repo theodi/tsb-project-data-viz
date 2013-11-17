@@ -51,6 +51,46 @@ tsb.viz.collaborations = {
       }.bind(this))
     }.bind(this))
 
+    this.legendLabels = [{label:'SME', size:5, outerSize:0}, {label:'Large', size:10, outerSize:0}, {label:'Academic', size:10, outerSize:13}]
+    this.legendGroup = svg.append('g').attr('transform', 'translate(100, 400)');;
+
+    this.legendGroup.append('text')
+      .attr('x', 0)
+      .attr('y', 0)
+      .style('fill', '#333')
+      .style('font-weight', 'bold')
+      .style('font-size', tsb.config.themes.current.titleFontSize/3 + 'px')
+      .text('Organization size')
+
+    var legendLabelIcons = this.legendGroup.selectAll('.legendLabel')
+      .data(this.legendLabels)
+      .enter();
+
+    legendLabelIcons.append('circle')
+      .attr('cx', function(d, i) { return 5 + i * 100; })
+      .attr('cy', 30)
+      .attr('r', 0)
+      .style('stroke', '#333')
+      .style('fill', '#FFF')
+      .transition()
+      .attr('r', function(d) { return d.size; })
+
+    legendLabelIcons.append('circle')
+      .attr('cx', function(d, i) { return 5 + i * 100; })
+      .attr('cy', 30)
+      .attr('r', 0)
+      .style('stroke', 'rgba(30, 30, 30, 0.4)')
+      .style('fill', 'transparent')
+      .transition()
+      .attr('r', function(d) { return d.outerSize; });
+
+    legendLabelIcons.append('text')
+      .text(function(d) { return d.label; })
+      .attr('x', function(d, i) { return 5 + i * 100 + d.size*2; })
+      .attr('y', 35)
+      .style('fill', '#333')
+      .style('font-size', tsb.config.themes.current.titleFontSize/3 + 'px')
+
     this.addToolTip();
     this.addBackBtn();
     this.resize(this.w, this.h);
@@ -66,7 +106,6 @@ tsb.viz.collaborations = {
       .attr('rx', '5px')
       .attr('ry', '5px')
       .attr('stroke', 'rgba(0,0,0,0.1)')
-
 
     this.backBtnArrow = this.backBtn.append('text')
       .attr('x', '0.27em')
@@ -111,6 +150,7 @@ tsb.viz.collaborations = {
     var yearsY = titleFontSize + containerMargin;
 
     this.yearsGroup.attr('transform', 'translate('+yearsX+','+yearsY+')');
+    this.legendGroup.attr('transform', 'translate('+(leftMargin+containerMargin)+','+(this.h - 80)+')');
   },
   loadData: function() {
     if (this.rootGroup) {
