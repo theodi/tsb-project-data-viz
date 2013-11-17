@@ -410,7 +410,7 @@ tsb.viz.regions = {
       this.tooltip.node().parentNode.appendChild(this.tooltip.node());
       this.tooltip.style('display', 'block')
       var areaName = tsb.config.priorityAreaLabels[d.priorityAreaCode];
-      var grantsSum = Math.floor(d.area.grantsSum/1000000*10)/10 + 'M'
+      var grantsSum = '£' + Math.floor(d.area.grantsSum/1000000*10)/10 + 'm'
       this.tooltipText.text(areaName + ' : ' + grantsSum + ' for ' + d.area.numProjects + ' projects');
       this.tooltipBg.style('fill', d.priorityAreaColor)
     }.bind(this))
