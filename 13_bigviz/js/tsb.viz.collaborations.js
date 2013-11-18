@@ -327,11 +327,15 @@ tsb.viz.collaborations = {
         var priorityAreaName = tsb.config.priorityAreaLabels[d.priorityAreaCode];
         var priorityAreaColor = tsb.config.themes.current.priorityAreaColor[d.priorityAreaCode];
         tooltipBg.style('fill', priorityAreaColor);
-        tooltipText.text(priorityAreaName + ': ' + d.label.substr(0, 20) + '...');
+        self.setTooltipText(priorityAreaName + ': ' + d.label);
       })
 
       projectNodes.on('mouseout', function() {
         tooltip.style('display', 'none');
+      })
+
+      projectNodes.on('click', function(d) {
+        window.open(d.id.replace('/id/', '/doc/'));
       })
 
       //COLLABORATORS
@@ -410,7 +414,7 @@ tsb.viz.collaborations = {
         var priorityAreaName = tsb.config.priorityAreaLabels[d.priorityAreaCode];
         var priorityAreaColor = tsb.config.themes.current.priorityAreaColor[d.priorityAreaCode];
         tooltipBg.style('fill', priorityAreaColor);
-        tooltipText.text(priorityAreaName + ': ' + d.label.substr(0, 20) + '...');
+        self.setTooltipText(priorityAreaName + ': ' + d.label);
       })
 
       collabolatorProjects.on('mouseout', function() {
@@ -422,7 +426,7 @@ tsb.viz.collaborations = {
         if (d3.event.target.nodeName == 'circle') {
           tooltip.style('display', 'block')
           tooltipBg.style('fill', '#000000');
-          tooltipText.text(d.label);
+          self.setTooltipText(d.label);
         }
       })
 
@@ -522,6 +526,50 @@ tsb.viz.collaborations = {
     }
     exploreOrganization(startOrg);
   },
+  setTooltipText: function(text) {
+    var text2 = '';
+    var text3 = '';
+    this.tooltipText.text(text);
+    this.tooltipText2.text(text2);
+    var iterations = 0;
+    var bgWidth = parseInt(this.tooltipBg.attr('width'));
+    while (this.tooltipText[0][0].getBoundingClientRect().width > bgWidth - 10) {
+      if (++iterations > 50) break;
+      var spaceIndex = text.lastIndexOf(' ');
+      if (spaceIndex > -1) {
+        text2 = text.substr(spaceIndex+1) + ' ' + text2;
+        text = text.substr(0, spaceIndex);
+        this.tooltipText.text(text);
+        this.tooltipText2.text(text2);
+      }
+      else {
+        break;
+      }
+    }
+    iterations = 0;
+    while (this.tooltipText2[0][0].getBoundingClientRect().width > bgWidth - 10) {
+      if (++iterations > 50) break;
+      var spaceIndex = text.lastIndexOf(' ');
+      if (spaceIndex > -1) {
+        text3 = text2.substr(spaceIndex+1) + ' ' + text3;
+        text2 = text2.substr(0, spaceIndex);
+        this.tooltipText2.text(text2);
+      }
+      else {
+        break;
+      }
+    }
+    if (text3.length > 0) {
+      text2 = text2 + ' ...';
+      this.tooltipText2.text(text2);
+    }
+    if (text2.length > 0) {
+      this.tooltipBg.attr('height', '2.5em')
+    }
+    else {
+      this.tooltipBg.attr('height', '1.5em')
+    }
+  },
   addToolTip: function() {
     this.tooltip = this.svg.append('g');
     this.tooltip.style('display', 'none');
@@ -537,6 +585,13 @@ tsb.viz.collaborations = {
       .text('BLA BLA')
       .attr('dx', '0.5em')
       .attr('dy', '1.5em')
+      .style('fill', '#FFF')
+      .style('font-size', '12px')
+
+    this.tooltipText2 = this.tooltip.append('text')
+      .text('BLA BLA 2')
+      .attr('dx', '0.5em')
+      .attr('dy', '3em')
       .style('fill', '#FFF')
       .style('font-size', '12px')
 
