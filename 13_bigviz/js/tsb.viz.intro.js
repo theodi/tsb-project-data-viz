@@ -8,7 +8,7 @@ tsb.viz.intro = {
     this.h = h;
     this.staticMode = staticMode;
     this.year = (new Date().getFullYear());
-    this.duration = 60000;
+    this.duration = 60;
     this.minimizeDelay = 3000;
     this.minimizeTime = 2000;
     this.titleScale = 1;
@@ -56,12 +56,13 @@ tsb.viz.intro = {
         tsb.common.log('tsb.intro.loaded', projects.rows.length);
 
         this.createProjects(_.shuffle(projects.rows));
-        var alreadyOpened = document.location.hash == '#introopened';
+        var alreadyOpened = document.location.hash == '#introopened' || tsb.common.isMobile();
         this.addLabels(alreadyOpened);
         if (!this.staticMode) {
           this.addVizButtons();
-          if (document.location.hash != '#introopened') {
+          if (!alreadyOpened) {
             this.showVizButtons();
+            this.animateTitles();
           }
         }
         if (alreadyOpened) {
@@ -69,6 +70,7 @@ tsb.viz.intro = {
           this.minimizeDelay = 0;
           this.eatenLetters = 50;
           this.showVizButtons();
+          this.animateTitles();
         }
       }.bind(this));
     }.bind(this));
@@ -100,7 +102,25 @@ tsb.viz.intro = {
   },
   rectangles: [],
   drawRects: function() {
-    this.rectangles.forEach(function(rect) {
+    this.rectangles.forEach(function(rect, rectI) {
+      if (rect.delay > 0) {
+        rect.delay -= 1/30;
+        return;
+      }
+      if (rect.height < rect.targetHeight - 0.01) {
+        rect.height += (rect.targetHeight - rect.height) * 0.15;
+      }
+      else {
+        if (!rect.counted) {
+          rect.counted = true;
+          if (!this.staticMode) {
+            this.numProjects++;
+          }
+        }
+      }
+      if (rect.y > rect.targetY) {
+        rect.y += (rect.targetY - rect.y) * 0.15;
+      }
       if (rect.height == rect.prevHeight) return;
       rect.prevHeight = rect.height;
       this.ctx.fillStyle = rect.color;
@@ -111,30 +131,20 @@ tsb.viz.intro = {
     var rect = {
       x: x,
       y: y+h,
+      targetY: y,
       width: w,
       height: this.staticMode ? h : 0,
+      targetHeight: h,
       color: d3.rgb(color).darker(2).toString(),
-      opacity: tsb.config.themes.current.priorityAreaColorAlpha
+      opacity: tsb.config.themes.current.priorityAreaColorAlpha,
+      delay: Math.random()*this.duration,
+      counted: false
     };
     this.rectangles.push(rect);
     var projectRect = d3.select(rect);
 
-    function interpolateProperty(propertyName, targetValue) {
-      return function() {
-          var i = d3.interpolateNumber(this[propertyName], targetValue);
-          return function(t) { this[propertyName] = i(t); };
-      };
-    }
-
     if (this.staticMode) {
       this.numProjects++;
-    }
-    else {
-      projectRect
-        .transition().delay(Math.random()*this.duration)
-        .tween('animy', interpolateProperty('y', y))
-        .tween('animh', interpolateProperty('height', h))
-        .each('end', this.onProjectAnimComplete.bind(this));
     }
   },
   makeRectOld: function(x, y, w, h, color, className, projectIndex) {
@@ -156,12 +166,6 @@ tsb.viz.intro = {
         .attr('y', y)
         .attr('height', h)
         .each('end', this.onProjectAnimComplete.bind(this));
-    }
-  },
-  onProjectAnimComplete: function() {
-    if (!this.staticMode) {
-      this.numProjects++;
-      //this.updateLabels();
     }
   },
   addLabels: function(alreadyOpened) {
@@ -225,26 +229,33 @@ tsb.viz.intro = {
     if (this.updateLabelsAnim) {
       clearInterval(this.updateLabelsAnim);
     }
-    this.updateLabelsAnim = setInterval(this.updateLabels.bind(this), 1/30);
+    this.updateLabelsAnim = setInterval(this.updateLabels.bind(this), 1000/30);
 
     this.updateLabels();
     this.resize(this.w, this.h); //force layout update
   },
+  frame: false,
   updateLabels: function() {
     var titleText = tsb.config.text.introTitle.replace('YEAR', this.year);
     var projectCountText = tsb.config.text.introTitle2.replace('NUMPROJECTS', this.numProjects);
 
-    if (this.eatenLetters >= 0) {
-      this.eatenLetters += 0.5;
-      var cut = Math.floor(this.eatenLetters);
-      titleText += projectCountText.substr(0, cut);
-      projectCountText = projectCountText.substr(cut);
-    }
+    var updateFrequency = 1;
+    if (tsb.common.isMobile()) updateFrequency = 5;
 
-    this.title.text(titleText);
-    this.title2.text(titleText);
-    this.projectCount.text(projectCountText);
-    this.projectCount2.text(projectCountText);
+    if (this.frame++ % updateFrequency == 0) {
+      this.once = true;
+      if (this.eatenLetters >= 0) {
+        this.eatenLetters += 0.5;
+        var cut = Math.floor(this.eatenLetters);
+        titleText += projectCountText.substr(0, cut);
+        projectCountText = projectCountText.substr(cut);
+      }
+
+      this.title.text(titleText);
+      this.title2.text(titleText);
+      this.projectCount.text(projectCountText);
+      this.projectCount2.text(projectCountText);
+    }
 
     this.drawRects();
   },
@@ -589,8 +600,6 @@ tsb.viz.intro = {
       childLinks.push({source:grandChild, target:children[Math.floor(grandChildIndex/6)]});
     })
 
-    console.log(links);
-
     var linkNodes = nodeGroup.selectAll('.link').data(links);
 
     linkNodes.enter().append('path')
@@ -651,7 +660,14 @@ tsb.viz.intro = {
         this.titleScale = 0.5;
       }.bind(this));
 
-      this.subTitle
+    this.subVizButtons.selectAll('.cookieCutter')
+      .transition()
+      .delay(function(d) { return this.minimizeDelay + this.minimizeTime*0.5 + d * this.minimizeTime*0.1}.bind(this))
+      .duration(this.minimizeTime)
+      .attr('r', this.subVizBtnSize/2)
+  },
+  animateTitles: function() {
+    this.subTitle
         .transition()
         .delay(this.minimizeDelay + this.minimizeTime)
         .duration(this.minimizeTime)
@@ -662,13 +678,5 @@ tsb.viz.intro = {
         .delay(this.minimizeDelay + this.minimizeTime)
         .duration(this.minimizeTime)
         .style('opacity', 1)
-
-    this.subVizButtons.selectAll('.cookieCutter')
-      .transition()
-      .delay(function(d) { return this.minimizeDelay + this.minimizeTime*0.5 + d * this.minimizeTime*0.1}.bind(this))
-      .duration(this.minimizeTime)
-      .attr('r', this.subVizBtnSize/2)
-
-    //TODO: show buttons here
   }
 }

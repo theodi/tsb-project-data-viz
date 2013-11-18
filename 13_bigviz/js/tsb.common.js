@@ -55,3 +55,14 @@ tsb.common.log = function() {
     window.console.log.apply(window.console, arguments);
   }
 }
+
+tsb.common.isMobile = (function() {
+  var iOS = ( navigator.userAgent.match(/(iPad|iPhone|iPod)/g) ? true : false );
+  var Android = navigator.userAgent.toLowerCase().indexOf("android") > -1;
+  var WindowsMobile = ( navigator.userAgent.match(/(Windows Phone)/g) ? true : false );
+  var smallDevice = window.innerWidth <= 1024;
+  var mobile = iOS || Android || WindowsMobile || smallDevice;
+  return function() {
+    return mobile;
+  }
+})();
