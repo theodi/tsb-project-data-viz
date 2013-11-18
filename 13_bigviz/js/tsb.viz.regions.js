@@ -382,7 +382,7 @@ tsb.viz.regions = {
     })
 
     function areaBarHeight(d) {
-      return Math.min(90, Math.max(5, 20 * d.area.grantsSum/12000000));
+      return Math.min(80, Math.max(5, 20 * d.area.grantsSum/12000000));
     }
 
     var areaBars = this.svg.selectAll('.areaBar').data(barsData);
