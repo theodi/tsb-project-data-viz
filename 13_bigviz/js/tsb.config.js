@@ -97,3 +97,5 @@ tsb.config.themes = {
 }
 
 tsb.config.themes.current = tsb.config.themes.odiDark;
+
+tsb.config.currentYear = 2013; //(new Date().getFullYear());

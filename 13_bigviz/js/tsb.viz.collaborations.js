@@ -5,7 +5,7 @@ tsb.viz.collaborations = {
     this.svg = svg;
     this.w = w;
     this.h = h;
-    this.year = (new Date()).getFullYear();
+    this.year = tsb.config.currentYear;
     this.years = d3.range(this.year-4, this.year+1);
 
     this.loadData();
