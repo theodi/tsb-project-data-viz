@@ -4,3 +4,4 @@ node_modules
 09_projectEmbed/config.php
 12_academia/config.php
 13_bigviz/config.php
+.DS_Store
