@@ -45,10 +45,12 @@ tsb.SPARQLDataSource = (function() {
     var self = this;
 
     this.executeQuery(tsb.config.sparqlEndpoint, queryStr).then(function(json) {
+        console.log('SPARQLDataSource.query.loaded', json);
       var data = json.results.bindings.map(self.extractValues);
       var dataSet = tsb.DataSet.fromArray(data);
       deferred.resolve(dataSet);
     }).fail(function(err) {
+        console.log('SPARQLDataSource.query.err', err);
       deferred.reject(err);
     })
 
@@ -120,7 +122,7 @@ tsb.SPARQLDataSource = (function() {
           ?project a <http://tsb-projects.labs.theodi.org/def/Project> .
           ?project <http://www.w3.org/2000/01/rdf-schema#label> ?projectLabel .
           ?project <http://tsb-projects.labs.theodi.org/def/hasParticipant>  <http://tsb-projects.labs.theodi.org/id/organization/04190816> .
-        } 
+        }
       }
   }  GROUP BY ?project ?projectLabel
   (/)
@@ -218,8 +220,7 @@ tsb.SPARQLDataSource = (function() {
         ?project a tsb:Project . \
         ?project tsb:projectDuration ?projectDuration . \
         ?projectDuration ptime:start ?projectStartDate . \
-        ?project tsb:competition ?competition . \
-        ?competition tsb:priorityArea ?priorityArea . \
+        ?project tsb:areaBudgetHolder ?priorityArea . \
         FILTER(?projectStartDate >= \""+year+"-01-01\"^^xsd:date) . \
         FILTER(?projectStartDate <= \""+year+"-12-31\"^^xsd:date) . \
     } \
@@ -264,8 +265,7 @@ tsb.SPARQLDataSource = (function() {
           ?project tsb:supportedBy ?projectGrant . \
           ?projectGrant tsb:offerGrant ?offerGrant . \
           ?projectDuration ptime:start ?projectStartDate . \
-          ?project tsb:competition ?competition . \
-          ?competition tsb:priorityArea ?priorityArea . \
+          ?project tsb:areaBudgetHolder ?priorityArea . \
           FILTER(?projectStartDate >= \""+year+"-01-01\"^^xsd:date) . \
           FILTER(?projectStartDate <= \""+year+"-12-31\"^^xsd:date) . \
       } \

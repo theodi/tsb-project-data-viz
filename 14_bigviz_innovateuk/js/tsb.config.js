@@ -1,9 +1,10 @@
 var tsb = tsb || {};
 
+
+
 tsb.config = {};
 tsb.config.domain = 'http://tsb-projects.labs.theodi.org/';
-tsb.config.sparqlEndpoint = 'http://tsb-projects.labs.theodi.org/sparql.json';
-tsb.config.priorityAreaBase = 'http://tsb-projects.labs.theodi.org/id/budget-area/';
+tsb.config.sparqlEndpoint = 'http://innovateuk.publishmydata.com/sparql.json';
 tsb.config.ukMapSVG = 'assets/United_Kingdom_Map_-_Region.svg';
 
 tsb.config.text = {};
@@ -78,15 +79,34 @@ tsb.config.themes = {
     introVizBtnLabelColors: ['#FFF', '#FFF', '#FFF'],
     priorityAreaColorAlpha: 0.55,
     priorityAreaColor : {
-      'TRANSPO'         : '#00B7FF',
-      'TECH'            : '#D60303',
-      'MANF'            : '#FF6700',
-      'ENV_SUS'         : '#0DBC37',
-      'tsb-programmes'  : '#B13198',
-      'DIGS'            : '#EF3AAB',
-      'ENRG'            : '#F9BC26',
-      'HLTHCR'          : '#1DD3A7',
-      'SPAC'            : '#08DEF9'
+      //TODO: group new categories
+      'unknown'                        :'#00B7FF',
+      'large'                          :'#D60303',
+      'transport'                      :'#FF6700',
+      'healthcare'                     :'#0DBC37',
+      'catapult'                       :'#B13198',
+      'NREC'                           :'#EF3AAB',
+      'high-value-manufacturing'       :'#F9BC26',
+      'energy'                         :'#1DD3A7',
+      'EPES'                           :'#08DEF9',
+      'advanced-materials'             :'#00B7FF',
+      'sustainability'                 :'#D60303',
+      'buildings'                      :'#FF6700',
+      'ICT'                            :'#0DBC37',
+      'digital'                        :'#B13198',
+      'bioscience'                     :'#EF3AAB',
+      'SAF'                            :'#F9BC26',
+      'low-impact-buildings'           :'#1DD3A7',
+      'nanotechnology'                 :'#08DEF9',
+      'development'                    :'#00B7FF',
+      'urban-living'                   :'#D60303',
+      'space'                          :'#FF6700',
+      'manufacturing'                  :'#0DBC37',
+      'responsive'                     :'#B13198',
+      'TSB-programmes'                 :'#EF3AAB',
+      'KTP'                            :'#F9BC26',
+      'BISF'                           :'#1DD3A7',
+      'SBRI'                           :'#08DEF9'
     },
     priorityAreasBgColor: '#FFFFFF',
     collaborationsBgColor: '#FFFFFF',
@@ -98,4 +118,4 @@ tsb.config.themes = {
 
 tsb.config.themes.current = tsb.config.themes.odiDark;
 
-tsb.config.currentYear = 2013; //(new Date().getFullYear());
+tsb.config.currentYear = (new Date()).getFullYear() - 1;
