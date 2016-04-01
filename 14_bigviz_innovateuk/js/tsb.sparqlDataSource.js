@@ -253,6 +253,7 @@ tsb.SPARQLDataSource = (function() {
     return this.query(q);
   }
 
+  //FIXME: replaced offerGrant with offerCost to get some numbers
   SPARQLDataSource.prototype.getAreaSummaryForYear = function(year) {
     var q =" \
       PREFIX tsb: <http://tsb-projects.labs.theodi.org/def/> \
@@ -263,7 +264,7 @@ tsb.SPARQLDataSource = (function() {
           ?project a tsb:Project . \
           ?project tsb:projectDuration ?projectDuration . \
           ?project tsb:supportedBy ?projectGrant . \
-          ?projectGrant tsb:offerGrant ?offerGrant . \
+          ?projectGrant tsb:offerCost ?offerGrant . \
           ?projectDuration ptime:start ?projectStartDate . \
           ?project tsb:areaBudgetHolder ?priorityArea . \
           FILTER(?projectStartDate >= \""+year+"-01-01\"^^xsd:date) . \

@@ -45,17 +45,42 @@ tsb.config.regionsMap = {
 };
 
 
-tsb.config.priorityAreas = [ 'SPAC', 'TRANSPO', 'TECH', 'MANF', 'ENV_SUS', 'tsb-programmes', 'DIGS', 'ENRG', 'HLTHCR' ];
+tsb.config.priorityAreas = [
+    'unknown','large','transport','healthcare','catapult','NREC',
+    'high-value-manufacturing','energy','EPES','advanced-materials',
+    'sustainability','buildings','ICT','digital','bioscience','SAF',
+    'low-impact-buildings','nanotechnology','development','urban-living',
+    'space','manufacturing','responsive','TSB-programmes','KTP','BISF','SBRI'
+];
+
 tsb.config.priorityAreaLabels = {
-  'SPAC' : 'Space',
-  'TRANSPO' : 'Transport',
-  'TECH' : 'Technology',
-  'MANF' : 'Manufacturing',
-  'ENV_SUS' : 'Sustainability',
-  'tsb-programmes' : 'TSB Programmes',
-  'DIGS' : 'Digital',
-  'ENRG' : 'Energy' ,
-  'HLTHCR' : 'Healthcare'
+    'unknown':'unknown',
+    'large':'large',
+    'transport':'transport',
+    'healthcare':'healthcare',
+    'catapult':'catapult',
+    'NREC':'NREC',
+    'high-value-manufacturing':'high-value-manufacturing',
+    'energy':'energy',
+    'EPES':'EPES',
+    'advanced-materials':'advanced-materials',
+    'sustainability':'sustainability',
+    'buildings':'buildings',
+    'ICT':'ICT',
+    'digital':'digital',
+    'bioscience':'bioscience',
+    'SAF':'SAF',
+    'low-impact-buildings':'low-impact-buildings',
+    'nanotechnology':'nanotechnology',
+    'development':'development',
+    'urban-living':'urban-living',
+    'space':'space',
+    'manufacturing':'manufacturing',
+    'responsive':'responsive',
+    'TSB-programmes':'TSB-programmes',
+    'KTP':'KTP',
+    'BISF':'BISF',
+    'SBRI':'SBRI'
 };
 
 tsb.config.introVizBtnLabels = ['PRIORITY AREAS', 'REGIONS', 'COLLABORATIONS'];

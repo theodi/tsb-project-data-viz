@@ -6,7 +6,7 @@ tsb.viz.priorityAreas = {
     this.w = w;
     this.h = h;
     this.minColumnWidth = 120;
-    this.endYear = (new Date().getFullYear())+1;
+    this.endYear = (new Date().getFullYear());
     this.startYear = this.endYear-Math.ceil(this.w/this.minColumnWidth);
     this.duration = 60000;
     this.loadData();
