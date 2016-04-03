@@ -159,10 +159,11 @@ tsb.SPARQLDataSource = (function() {
     var q =" \
     PREFIX tsb: <http://tsb-projects.labs.theodi.org/def/> \
     PREFIX rdf: <http://www.w3.org/2000/01/rdf-schema#> \
+    PREFIX esize: <http://tsb-projects.labs.theodi.org/def/concept/enterprise-size/> \
     PREFIX w3: <http://www.w3.org/ns/org#> \
     PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> \
     PREFIX postcode: <http://data.ordnancesurvey.co.uk/ontology/postcode/postcode> \
-    SELECT ?org (count(?org) as ?numProjects) ?orgLabel ?orgRegion (?orgLat as ?lat) (?orgLng as ?lng) \
+    SELECT ?org (count(?org) as ?numProjects) ?orgLabel ?orgRegion (?orgLat as ?lat) (?orgLng as ?lng) ?size\
     WHERE { \
     ?org a tsb:Organization . \
     ?org rdf:label ?orgLabel . \
@@ -174,8 +175,9 @@ tsb.SPARQLDataSource = (function() {
     ?orgSite postcode: ?postcode . \
     ?postcode geo:lat ?orgLat . \
     ?postcode geo:long ?orgLng . \
+    ?org tsb:enterpriseSize ?size . \
     } \
-    GROUP BY ?org ?orgLabel ?orgRegion ?orgLat ?orgLng \
+    GROUP BY ?org ?orgLabel ?orgRegion ?orgLat ?orgLng ?size\
     OFFSET " + offset + " \
     LIMIT " + limit + " \
     ";
