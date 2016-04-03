@@ -6,7 +6,7 @@ tsb.viz.collaborations = {
     this.w = w;
     this.h = h;
     this.year = tsb.config.currentYear;
-    this.years = d3.range(this.year-4, this.year+1);
+    this.years = d3.range(tsb.config.minYear, tsb.config.maxYear + 1);
 
     this.loadData();
 

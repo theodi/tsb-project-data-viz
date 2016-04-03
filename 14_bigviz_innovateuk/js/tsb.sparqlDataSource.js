@@ -241,13 +241,12 @@ tsb.SPARQLDataSource = (function() {
         ?project a tsb:Project . \
         ?project tsb:projectDuration ?projectDuration . \
         ?projectDuration ptime:start ?projectStartDate . \
-        ?project tsb:competition ?competition . \
         ?project tsb:hasParticipant ?participant . \
         ?project rdf:label ?projectLabel . \
         ?participant rdf:label ?participantLabel . \
         ?participant tsb:enterpriseSize ?participantSize . \
         ?participantSize rdf:label ?participantSizeLabel . \
-        ?competition tsb:priorityArea ?priorityArea . \
+        ?project tsb:areaBudgetHolder ?priorityArea . \
         FILTER(?projectStartDate >= \""+year+"-01-01\"^^xsd:date) . \
         FILTER(?projectStartDate <= \""+year+"-12-31\"^^xsd:date) . \
     } \
