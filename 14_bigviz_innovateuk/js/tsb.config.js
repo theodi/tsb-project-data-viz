@@ -143,4 +143,6 @@ tsb.config.themes = {
 
 tsb.config.themes.current = tsb.config.themes.odiDark;
 
+tsb.config.minYear = 2011;
+tsb.config.maxYear = (new Date()).getFullYear();
 tsb.config.currentYear = (new Date()).getFullYear() - 1;
