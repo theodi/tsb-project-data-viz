@@ -113,7 +113,7 @@ tsb.viz.locations = {
 
      orgCircles.enter()
      .append('circle')
-        .attr('r', function(d) { return Math.max(0.5, Math.min(d.numProjects / 10, 5)) })
+        .attr('r', function(d) { return Math.max(0.5, Math.min(Math.log(d.numProjects)/1.5, 7)) })
         .attr('cx', function(d) { return remap(d.lng, -7.2, 1.76, 720, 960); })
         .attr('cy', function(d) { return remap(d.lat, 49.8, 59.2, 450, 65); })
         .attr('fill', function(d) { return d.color })
