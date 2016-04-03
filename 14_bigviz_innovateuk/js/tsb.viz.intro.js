@@ -8,7 +8,7 @@ tsb.viz.intro = {
     this.h = h;
     this.staticMode = staticMode;
     this.year = tsb.config.currentYear;
-    this.duration = 60;
+    this.duration = 5;
     this.minimizeDelay = 3000;
     this.minimizeTime = 2000;
     this.titleScale = 1;
@@ -47,7 +47,6 @@ tsb.viz.intro = {
   loadData: function() {
     tsb.common.log('tsb.intro.loading...');
     this.numProjects = 0;
-    this.displayedNumProjects = 0;
     var svg = this.svg;
     var w = this.w;
     var h = this.h;

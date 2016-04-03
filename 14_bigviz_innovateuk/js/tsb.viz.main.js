@@ -48,8 +48,6 @@ function init() {
       currentViz = tsb.viz.intro;
     }
 
-    currentViz = tsb.viz.collaborations;
-
     tsb.viz.preloader.start();
     currentViz.init(currentVizGroup, tsb.state.w, tsb.state.h, staticMode);
   }
