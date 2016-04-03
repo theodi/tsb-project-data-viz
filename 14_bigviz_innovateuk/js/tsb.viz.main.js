@@ -13,8 +13,9 @@ function init() {
 
   tsb.viz.preloader.init(svg, tsb.state.w, tsb.state.h);
 
+  //TODO: hash scene linking is not working
   function checkScene() {
-    tsb.common.log('tsb.checkScene');
+    tsb.common.log('tsb.checkScene', document.location.hash);
     if (currentViz && currentViz.close) {
       currentViz.close();
     }
@@ -43,19 +44,16 @@ function init() {
     else if (document.location.hash == '#regions') {
       currentViz = tsb.viz.regions;
     }
-    else if (document.location.hash == '#network') {
-      currentViz = tsb.viz.network;
-    }
-    else if (document.location.hash == '#collabtree') {
-      currentViz = tsb.viz.collabTree;
-    }
     else {
       currentViz = tsb.viz.intro;
     }
 
+    currentViz = tsb.viz.regions;
+
     tsb.viz.preloader.start();
     currentViz.init(currentVizGroup, tsb.state.w, tsb.state.h, staticMode);
   }
+
   checkScene();
 
   window.addEventListener('resize', function() {

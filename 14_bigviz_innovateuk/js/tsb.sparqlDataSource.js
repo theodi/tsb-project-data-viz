@@ -44,6 +44,8 @@ tsb.SPARQLDataSource = (function() {
     var deferred = Q.defer();
     var self = this;
 
+    console.log('queryStr', queryStr);
+
     this.executeQuery(tsb.config.sparqlEndpoint, queryStr).then(function(json) {
         console.log('SPARQLDataSource.query.loaded', json);
       var data = json.results.bindings.map(self.extractValues);
@@ -289,10 +291,9 @@ tsb.SPARQLDataSource = (function() {
           ?project tsb:hasParticipant ?participant . \
           ?participant w3:hasSite ?participantSite . \
           ?participantSite tsb:region <http://statistics.data.gov.uk/id/statistical-geography/" + region + "> .\
-          ?projectGrant tsb:offerGrant ?offerGrant . \
+          ?projectGrant tsb:offerCost ?offerGrant . \
           ?projectDuration ptime:start ?projectStartDate . \
-          ?project tsb:competition ?competition . \
-          ?competition tsb:priorityArea ?priorityArea . \
+          ?project tsb:areaBudgetHolder ?priorityArea . \
           FILTER(?projectStartDate >= \""+year+"-01-01\"^^xsd:date) . \
           FILTER(?projectStartDate <= \""+year+"-12-31\"^^xsd:date) . \
       } \

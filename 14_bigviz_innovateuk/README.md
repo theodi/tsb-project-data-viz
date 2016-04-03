@@ -12,4 +12,4 @@ is now
 ?project tsb:areaBudgetHolder ?priorityArea . \
 ```
 
-2. `?offerGrant` is always 0? 
+2. `?offerGrant` is always 0?  -> Using `?offerCost` for now.
