@@ -258,6 +258,7 @@ tsb.viz.regions = {
       return self.margin + (self.spacing + self.colWidth) * i;
     }
 
+
     function calcNumProjects(d, i) {
       var data = dataByRegion[i];
       var totalNumProjects = data.rows.reduce(function(prev, area) {
@@ -381,8 +382,40 @@ tsb.viz.regions = {
       })
     })
 
+    var dataByRegion = {}
+    barsData.forEach(function(barData) {
+        if (!dataByRegion[barData.regionCode]) {
+            dataByRegion[barData.regionCode] = [];
+        }
+        dataByRegion[barData.regionCode].push(barData);
+    })
+
+    var newBarsData = [];
+    for(var regionCode in dataByRegion) {
+        var regionData = dataByRegion[regionCode];
+        //sort by grants
+        regionData.sort(function(a, b) {
+            return -(a.area.grantsSum - b.area.grantsSum);
+        })
+        //take top 9 by value
+        regionData = regionData.slice(0, 9)
+        //back to original order
+        regionData.sort(function(a, b) {
+            return -(a.areaIndex - b.areaIndex);
+        })
+        regionData.forEach(function(barData, i) {
+            //compress spaces between top grants
+            barData.areaIndex = i;
+            newBarsData.push(barData)
+        })
+    }
+
+    barsData = newBarsData;
+
+
+    //FIXME: max value for areaBarHeight is hardcoded
     function areaBarHeight(d) {
-      return Math.min(80, Math.max(5, 20 * d.area.grantsSum/12000000));
+      return Math.min(80, Math.max(5, 20 * d.area.grantsSum/22000000));
     }
 
     var areaBars = this.svg.selectAll('.areaBar').data(barsData);
