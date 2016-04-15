@@ -280,7 +280,7 @@ tsb.viz.collaborations = {
       })
 
       rootNodeLabel.on('click', function(d) {
-        window.open(d.id.replace('/id/', '/doc/'));
+        window.open(tsb.config.domain + 'resource?uri=' + d.id);
       })
 
       rootNodeCircle
@@ -335,7 +335,7 @@ tsb.viz.collaborations = {
       })
 
       projectNodes.on('click', function(d) {
-        window.open(d.id.replace('/id/', '/doc/'));
+        window.open(tsb.config.domain + 'resource?uri=' + d.id);
       })
 
       //COLLABORATORS
