@@ -3,7 +3,7 @@ var tsb = tsb || {};
 
 
 tsb.config = {};
-tsb.config.domain = 'http://tsb-projects.labs.theodi.org/';
+tsb.config.domain = 'http://innovateuk.publishmydata.com/';
 tsb.config.sparqlEndpoint = 'http://innovateuk.publishmydata.com/sparql.json';
 tsb.config.ukMapSVG = 'assets/United_Kingdom_Map_-_Region.svg';
 
